@@ -1,0 +1,8 @@
+.panel{
+    z-index: 99;
+    position: absolute;
+    width: 25em;
+    margin-left: 78%;
+    height: 60em;
+    background-color: rgb(238, 238, 238);
+}

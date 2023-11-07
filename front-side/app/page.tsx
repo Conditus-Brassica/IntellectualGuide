@@ -14,7 +14,7 @@ export default function Home() {
         <div className={styles.welcome_block}>
           <h1>✈TRAVELER.AI</h1>
           <h3>Ваш персональный гид по достопримечательностям Беларуси</h3>
-          <TheButton title={'Поехали!'} href={'/route'}/>
+          <TheButton title={'Поехали!'} href={'/map_route'}/>
         </div>
       </main>
     </>

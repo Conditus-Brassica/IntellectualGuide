@@ -2,6 +2,7 @@
     border-radius: 0em 0em 40em 0em;
     background-color: #001A76;
     position: absolute;
+    z-index: 100;
 }
 
 .menu{
