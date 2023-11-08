@@ -4,12 +4,23 @@ import { useEffect } from 'react';
 import L from 'leaflet';
 import styles from '@/styles/map.module.css'
 
-async function fetchPoints() {
+async function getPoints() {
   try {
     const response = await fetch('https://example.com/data');
     const data = await response.json();
     console.log(data);
-    
+    //Кастомные интерактивные маркеры
+  } catch (error) {
+    alert("Что-то пошло не так! Проверьте соединение с интернетом!");
+  }
+}
+
+async function getPointInfo() {
+  try {
+    const response = await fetch('https://example.com/data');
+    const data = await response.json();
+    console.log(data);
+    //отрисовка карточки достопримечательности
   } catch (error) {
     alert("Что-то пошло не так! Проверьте соединение с интернетом!");
   }
@@ -55,10 +66,8 @@ const TheMap = () => {
                 ]
               ]
             }
-          }
-        ]
-      }; 
-
+          }]}; 
+          
       var BelarusLayer: any = L.geoJSON(BelarusGeoJSON);
       map.setView(BelarusLayer.getBounds().getCenter(), 10);
       map.setMaxBounds(BelarusLayer.getBounds())      
@@ -66,12 +75,12 @@ const TheMap = () => {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       }).addTo(map);
       
-      map.on('click', function(e) {
-        var lat = e.latlng.lat;
-        var lng = e.latlng.lng;
-        var marker = L.marker([lat, lng]).addTo(map);
-        console.log('Координаты клика:', lat, lng);
-      });
+      // map.on('click', function(e) {
+      //   var lat = e.latlng.lat;
+      //   var lng = e.latlng.lng;
+      //   var marker = L.marker([lat, lng]).addTo(map);
+      //   console.log('Координаты клика:', lat, lng);
+      // });
   
       return () => {
         map.remove(); // Очистка карты при размонтировании компонента

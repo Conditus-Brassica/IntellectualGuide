@@ -1,7 +1,6 @@
 import Head from "next/head";
 import styles from "@/styles/main_page.module.css";
 import Map from "@/components/TheMap";
-import "leaflet/dist/leaflet.module.css"
 import TheSidePanel from "@/components/TheSidePanel";
 
 export default function MapRoute() {
