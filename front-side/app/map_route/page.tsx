@@ -1,9 +1,18 @@
+'use client'
+
 import Head from "next/head";
 import styles from "@/styles/main_page.module.css";
 import Map from "@/components/TheMap";
+
 import TheSidePanel from "@/components/TheSidePanel";
+import { useState } from "react";
+
 
 export default function MapRoute() {
+  const [mapData, setMapData] = useState({
+    markers: {}
+  });
+
   return (
     <>
       <Head>
@@ -13,8 +22,8 @@ export default function MapRoute() {
       </Head>
       <main className={styles.main_page}>
         <div>
-          <TheSidePanel/> 
-          <Map/>
+          <TheSidePanel mapData={mapData} setMapData={setMapData}/>
+          <Map mapData={mapData} setMapData={setMapData}/> 
         </div>
       </main>
     </>

@@ -2,11 +2,18 @@
     display: inline-block;
     height: min-content;
 }
+
 .content{
     display: flex;
     align-items: center;
     flex-direction: column;
 }
+
+
+.content:hover{
+    cursor: pointer;
+}
+
 .button img{
     background: #000;
     border-radius: 100%;

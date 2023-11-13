@@ -4,7 +4,7 @@
     width: 21em;
     padding: 2em;
     margin-left: 78%;
-    height: 60em;
+    height: 56em;
     background-color: rgb(238, 238, 238);
 }
 
@@ -14,6 +14,7 @@
     /* justify-content:; */
     flex-wrap: wrap;
 }
+
 
 .search{
     margin-bottom: 2em;

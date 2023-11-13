@@ -1,4 +1,5 @@
 .map {
-    height: 80em;
+    height: 100vh; /* 100% высоты окна браузера */
+    width: 100vw;
     z-index: 0;
 }
