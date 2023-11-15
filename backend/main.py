@@ -24,13 +24,13 @@ class RequestAgent:
             Method gets the request for receiving list
             of landmarks in a specific sector.
             Returns a response of json list of landmarks and it's data.
-            :return: json response
+            return: json response
             """
             received = request.args
             gotten_json = imd.to_dict(received, flat=False)
 
             if gotten_json is None:
-                self.__app__.logger.error("get_sector_points() returned None")
+                self.__app__.logger.error("get_sector_points() returned jsonify([])")
                 return jsonify([])
 
             if not self.validate_sector_schema_receive(self, gotten_json):
@@ -50,22 +50,54 @@ class RequestAgent:
 
             return jsonify(sending_json)
 
-        @self.__app__.get('/api/v1/sector/points', method=['GET'])
-        def get_rout_points():
+        @self.__app__.get('/api/v1/map/point', methods=['GET'])
+        def get_point():
             """
+            Method for getting info about one landmark.
+            return: jsonify response
+            """
+            received = request.args
+            gotten_json = imd.to_dict(received, flat=False)
 
-            :return: json response
+            if gotten_json is None:
+                self.__app__.logger.error("get_point() returned jsonify([])")
+                return jsonify([])
+
+            # TODO: there's must be a function of receiving json of about one point
+            rout_points = {"A": "b"}
+
+            if not self.validate_point_schema_send(self, rout_points):
+                return jsonify([])
+
+            return jsonify(rout_points)
+
+        @self.__app__.get('/api/v1/map/route', methods=['GET'])
+        def get_rout():
             """
+            Method for getting list of routing points.
+            return: jsonify response
+            """
+            received = request.args
+            gotten_json = imd.to_dict(received, flat=False)
+
+            if gotten_json is None:
+                self.__app__.logger.error("get_point() returned jsonify([])")
+                return jsonify([])
+
             # TODO: there's must be a function of receiving json of route points
             rout_points = {"A": "b"}
 
-            if not self.validate_rout_points(self, rout_points):
+            if not self.validate_rout_points_schema_send(self, rout_points):
                 return jsonify([])
 
             return jsonify(rout_points)
 
     @staticmethod
     def validate_sector_schema_receive(self, gotten_json):
+        """
+        Validate sector received json.
+        return bool
+        """
         print(gotten_json)
         try:
             validate(gotten_json, schemas.sector_schema_receive)
@@ -76,6 +108,10 @@ class RequestAgent:
 
     @staticmethod
     def validate_sector_schema_send(self, sending_json):
+        """
+        Validate sector sent json.
+        return bool
+        """
         try:
             validate(sending_json, schemas.sector_send_schema)
             return True
@@ -84,12 +120,28 @@ class RequestAgent:
             return False
 
     @staticmethod
-    def validate_rout_points(self, sending_json):
+    def validate_rout_points_schema_send(self, sending_json):
+        """
+        Validate rout points send json.
+        """
         try:
             validate(sending_json, schemas.send_rout_schema)
             return True
         except ValidationError:
-            self.__app__.logger.error("rout points", ValidationError)
+            self.__app__.logger.error("rout points send", ValidationError)
+            return False
+
+    @staticmethod
+    def validate_point_schema_send(self, sending_json):
+        """
+        Validate point send json.
+        return: bool
+        """
+        try:
+            validate(sending_json, schemas.send_point)
+            return True
+        except ValidationError:
+            self.__app__.logger.error("point send", ValidationError)
             return False
 
 

@@ -18,32 +18,32 @@ Schema for sending sector request to client.
 """
 sector_send_schema = {
     "type": "object",
-    "properties": {"points":
-        {
-            "type": "array",
-            "items":
-                {
-                    "type": "object",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "lat": {
-                            "type": "number"
-                        },
-                        "lng": {
-                            "type": "number"
-                        },
-                        "cat": {
-                            "type": "string"
-                        }
+    "properties": {"points": {
+        "type": "array",
+        "items":
+            {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
                     },
-                    "required": ["name", "lat", "lng", "cat"],
-                    "additionalProperties": False
-                }
-        }, "required": ["points"],
+                    "lat": {
+                        "type": "number"
+                    },
+                    "lng": {
+                        "type": "number"
+                    },
+                    "cat": {
+                        "type": "string"
+                    }
+                },
+                "required": ["name", "lat", "lng", "cat"],
+                "additionalProperties": False
+            }
+    }, "required": ["points"],
         "additionalProperties": False
-    }}
+    }
+}
 
 """
 Schema for checking sending route points.
@@ -64,4 +64,19 @@ send_rout_schema = {
             "required": ["lat", "lng"],
             "additionalProperties": False
         }
+}
+
+"""
+Schema for sending one point.
+"""
+send_point = {
+    "type": "object",
+    "properties": {
+        "name": "string",
+        "lat": "number",
+        "lng": "number",
+        "cat": "string"
+    },
+    "required": ["name", "lat", "lng", "cat"],
+    "additionalProperties": False
 }
