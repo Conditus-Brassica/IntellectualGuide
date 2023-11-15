@@ -163,8 +163,8 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, mapData }) => {
 
     //обработка перемещения карты
     const onMapMoveEnd = function () {
-      var left_top = (map.getBounds().getNorthWest().lat, map.getBounds().getNorthWest().lng)
-      var right_bottom = (map.getBounds().getSouthEast().lat, map.getBounds().getSouthEast().lng)
+      var left_top = [map.getBounds().getNorthWest().lat, map.getBounds().getNorthWest().lng]
+      var right_bottom = [map.getBounds().getSouthEast().lat, map.getBounds().getSouthEast().lng]
       getPoints(left_top, right_bottom)
     };
     onMapMoveEnd();
