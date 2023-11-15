@@ -1,73 +1,54 @@
-import json
-
 """
 Schema for checking sectors from client.
 """
-sector_schema_receive = '''{
+sector_schema_receive = {
     "type": "object",
     "properties": {
-        "TL": {
-            "type": "object",
-            "properties": {
-                "lat": {
-                    "type": "number"
-                },
-                "lng": {
-                    "type": "number"
-                }
-            },
-            "required": ["lat", "lng"]
-        },
-        "BR": {
-            "type": "object",
-            "properties": {
-                "lat": {
-                    "type": "number"
-                },
-                "lng": {
-                    "type": "number"
-                }
-            },
-            "required": ["lat", "lng"],
-            "additionalProperties": False
-        }
+        "tl_lat": "number",
+        "tl_lng": "number",
+        "br_lat": "number",
+        "br_lng": "number"
     },
-    "required": ["TL", "BR"],
+    "required": ["tl_lat", "tl_lng", "br_lat", "br_lng"],
     "additionalProperties": False
-}'''
+}
 
 """
 Schema for sending sector request to client.
 """
-sector_send_schema = '''{
-    "type": "array",
-    "items":
+sector_send_schema = {
+    "type": "object",
+    "properties": {"points":
         {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "lat": {
-                    "type": "number"
-                },
-                "lng": {
-                    "type": "number"
-                },
-                "cat": {
-                    "type": "string"
+            "type": "array",
+            "items":
+                {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "lat": {
+                            "type": "number"
+                        },
+                        "lng": {
+                            "type": "number"
+                        },
+                        "cat": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["name", "lat", "lng", "cat"],
+                    "additionalProperties": False
                 }
-            },
-            "required": ["name", "lat", "lng", "cat"],
-            "additionalProperties": False
-        }
-}'''
-
+        }, "required": ["points"],
+        "additionalProperties": False
+    }}
 
 """
 Schema for checking sending route points.
 """
-send_rout_schema = ''''{
+send_rout_schema = {
     "type": "array",
     "items":
         {
@@ -81,6 +62,6 @@ send_rout_schema = ''''{
                 },
             },
             "required": ["lat", "lng"],
-            "additionalProperties": false
+            "additionalProperties": False
         }
-}'''
+}
