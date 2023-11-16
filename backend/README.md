@@ -32,4 +32,6 @@ Backend needs the following packages:
 pip install flask
 pip install jsonshema
 pip install Werkzeug
+pip install flask_cors
+pip install osmnx
 ```
