@@ -27,8 +27,9 @@ class RequestAgent:
             return: json response
             """
             received = request.args
-            gotten_json = imd.to_dict(received, flat=False)
-
+            print(received)
+            gotten_json = imd.to_dict(received)
+            print(gotten_json)
             if gotten_json is None:
                 self.__app__.logger.error("get_sector_points() returned jsonify([])")
                 return jsonify([])
@@ -50,7 +51,7 @@ class RequestAgent:
 
             return jsonify(sending_json)
 
-        @self.__app__.get('/api/v1/map/point', methods=['GET'])
+        @self.__app__.route('/api/v1/map/point', methods=['GET'])
         def get_point():
             """
             Method for getting info about one landmark.
@@ -71,7 +72,7 @@ class RequestAgent:
 
             return jsonify(rout_points)
 
-        @self.__app__.get('/api/v1/map/route', methods=['GET'])
+        @self.__app__.route('/api/v1/map/route', methods=['GET'])
         def get_rout():
             """
             Method for getting list of routing points.
