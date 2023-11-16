@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from jsonschema import validate, ValidationError
 from werkzeug.datastructures import ImmutableMultiDict as imd
+import json
 
 import backend.agents.json_schemas as schemas
 
@@ -27,9 +28,12 @@ class RequestAgent:
             return: json response
             """
             received = request.args
-            print(received)
             gotten_json = imd.to_dict(received)
-            print(gotten_json)
+
+            keys = gotten_json.keys()
+            for i in keys:
+                gotten_json[i] = float(gotten_json[i])
+
             if gotten_json is None:
                 self.__app__.logger.error("get_sector_points() returned jsonify([])")
                 return jsonify([])
@@ -37,12 +41,12 @@ class RequestAgent:
             if not self.validate_sector_schema_receive(self, gotten_json):
                 return jsonify([])
 
-            # # TODO: there's must be a function of receiving json from lower agents
+            # TODO: there's must be a function of receiving json from lower agents
 
-            sending_json = {"a": "b"}
-
-            if not self.validate_sector_schema_send(self, sending_json):
-                return jsonify([])
+            # sending_json = {"a": "b"}
+            #
+            # if not self.validate_sector_schema_send(self, sending_json):
+            #     return jsonify([])
 
             sending_json = {"points": [{"name": "name1",
                                         "lat": 54.098865472796994,
@@ -58,7 +62,7 @@ class RequestAgent:
             return: jsonify response
             """
             received = request.args
-            gotten_json = imd.to_dict(received, flat=False)
+            gotten_json = imd.to_dict(received)
 
             if gotten_json is None:
                 self.__app__.logger.error("get_point() returned jsonify([])")
@@ -79,7 +83,7 @@ class RequestAgent:
             return: jsonify response
             """
             received = request.args
-            gotten_json = imd.to_dict(received, flat=False)
+            gotten_json = imd.to_dict(received)
 
             if gotten_json is None:
                 self.__app__.logger.error("get_point() returned jsonify([])")
@@ -99,12 +103,11 @@ class RequestAgent:
         Validate sector received json.
         return bool
         """
-        print(gotten_json)
         try:
             validate(gotten_json, schemas.sector_schema_receive)
             return True
         except ValidationError:
-            self.__app__.logger.error("sector receive", ValidationError)
+            self.__app__.logger.error("sector receive error")
             return False
 
     @staticmethod

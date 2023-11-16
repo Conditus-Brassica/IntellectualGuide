@@ -4,10 +4,10 @@ Schema for checking sectors from client.
 sector_schema_receive = {
     "type": "object",
     "properties": {
-        "tl_lat": "number",
-        "tl_lng": "number",
-        "br_lat": "number",
-        "br_lng": "number"
+        "tl_lat": {"type": "number"},
+        "tl_lng": {"type": "number"},
+        "br_lat": {"type": "number"},
+        "br_lng": {"type": "number"}
     },
     "required": ["tl_lat", "tl_lng", "br_lat", "br_lng"],
     "additionalProperties": False

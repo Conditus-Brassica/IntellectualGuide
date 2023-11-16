@@ -120,8 +120,7 @@ const TheMap: React.FC<TheMapInterface> = ({setMapData, mapData}) => {
 
         const getPoints = async function (tl: any, br: any) {
             try {
-                // put your host instead of `example`
-                const response = await fetch(`http://example/api/v1/sector/points?tl_lat=${tl}&tl_lng=${tl}br_lat=${br}&br_lng=${br}`);
+                const response = await fetch("http://127.0.0.1:4444/api/v1/sector/points?tl_lat=" + tl[0] + "&tl_lng=" + tl[1] + "&br_lat="+br[0]+"&br_lng="+br[1]);
                 const data = await response.json();
                 console.log(data);
                 // const data = {
