@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from jsonschema import validate, ValidationError
+from jsonschema import validate, ValidationError, SchemaError
 from werkzeug.datastructures import ImmutableMultiDict as imd
-import json
+import werkzeug.exceptions as werr
 
 import backend.agents.json_schemas as schemas
 
@@ -19,7 +19,7 @@ class RequestAgent:
         self.__handle__()
 
     def __handle__(self):
-        @self.__app__.route('/api/v1/sector/points', methods=['GET'])
+        @self.__app__.route("/api/v1/sector/points", methods=["GET"])
         def get_sector_points():
             """
             Method gets the request for receiving list
@@ -35,21 +35,24 @@ class RequestAgent:
                 for i in keys:
                     gotten_json[i] = float(gotten_json[i])
             except ValueError:
-                return jsonify([])
+                return werr.BadRequest()
 
             if gotten_json is None:
-                self.__app__.logger.error("get_sector_points() returned jsonify([])")
-                return jsonify([])
+                self.__app__.logger.error("get_sector_points() returned BadRequest")
+                return werr.BadRequest()
 
             if not self.__validate_sector_schema_receive__(self, gotten_json):
-                return jsonify([])
+                self.__app__.logger.error("get_sector_points() returned BadRequest")
+                return werr.BadRequest()
 
-            # TODO: there's must be a function of receiving json from lower agents
+            # TODO: there"s must be a function of receiving json from lower agents
 
             # sending_json = {"a": "b"}
-            #
-            # if not self.validate_sector_schema_send(self, sending_json):
-            #     return jsonify([])
+            # try:
+            #     self.__validate_sector_schema_send__(self, sending_json)
+            # except SchemaError:
+            #     self.__app__.logger.error("get_sector_points() returned NotFound")
+            #     return werr.NotFound()
 
             sending_json = {"points": [{"name": "name1",
                                         "lat": 54.098865472796994,
@@ -58,7 +61,7 @@ class RequestAgent:
 
             return jsonify(sending_json)
 
-        @self.__app__.route('/api/v1/map/point', methods=['GET'])
+        @self.__app__.route("/api/v1/map/point", methods=["GET"])
         def get_point():
             """
             Method for getting info about one landmark.
@@ -68,18 +71,19 @@ class RequestAgent:
             gotten_json = imd.to_dict(received)
 
             if gotten_json is None:
-                self.__app__.logger.error("get_point() returned jsonify([])")
-                return jsonify([])
+                self.__app__.logger.error("get_point() returned BadRequest")
+                return werr.BadRequest()
 
-            # TODO: there's must be a function of receiving json of about one point
+            # TODO: there"s must be a function of receiving json of about one point
             rout_points = {"A": "b"}
 
             if not self.__validate_point_schema_send__(self, rout_points):
-                return jsonify([])
+                self.__app__.logger.error("get_point() returned NotFound")
+                return werr.NotFound()
 
             return jsonify(rout_points)
 
-        @self.__app__.route('/api/v1/map/route', methods=['GET'])
+        @self.__app__.route("/api/v1/map/route", methods=["GET"])
         def get_rout():
             """
             Method for getting list of routing points.
@@ -89,14 +93,15 @@ class RequestAgent:
             gotten_json = imd.to_dict(received)
 
             if gotten_json is None:
-                self.__app__.logger.error("get_point() returned jsonify([])")
-                return jsonify([])
+                self.__app__.logger.error("get_rout() returned BadRequest")
+                return werr.BadRequest()
 
-            # TODO: there's must be a function of receiving json of route points
+            # TODO: there"s must be a function of receiving json of route points
             rout_points = {"A": "b"}
 
             if not self.__validate_rout_points_schema_send__(self, rout_points):
-                return jsonify([])
+                self.__app__.logger.error("get_rout() returned NotFound")
+                return werr.NotFound()
 
             return jsonify(rout_points)
 
@@ -156,4 +161,4 @@ if __name__ == "__main__":
     app = Flask(__name__)
     cors = CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
     request_agent = RequestAgent(app)
-    app.run(host='0.0.0.0', port=4444, debug=True)
+    app.run(host="0.0.0.0", port=4444, debug=True)
