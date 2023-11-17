@@ -76,8 +76,9 @@ class RequestAgent:
 
             # TODO: there"s must be a function of receiving json of about one point
             rout_points = {"A": "b"}
-
-            if not self.__validate_point_schema_send__(self, rout_points):
+            try:
+                self.__validate_point_schema_send__(self, rout_points)
+            except SchemaError:
                 self.__app__.logger.error("get_point() returned NotFound")
                 return werr.NotFound()
 
@@ -99,7 +100,9 @@ class RequestAgent:
             # TODO: there"s must be a function of receiving json of route points
             rout_points = {"A": "b"}
 
-            if not self.__validate_rout_points_schema_send__(self, rout_points):
+            try:
+                self.__validate_rout_points_schema_send__(self, rout_points)
+            except SchemaError:
                 self.__app__.logger.error("get_rout() returned NotFound")
                 return werr.NotFound()
 
