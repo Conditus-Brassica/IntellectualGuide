@@ -16,9 +16,9 @@ class RequestAgent:
 
     def __init__(self, flask_app: Flask):
         self.__app__ = flask_app
-        self.handle()
+        self.__handle__()
 
-    def handle(self):
+    def __handle__(self):
         @self.__app__.route('/api/v1/sector/points', methods=['GET'])
         def get_sector_points():
             """
@@ -31,14 +31,17 @@ class RequestAgent:
             gotten_json = imd.to_dict(received)
 
             keys = gotten_json.keys()
-            for i in keys:
-                gotten_json[i] = float(gotten_json[i])
+            try:
+                for i in keys:
+                    gotten_json[i] = float(gotten_json[i])
+            except ValueError:
+                return jsonify([])
 
             if gotten_json is None:
                 self.__app__.logger.error("get_sector_points() returned jsonify([])")
                 return jsonify([])
 
-            if not self.validate_sector_schema_receive(self, gotten_json):
+            if not self.__validate_sector_schema_receive__(self, gotten_json):
                 return jsonify([])
 
             # TODO: there's must be a function of receiving json from lower agents
@@ -71,7 +74,7 @@ class RequestAgent:
             # TODO: there's must be a function of receiving json of about one point
             rout_points = {"A": "b"}
 
-            if not self.validate_point_schema_send(self, rout_points):
+            if not self.__validate_point_schema_send__(self, rout_points):
                 return jsonify([])
 
             return jsonify(rout_points)
@@ -92,13 +95,13 @@ class RequestAgent:
             # TODO: there's must be a function of receiving json of route points
             rout_points = {"A": "b"}
 
-            if not self.validate_rout_points_schema_send(self, rout_points):
+            if not self.__validate_rout_points_schema_send__(self, rout_points):
                 return jsonify([])
 
             return jsonify(rout_points)
 
     @staticmethod
-    def validate_sector_schema_receive(self, gotten_json):
+    def __validate_sector_schema_receive__(self, gotten_json):
         """
         Validate sector received json.
         return bool
@@ -111,7 +114,7 @@ class RequestAgent:
             return False
 
     @staticmethod
-    def validate_sector_schema_send(self, sending_json):
+    def __validate_sector_schema_send__(self, sending_json):
         """
         Validate sector sent json.
         return bool
@@ -124,7 +127,7 @@ class RequestAgent:
             return False
 
     @staticmethod
-    def validate_rout_points_schema_send(self, sending_json):
+    def __validate_rout_points_schema_send__(self, sending_json):
         """
         Validate rout points send json.
         """
@@ -136,7 +139,7 @@ class RequestAgent:
             return False
 
     @staticmethod
-    def validate_point_schema_send(self, sending_json):
+    def __validate_point_schema_send__(self, sending_json):
         """
         Validate point send json.
         return: bool
