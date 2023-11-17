@@ -88,25 +88,19 @@ const TheMap: React.FC<TheMapInterface> = ({setMapData, mapData}) => {
                 L.icon({
                     iconUrl: 'green_icon.svg',
 
-                    iconSize: [30, 87],
-                    iconAnchor: [22, 94],
-                    popupAnchor: [-3, -76]
+                    iconSize: [30, 87]
                 }),
             "restaurant":
                 L.icon({
                     iconUrl: 'blue_icon.svg',
 
-                    iconSize: [30, 87],
-                    iconAnchor: [22, 94],
-                    popupAnchor: [-3, -76]
+                    iconSize: [30, 87]
                 }),
             "river":
                 L.icon({
                     iconUrl: 'red_icon.svg',
 
-                    iconSize: [30, 87],
-                    iconAnchor: [22, 94],
-                    popupAnchor: [-3, -76]
+                    iconSize: [30, 87]
                 })
         };
 
