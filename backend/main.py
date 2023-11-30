@@ -31,6 +31,8 @@ class RequestAgent:
             gotten_json = imd.to_dict(received)
 
             keys = gotten_json.keys()
+
+            print(wer_exp.BadRequest())
             try:
                 for i in keys:
                     gotten_json[i] = float(gotten_json[i])
@@ -39,11 +41,11 @@ class RequestAgent:
 
             if gotten_json is None:
                 self.__app__.logger.error("get_sector_points() returned BadRequest")
-                return wer_exp.BadRequest()
+                return wer_exp.BadRequest().code
 
             if not self.__validate_sector_schema_receive__(self, gotten_json):
                 self.__app__.logger.error("get_sector_points() returned BadRequest")
-                return wer_exp.BadRequest()
+                return wer_exp.BadRequest().code
 
             # TODO: there"s must be a function of receiving json from lower agents
 
