@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 *.idea
 venv
 agents/cache
-=======
-venv
+
 *.cypher
-*.idea
->>>>>>> 3d3cf9c (upload bases of command)
+
