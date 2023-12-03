@@ -20,7 +20,7 @@ class Reader(PureReader):
     """
 
     @staticmethod
-    async def _read_categories_of_region(tx, region_name: str):
+    async def _read_categories_of_region(tx, region_name: str, optional_limit: int = None):
         """Transaction handler for read_categories_of_region"""
         result = await tx.run(
             """
@@ -44,7 +44,10 @@ class Reader(PureReader):
             region_name=region_name
         )
         try:
-            result_values = [record.data("category", "located_at") async for record in result]
+            if optional_limit:
+                result_values = [record.data("category", "located_at") for record in await result.fetch(optional_limit)]
+            else:
+                result_values = [record.data("category", "located_at") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -52,13 +55,13 @@ class Reader(PureReader):
         return result_values
 
     @staticmethod
-    async def read_categories_of_region(session: AsyncSession, region_name: str):
-        result = await session.execute_read(Reader._read_categories_of_region, region_name)
+    async def read_categories_of_region(session: AsyncSession, region_name: str, optional_limit: int = None):
+        result = await session.execute_read(Reader._read_categories_of_region, region_name, optional_limit)
         await logger.info(f"method:\tread_categories_of_region,\nresult:\t{result}")
         return result
 
     @staticmethod
-    async def _read_landmarks_in_map_sectors(tx, sector_names: List[str]):
+    async def _read_landmarks_in_map_sectors(tx, sector_names: List[str], optional_limit: int = None):
         """Transaction handler for read_categories_of_region"""
         result = await tx.run(
             """
@@ -78,7 +81,10 @@ class Reader(PureReader):
             sector_names=sector_names
         )
         try:
-            result_values = [record.data("landmark", "sector") async for record in result]
+            if optional_limit:
+                result_values = [record.data("landmark", "sector") for record in await result.fetch(optional_limit)]
+            else:
+                result_values = [record.data("landmark", "sector") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -87,13 +93,13 @@ class Reader(PureReader):
         return result_values
 
     @staticmethod
-    async def read_landmarks_in_map_sectors(session: AsyncSession, sector_names: List[str]):
-        result = await session.execute_read(Reader._read_landmarks_in_map_sectors, sector_names)
+    async def read_landmarks_in_map_sectors(session: AsyncSession, sector_names: List[str], optional_limit: int = None):
+        result = await session.execute_read(Reader._read_landmarks_in_map_sectors, sector_names, optional_limit)
         await logger.info(f"method:\tread_landmarks_in_map_sectors,\nresult:\t{result}")
         return result
 
     @staticmethod
-    async def _read_landmarks_by_coordinates(tx, coordinates: List[Dict[str, float]]):
+    async def _read_landmarks_by_coordinates(tx, coordinates: List[Dict[str, float]], optional_limit: int = None):
         """Transaction handler for read_landmarks_by_coordinates"""
         result = await tx.run(
             """
@@ -107,7 +113,10 @@ class Reader(PureReader):
             coordinates=coordinates
         )
         try:
-            result_values = [record.data("landmark") async for record in result]
+            if optional_limit:
+                result_values = [record.data("landmark") for record in await result.fetch(optional_limit)]
+            else:
+                result_values = [record.data("landmark") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -116,13 +125,15 @@ class Reader(PureReader):
         return result_values
 
     @staticmethod
-    async def read_landmarks_by_coordinates(session: AsyncSession, coordinates: List[Dict[str, float]]):
-        result = await session.execute_read(Reader._read_landmarks_by_coordinates, coordinates)
+    async def read_landmarks_by_coordinates(
+            session: AsyncSession, coordinates: List[Dict[str, float]], optional_limit: int = None
+    ):
+        result = await session.execute_read(Reader._read_landmarks_by_coordinates, coordinates, optional_limit)
         await logger.info(f"method:\tread_landmarks_by_coordinates,\nresult:\t{result}")
         return result
 
     @staticmethod
-    async def _read_landmarks_refers_to_categories(tx, categories_names: List[str]):
+    async def _read_landmarks_refers_to_categories(tx, categories_names: List[str], optional_limit: int = None):
         """Transaction handler for read_landmarks_refers_to_categories"""
         result = await tx.run(
             """
@@ -142,7 +153,10 @@ class Reader(PureReader):
             categories_names=categories_names
         )
         try:
-            result_values = [record.data("landmark", "category") async for record in result]
+            if optional_limit:
+                result_values = [record.data("landmark", "category") for record in await result.fetch(optional_limit)]
+            else:
+                result_values = [record.data("landmark", "category") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -151,13 +165,17 @@ class Reader(PureReader):
         return result_values
 
     @staticmethod
-    async def read_landmarks_refers_to_categories(session: AsyncSession, categories_names: List[str]):
-        result = await session.execute_read(Reader._read_landmarks_refers_to_categories, categories_names)
+    async def read_landmarks_refers_to_categories(
+            session: AsyncSession, categories_names: List[str], optional_limit: int = None
+    ):
+        result = await session.execute_read(
+            Reader._read_landmarks_refers_to_categories, categories_names, optional_limit
+        )
         await logger.info(f"method:\read_landmarks_refers_to_categories,\nresult:\t{result}")
         return result
 
     @staticmethod
-    async def _read_landmarks_by_names(tx, landmark_names: List[str]):
+    async def _read_landmarks_by_names(tx, landmark_names: List[str], optional_limit: int = None):
         """Transaction handler for read_landmarks_by_names"""
         result = await tx.run(
             """
@@ -175,7 +193,10 @@ class Reader(PureReader):
             landmark_names=landmark_names
         )
         try:
-            result_values = [record.data("landmark") async for record in result]
+            if optional_limit:
+                result_values = [record.data("landmark") for record in await result.fetch(optional_limit)]
+            else:
+                result_values = [record.data("landmark") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -184,13 +205,15 @@ class Reader(PureReader):
         return result_values
 
     @staticmethod
-    async def read_landmarks_by_names(session: AsyncSession, landmark_names: List[str]):
-        result = await session.execute_read(Reader._read_landmarks_by_names, landmark_names)
+    async def read_landmarks_by_names(session: AsyncSession, landmark_names: List[str], optional_limit: int = None):
+        result = await session.execute_read(Reader._read_landmarks_by_names, landmark_names, optional_limit)
         await logger.info(f"method:\tread_landmarks_by_names,\nresult:\t{result}")
         return result
 
     @staticmethod
-    async def _read_landmarks_of_categories_in_region(tx, region_name: str, categories_names: List[str]):
+    async def _read_landmarks_of_categories_in_region(
+            tx, region_name: str, categories_names: List[str], optional_limit
+    ):
         """Transaction handler for read_landmarks_of_categories_in_region"""
         result = await tx.run(
             """
@@ -222,7 +245,12 @@ class Reader(PureReader):
             categories_names=categories_names
         )
         try:
-            result_values = [record.data("landmark", "located_at", "category") async for record in result]
+            if optional_limit:
+                result_values = [
+                    record.data("landmark", "located_at", "category") for record in await result.fetch(optional_limit)
+                ]
+            else:
+                result_values = [record.data("landmark", "located_at", "category") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -232,10 +260,10 @@ class Reader(PureReader):
 
     @staticmethod
     async def read_landmarks_of_categories_in_region(
-            session: AsyncSession, region_name: str, categories_names: List[str]
+            session: AsyncSession, region_name: str, categories_names: List[str], optional_limit: int = None
     ):
         result = await session.execute_read(
-            Reader._read_landmarks_of_categories_in_region, region_name, categories_names
+            Reader._read_landmarks_of_categories_in_region, region_name, categories_names, optional_limit
         )
         await logger.info(f"method:\tread_landmarks_of_categories_in_region,\nresult:\t{result}")
         return result
@@ -323,7 +351,7 @@ class Reader(PureReader):
         return result
 
     @staticmethod
-    async def _read_landmarks_by_region(tx, region_name: str):
+    async def _read_landmarks_by_region(tx, region_name: str, optional_limit: int = None):
         """Transaction handler for read_landmarks_by_region"""
         result = await tx.run(
             """
@@ -343,7 +371,10 @@ class Reader(PureReader):
             region_name=region_name
         )
         try:
-            result_values = [record.data("landmark", "located_at") async for record in result]
+            if optional_limit:
+                result_values = [record.data("landmark", "located_at") for record in await result.fetch(optional_limit)]
+            else:
+                result_values = [record.data("landmark", "located_at") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -352,7 +383,7 @@ class Reader(PureReader):
         return result_values
 
     @staticmethod
-    async def read_landmarks_by_region(session: AsyncSession, region_name: str):
-        result = await session.execute_read(Reader._read_landmarks_by_region, region_name)
+    async def read_landmarks_by_region(session: AsyncSession, region_name: str, optional_limit: int = None):
+        result = await session.execute_read(Reader._read_landmarks_by_region, region_name, optional_limit)
         await logger.info(f"method:\tread_landmarks_by_region,\nresult:\t{result}")
         return result

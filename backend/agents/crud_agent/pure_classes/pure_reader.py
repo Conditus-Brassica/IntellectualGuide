@@ -13,13 +13,14 @@ class PureReader(ABC):
 
     @staticmethod
     @abstractmethod
-    async def read_categories_of_region(session, region_name: str):
+    async def read_categories_of_region(session, region_name: str, optional_limit: int = None):
         """
         Returns from kb categories of region with included regions. Finds region by its name.
         Works asynchronously.
 
         :param session: async session of knowledge base driver
         :param region_name: str name of the given region
+        :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List[
                 Dict["category": Dict]
@@ -29,13 +30,14 @@ class PureReader(ABC):
 
     @staticmethod
     @abstractmethod
-    async def read_landmarks_in_map_sectors(session, sector_names: List[str]):
+    async def read_landmarks_in_map_sectors(session, sector_names: List[str], optional_limit: int = None):
         """
         Returns from kb landmarks, located in passed map sectors. Finds map sectors by their names.
         Works asynchronously.
 
         :param session: async session of knowledge base driver
         :param sector_names: List[str] names of map sectors, where target landmarks are located
+        :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List [
                 Dict["landmark": Dict, "sector": Dict]
@@ -45,7 +47,7 @@ class PureReader(ABC):
 
     @staticmethod
     @abstractmethod
-    async def read_landmarks_by_coordinates(session, coordinates: List[Dict[str, float]]):
+    async def read_landmarks_by_coordinates(session, coordinates: List[Dict[str, float]], optional_limit: int = None):
         """
         Returns from kb landmarks with given coordinates.
         Works asynchronously.
@@ -58,6 +60,7 @@ class PureReader(ABC):
                     "longitude": float
                 ]
             ] coordinates of target landmarks
+        :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List [
                 Dict["landmark": Dict]
@@ -67,13 +70,14 @@ class PureReader(ABC):
 
     @staticmethod
     @abstractmethod
-    async def read_landmarks_refers_to_categories(session, categories_names: List[str]):
+    async def read_landmarks_refers_to_categories(session, categories_names: List[str], optional_limit: int = None):
         """
         Returns from kb landmarks, that refers to given categories. Finds categories by their names
         Works asynchronously.
 
         :param session: async session of knowledge base driver
         :param categories_names: List[str] names of categories, that are referred by target landmarks
+        :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List [
                 Dict["landmark": Dict, "category": Dict]
@@ -83,13 +87,14 @@ class PureReader(ABC):
 
     @staticmethod
     @abstractmethod
-    async def read_landmarks_by_names(session, landmark_names: List[str]):
+    async def read_landmarks_by_names(session, landmark_names: List[str], optional_limit: int = None):
         """
         Returns from kb landmarks with given names.
         Works asynchronously.
 
         :param session: async session of knowledge base driver
         :param landmark_names: List[str] names of target landmarks
+        :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List [
                 Dict["landmark": Dict]
@@ -99,7 +104,9 @@ class PureReader(ABC):
 
     @staticmethod
     @abstractmethod
-    async def read_landmarks_of_categories_in_region(session, region_name: str, categories_names: List[str]):
+    async def read_landmarks_of_categories_in_region(
+            session, region_name: str, categories_names: List[str], optional_limit: int  = None
+    ):
         """
         Returns from kb landmarks, located in given region, that refer to given categories.
         Finds region by its name. Finds categories by their names.
@@ -108,6 +115,7 @@ class PureReader(ABC):
         :param session: async session of knowledge base driver
         :param region_name: str name of region where target landmarks are located or region that include such region
         :param categories_names: List[str] names of categories of target landmarks
+        :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List [
                 Dict[
@@ -161,13 +169,14 @@ class PureReader(ABC):
 
     @staticmethod
     @abstractmethod
-    async def read_landmarks_by_region(session, region_name: str):
+    async def read_landmarks_by_region(session, region_name: str, optional_limit: int = None):
         """
         Returns from kb landmarks, located in region. Finds region by its name.
         Works asynchronously.
 
         :param session: async session of knowledge base driver
         :param region_name: str name of region where target landmarks are located or region that include such region
+        :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List[
                 Dict[

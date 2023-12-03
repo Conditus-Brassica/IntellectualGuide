@@ -17,7 +17,7 @@ class PureCRUDAgent(ABC):
         Returns from kb categories of region with included regions. Finds region by its name.
         Works asynchronously.
 
-        :param json_params: Dict in form {"region_name": str}
+        :param json_params: Dict in form {"region_name": str, "optional_limit": int | None}
         :return: Coroutine
             List[
                 {
@@ -34,7 +34,7 @@ class PureCRUDAgent(ABC):
         Returns from kb landmarks, located in passed map sectors. Finds map sectors by their names.
         Works asynchronously.
 
-        :param json_params: Dict in form {"sector_names": List[str]}
+        :param json_params: Dict in form {"sector_names": List[str], "optional_limit": int | None}
         :return: Coroutine
             List [
                 {
@@ -51,7 +51,7 @@ class PureCRUDAgent(ABC):
         Returns from kb landmarks, that refers to given categories. Finds categories by their names
         Works asynchronously.
 
-        :param json_params: Dict in form {"categories_names": List[str]}
+        :param json_params: Dict in form {"categories_names": List[str], "optional_limit": int | None}
         :return: Coroutine
             List [
                 {
@@ -74,7 +74,8 @@ class PureCRUDAgent(ABC):
                         "latitude": float,
                         "longitude": float
                     ]
-                ]
+                ],
+                "optional_limit": int | None
             }
         :return: Coroutine
             List [
@@ -89,7 +90,7 @@ class PureCRUDAgent(ABC):
         Returns from kb landmarks with given names.
         Works asynchronously.
 
-        :param json_params: Dict in form {"landmark_names": List[str]}
+        :param json_params: Dict in form {"landmark_names": List[str], "optional_limit": int | None}
         :return: Coroutine
             List [
                 Dict["landmark": Dict | None]
@@ -106,7 +107,8 @@ class PureCRUDAgent(ABC):
 
         :param json_params: Dict in form {
                 "region_name": str,
-                "categories_names": List[str]
+                "categories_names": List[str],
+                "optional_limit": int | None
             }
         :return: Coroutine
             List [
@@ -125,7 +127,7 @@ class PureCRUDAgent(ABC):
         Returns from kb landmarks, located in region. Finds region by its name.
         Works asynchronously.
 
-        :param json_params: Dict in form {"region_name": str}
+        :param json_params: Dict in form {"region_name": str, "optional_limit": int | None}
         :return: Coroutine
             List[
                 Dict[
