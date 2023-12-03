@@ -13,3 +13,4 @@ referencing==0.31.1
 rpds-py==0.13.2
 Werkzeug==3.0.1
 neo4j==5.15
+aiologger==0.7.0
