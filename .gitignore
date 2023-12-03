@@ -4,3 +4,6 @@ agents/cache
 
 *.cypher
 
+backend/agents/crud_agent/basic_login.json
+
+./export_data.py
