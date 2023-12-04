@@ -182,3 +182,28 @@ class CRUDAgent(PureCRUDAgent):
         except ValidationError as ex:
             await logger.info(f"get_landmarks_of_categories_in_map_sectors. "
                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+
+    async def get_recommendations_by_coordinates_and_categories(self, json_params: Dict):
+        async def session(
+                coordinates_of_points: List[Dict[str, float]],
+                categories_names: List[str],
+                user_login: str,
+                amount_of_recommendations: int
+        ):
+            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
+                return await self._reader.read_recommendations_by_coordinates_and_categories(
+                    session, coordinates_of_points, categories_names, user_login, amount_of_recommendations
+                )
+
+        try:
+            # TODO validate(json_params, get_recommendations_for_landmark_by_region_json)
+            return await asyncio.shield(
+                session(
+                    json_params["coordinates_of_points"], json_params["categories_names"], json_params["user_login"],
+                    json_params["amount_of_recommendations"]
+                )
+            )
+        except ValidationError as ex:
+            await logger.info(f"get_recommendations_by_coordinates_and_categories. "
+                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            raise ValidationError

@@ -32,6 +32,23 @@ if __name__ == '__main__':
             command10 = CRUDCommandsFabric.create_landmarks_of_categories_in_map_sectors_command(
                 crud, {"map_sectors_names": ["a8", "h4"], "categories_names": ["историко-культурные ценности республики беларусь", "заказники белоруссии", "озёра поставского района"]}
             )
+            command11 = CRUDCommandsFabric.create_recommendations_by_coordinates_and_categories_command(
+                crud, {
+                    "coordinates_of_points": [
+                        {
+                            "latitude": 55.19861,
+                            "longitude": 27.41694
+                        },
+                        {
+                            "latitude": 54.1275,
+                            "longitude": 25.36306
+                        }
+                    ],
+                    "categories_names": ["озёра поставского района"], #["историко-культурные ценности республики беларусь", "озёра поставского района"],
+                    "user_login": "user",
+                    "amount_of_recommendations": 10
+                }
+            )
 
             task1 = asyncio.create_task(command1.execute())
             task2 = asyncio.create_task(command2.execute())
@@ -43,6 +60,7 @@ if __name__ == '__main__':
             task8 = asyncio.create_task(command8.execute())
             task9 = asyncio.create_task(command9.execute())
             task10 = asyncio.create_task(command10.execute())
+            task11 = asyncio.create_task(command11.execute())
 
             pprint(await task1)
             pprint(await task2)
@@ -54,5 +72,6 @@ if __name__ == '__main__':
             pprint(await task8)
             pprint(await task9)
             pprint(await task10)
+            pprint(await task11)
 
     asyncio.run(test())
