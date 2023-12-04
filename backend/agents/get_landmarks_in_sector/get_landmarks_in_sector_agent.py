@@ -41,7 +41,7 @@ class GetLandmarksInSector(Sender):
                     sectors_in_view = self.cache
                 elif (self.cache is None):  # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
                     sectors_in_view = None
-        else:  # Кэш задействовать невозможно
+        else:  # No cash at all
             sectors_in_view = self.__get_squares_in_sector(coords_of_square)
 
         print(sectors_in_view)
