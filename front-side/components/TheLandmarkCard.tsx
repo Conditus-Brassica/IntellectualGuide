@@ -1,4 +1,5 @@
 import style from "@/styles/landmark_card.module.css"
+
 import sidepanel_style from "@/styles/sidepanel.module.css"
 import TheButton from "./TheButton";
 interface TheLandmarkCard {
