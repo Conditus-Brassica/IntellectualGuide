@@ -4,16 +4,29 @@ import { useEffect } from 'react';
 import L from 'leaflet';
 import styles from '@/styles/map.module.css'
 import { LatLngExpression } from 'leaflet';
+import { Marker } from 'react-leaflet';
 
- 
+
 interface TheMapInterface {
   setMapData: any;
-  mapData: any;
+  markerState: any;
+  setMarkerState: any;
+  setLandmark: any;
 };
 
-async function getPointInfo() {
+
+class CustomMarker extends L.Marker {
+  type: string;
+  constructor(latlng: LatLngExpression, options: any) {
+    super(latlng, options);
+    this.type = options.type || 'none';
+  }
+};
+
+
+async function getRoute(start: any, finish: any) {
   try {
-    const response = await fetch('https://example.com/data');
+    const response = await fetch(`https://example.com/data?start=${start}&finish=${finish}`);
     const data = await response.json();
     console.log(data);
     //отрисовка карточки достопримечательности
@@ -22,18 +35,8 @@ async function getPointInfo() {
   }
 };
 
-class CustomMarker extends L.Marker {
-  type: string;
-  constructor(latlng: LatLngExpression, options: any) {
-    super(latlng, options);
-    this.type = options.type || 'default';
-  }
-}
-function custom_marker() {
 
-}
-
-const TheMap: React.FC<TheMapInterface> = ({ setMapData, mapData }) => {
+const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerState, setLandmark }) => {
   useEffect(() => {
     const map = L.map('map').setView([51.505, -0.09], 13);
     var BelarusGeoJSON: any = {
@@ -86,33 +89,39 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, mapData }) => {
       "museum":
         L.icon({
           iconUrl: 'green_icon.svg',
-
-          iconSize: [30, 87],
-          iconAnchor: [22, 94],
-          popupAnchor: [-3, -76]
+          iconSize: [30, 30],
         }),
       "restaurant":
         L.icon({
           iconUrl: 'blue_icon.svg',
-
-          iconSize: [30, 87],
-          iconAnchor: [22, 94],
-          popupAnchor: [-3, -76]
+          iconSize: [30, 30],
         }),
       "river":
         L.icon({
           iconUrl: 'red_icon.svg',
-
-          iconSize: [30, 87],
-          iconAnchor: [22, 94],
-          popupAnchor: [-3, -76]
+          iconSize: [30, 30],
         })
     };
 
     const onMarkerClick = function (e: L.LeafletMouseEvent) {
-      // Выполнение действий при нажатии на маркер
-      console.log('Маркер был нажат');
-      console.log('Координаты маркера:', e.latlng);
+      // useEffect(() =>{
+        if (markerState.targetMarker == e.target){
+          setLandmark((pref : boolean)=> {
+            pref = !pref
+            return pref
+        })
+        }
+        else{
+          setLandmark((pref: boolean )=> {
+            pref = true
+            return pref
+          })
+        }
+      // }, [markerState]);
+      setMarkerState((pref: { targetMarker: any; })=> {
+        pref.targetMarker = e.target
+        return pref
+      })
     };
 
     var drawnedMarkers: Array<CustomMarker> = [];
