@@ -43,8 +43,6 @@ class GetLandmarksInSector(Sender):
                     sectors_in_view = None
         else:  # No cash at all
             sectors_in_view = self.__get_squares_in_sector(coords_of_square)
-
-        print(sectors_in_view)
         result = await self.send_command(CRUDCommandsFabric.create_landmarks_in_map_sectors_command(self.crud, sectors_in_view))
         return result
 
