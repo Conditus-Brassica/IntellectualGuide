@@ -1,16 +1,11 @@
+# import asyncio
 import json
-from abc import ABC, abstractmethod
-from typing import Dict
-
 from aiologger.loggers.json import JsonLogger
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
-from backend.agents.crud_agent.crud_commands_fabric import CRUDCommandsFabric
-from backend.agents import PureCRUDAgent
+from backend.agents import PureCRUDAgent, CRUDCommandsFabric
 from backend.agents.get_landmarks_in_sector.squares_params_json_validation import *
 from backend.command_bases import Sender, BaseCommand
-
-from backend.agents.crud_agent import crud_agent
 
 logger = JsonLogger.with_default_handlers(
     level="DEBUG",
@@ -19,12 +14,11 @@ logger = JsonLogger.with_default_handlers(
 
 
 class GetLandmarksInSector(Sender):
-    LAT_DIFFERENCE = 0.31188881249999
-    LONG_DIFFERENCE = 0.610591875
+    LAT_DIFFERENCE = 0.312
+    LONG_DIFFERENCE = 0.611
 
     def __init__(self, Agent: PureCRUDAgent):
         self.crud = Agent
-        self.sectors_in_view = {}
         self.cache = {}
 
     async def get_landmarks(self, coords_of_square: dict):
@@ -36,24 +30,29 @@ class GetLandmarksInSector(Sender):
                 f"Validation error on json, args: {e.args[0]}, json_params: {get_coords_of_map_sectors_json}")
             raise ValidationError
 
-        if self.cache is not None:
-            if (self.cache["TL"]["longitude"] <= coords_of_square["TL"]["longitude"] < coords_of_square["BR"]["longitude"] <=
-                self.cache["BR"]["longitude"] + self.LONG_DIFFERENCE) and (
-                    self.cache["BR"]["latitude"] <= coords_of_square["BR"]["latitude"] < coords_of_square["TL"]["latitude"] <=
-                    self.cache["TL"]["latitude"]):  # Использование кэша, первый случай: когда новый квадрат полностью находится внутри старого
-                pass
-            elif (self.cache is None):  # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
-                pass
+        sectors_in_view = {}
+        # Cash
+        if len(self.cache) != 0:
+            for element in self.cache:
+                if (element["TL"]["longitude"] <= coords_of_square["TL"]["longitude"] < coords_of_square["BR"]["longitude"] <=
+                        element["BR"]["longitude"]) and (
+                        element["BR"]["latitude"] <= coords_of_square["BR"]["latitude"] < coords_of_square["TL"]["latitude"] <=
+                        element["TL"]["latitude"]):  # Cash using, first occurrence: when new square fully in the old square
+                    sectors_in_view = self.cache
+                elif (self.cache is None):  # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
+                    sectors_in_view = None
         else:  # Кэш задействовать невозможно
-            self.sectors_in_view = {}
-            self.get_squares_in_sector(coords_of_square)
+            sectors_in_view = self.__get_squares_in_sector(coords_of_square)
 
-        await self.send_command(CRUDCommandsFabric.create_landmarks_in_map_sectors_command(self.crud, self.sectors_in_view))
+        print(sectors_in_view)
+        result = await self.send_command(CRUDCommandsFabric.create_landmarks_in_map_sectors_command(self.crud, sectors_in_view))
+        return result
 
     async def send_command(self, command: BaseCommand):
         await command.execute()
 
-    def get_squares_in_sector(self, coords_of_square: dict):
+    def __get_squares_in_sector(self, coords_of_square: dict):
+        sectors_in_view = {"sector_names": []}
         data = json.load(open("new_squares.json"))
         for element in data:
             if (coords_of_square["TL"]["longitude"] - self.LONG_DIFFERENCE <= element["TL"]["longitude"] <
@@ -62,4 +61,24 @@ class GetLandmarksInSector(Sender):
                     coords_of_square["BR"]["latitude"] - self.LAT_DIFFERENCE <= element["BR"]["latitude"] <
                     element["TL"]["latitude"] <=
                     coords_of_square["TL"]["latitude"] + self.LAT_DIFFERENCE):
-                self.sectors_in_view["sector_names"].append(element["name"])
+                sectors_in_view["sector_names"].append(element["name"])
+        self.cache = sectors_in_view
+        return sectors_in_view
+
+
+# async def tescom():
+#     test_class = GetLandmarksInSector()
+#     test_dict = {
+#         "TL": {
+#             "latitude": 56.232289,
+#             "longitude": 23.690447875
+#         },
+#         "BR": {
+#             "latitude": 53.113400874999996,
+#             "longitude": 25.5222235
+#         }
+#     }
+#     await test_class.get_landmarks(test_dict)
+#
+#
+# asyncio.run(tescom())
