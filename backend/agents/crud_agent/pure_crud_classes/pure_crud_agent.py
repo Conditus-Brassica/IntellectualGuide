@@ -171,5 +171,28 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_map_sectors_of_points(self, json_params: Dict):
+        """
+            Returns map sectors where given points are located.
+            Works asynchronously.
 
+            :param json_params: Dict in form {
+                "coordinates_of_points": List[
+                    Dict [
+                        "longitude": float,
+                        "latitude": float
+                    ]
+                ],
+                "optional_limit": int | None
+            }
+            :return: Coroutine
+            List[
+                Dict[
+                    "of_point": Dict ["longitude": float, "latitude": float]
+                    "map_sector": Dict | None,
+                ]
+            ]
+        """
+        raise NotImplementedError
 

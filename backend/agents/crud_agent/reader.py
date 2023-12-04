@@ -388,3 +388,49 @@ class Reader(PureReader):
         result = await session.execute_read(Reader._read_landmarks_by_region, region_name, optional_limit)
         await logger.info(f"method:\tread_landmarks_by_region,\nresult:\t{result}")
         return result
+
+    @staticmethod
+    async def _read_map_sectors_of_points(
+            tx, coordinates_of_points: List[Dict[str: float]], optional_limit: int = None
+    ):
+        """Transaction handler for read_map_sectors_of_points"""
+        result = await tx.run(
+            """
+            UNWIND $coordinates_of_points AS coordinates_of_point
+            OPTIONAL MATCH (mapSector: MapSector)
+                WHERE
+                    mapSector.tl_longitude <= toFloat(coordinates_of_point.longitude) AND
+                    mapSector.tl_latitude <= toFloat(coordinates_of_point.latitude) AND
+                    point.withinBBox(
+                        point({
+                            latitude: coordinates_of_point.latitude,
+                            longitude: coordinates_of_point.latitude, crs:'WGS-84'
+                        }),
+                        point({latitude: mapSector.br_latitude, longitude: mapSector.tl_longitude, crs:'WGS-84'}),
+                        point({latitude: mapSector.tl_latitude, longitude: mapSector.br_longitude, crs:'WGS-84'})
+                    )
+            RETURN mapSector AS map_sector, coordinates_of_point AS of_point;
+            """,
+            coordinates_of_points=coordinates_of_points
+        )
+        try:
+            if optional_limit:
+                result_values = [record.data("map_sector", "of_point") for record in await result.fetch(optional_limit)]
+            else:
+                result_values = [record.data("map_sector", "of_point") async for record in result]
+        except IndexError as ex:
+            await logger.error(f"Index error, args: {ex.args[0]}")
+            result_values = []
+
+        await logger.info(f"method:\t_read_map_sectors_of_points,\nresult:\t{await result.consume()}")
+        return result_values
+
+    @staticmethod
+    async def read_map_sectors_of_points(
+            session: AsyncSession, coordinates_of_points: List[Dict[str: float]], optional_limit: int = None
+    ):
+        result = await session.execute_read(
+            Reader._read_map_sectors_of_points, coordinates_of_points, optional_limit
+        )
+        await logger.info(f"method:\tread_map_sectors_of_points,\nresult:\t{result}")
+        return result

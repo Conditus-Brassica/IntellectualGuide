@@ -111,7 +111,7 @@ class CRUDCommandsFabric:
             crud_agent: PureCRUDAgent, json_params: Dict
     ) -> RecommendationsForLandmarkByRegionCommand:
         """
-        Creates Command to get recommendations for landmark by region from PureCRUDAgent children classes
+        Creates Command to get recommendations for landmark by region from PureCRUDAgent children classes.
 
         :param crud_agent: PureCRUDAgent child class entity to get from
         :param json_params: Dict in form {
@@ -125,3 +125,24 @@ class CRUDCommandsFabric:
         """
         return RecommendationsForLandmarkByRegionCommand(crud_agent, json_params)
 
+    @staticmethod
+    def create_map_sectors_of_points_command(
+        crud_agent: PureCRUDAgent, json_params: Dict
+    ) -> MapSectorsOfPointsCommand:
+        """
+        Creates Command to get map sectors where given points are located from PureCRUDAgent children classes.
+
+        :param crud_agent: PureCRUDAgent child class entity to get from
+        :param json_params: Dict in form {
+            "coordinates_of_points": List[
+                Dict [
+                    "longitude": float,
+                    "latitude": float
+                ]
+            ],
+            "optional_limit": int | None
+        }
+        :return: MapSectorsOfPointsCommand for CRUD
+        """
+        return MapSectorsOfPointsCommand(crud_agent, json_params)
+    

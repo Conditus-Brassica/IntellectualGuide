@@ -186,3 +186,26 @@ class PureReader(ABC):
             ], where "located_at" is the region, where landmark is located
         """
         raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    async def read_map_sectors_of_points(
+            session, coordinates_of_points: List[Dict[str: float]], optional_limit: int = None
+    ):
+        """
+        Returns from kb map sectors where given points are located.
+        Works asynchronously.
+
+        :param session: async session of knowledge base driver
+        :param coordinates_of_points: List of Dict. Dict represent point for which the map sector is defining.
+        Must include latitude and longitude.
+        :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
+        :return: Coroutine
+            List[
+                Dict[
+                    "landmark": Dict,
+                    "located_at": Dict
+                ]
+            ], where "located_at" is the region, where landmark is located
+        """
+        raise NotImplementedError
