@@ -1,4 +1,5 @@
 #Author: Vodohleb04
+import asyncio
 from typing import List, Dict
 from aiologger.logger import LogLevel
 from aiologger.loggers.json import JsonLogger
