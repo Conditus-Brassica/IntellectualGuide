@@ -439,7 +439,32 @@ class Reader(PureReader):
         """Transaction handler for read_landmarks_of_categories_in_map_sectors"""
         result = await tx.run(
             """
-            
+            UNWIND $map_sectors_names AS map_sector_name
+            CALL {
+                WITH map_sector_name
+                CALL db.index.fulltext.queryNodes('map_sector_name_fulltext_index', map_sector_name)
+                    YIELD score, node AS mapSector
+                WITH score, mapSector
+                    ORDER BY score DESC
+                    LIMIT 1
+            }
+            WITH mapSector
+            UNWIND $categories_names AS category_name
+            CALL {
+                WITH category_name
+                CALL db.index.fulltext.queryNodes("landmark_category_name_fulltext_index", category_name)
+                    YIELD score, node AS category
+                RETURN category
+                    ORDER BY score DESC
+                    LIMIT 1
+            }
+            OPTIONAL MATCH
+                (mapSector)
+                    <-[:IN_SECTOR]-
+                (landmark:Landmark)
+                    -[:REFERS]->
+                (category)
+            RETURN landmark, mapSector AS map_sector, category;
             """,
             map_sectors_names=map_sectors_names,
             categories_names=categories_names
