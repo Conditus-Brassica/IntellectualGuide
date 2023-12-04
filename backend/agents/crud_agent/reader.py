@@ -431,3 +431,42 @@ class Reader(PureReader):
         )
         await logger.info(f"method:\tread_map_sectors_of_points,\nresult:\t{result}")
         return result
+
+    @staticmethod
+    async def _read_landmarks_of_categories_in_map_sectors(
+            tx, map_sectors_names: List[str], categories_names: List[str], optional_limit: int = None
+    ):
+        """Transaction handler for read_landmarks_of_categories_in_map_sectors"""
+        result = await tx.run(
+            """
+            
+            """,
+            map_sectors_names=map_sectors_names,
+            categories_names=categories_names
+        )
+        try:
+            if optional_limit:
+                result_values = [
+                    record.data("landmark", "map_sector", "category") for record in await result.fetch(optional_limit)
+                ]
+            else:
+                result_values = [record.data("landmark", "map_sector", "category") async for record in result]
+        except IndexError as ex:
+            await logger.error(f"Index error, args: {ex.args[0]}")
+            result_values = []
+
+        await logger.info(f"method:\t_read_landmarks_of_categories_in_map_sectors,\nresult:\t{await result.consume()}")
+        return result_values
+
+    @staticmethod
+    async def read_landmarks_of_categories_in_map_sectors(
+            session: AsyncSession, map_sectors_names: List[str], categories_names: List[str], optional_limit: int = None
+    ):
+        result = await session.execute_read(
+            Reader._read_landmarks_of_categories_in_map_sectors,
+            map_sectors_names,
+            categories_names,
+            optional_limit
+        )
+        await logger.info(f"method:\tread_landmarks_of_categories_in_map_sectors,\nresult:\t{result}")
+        return result

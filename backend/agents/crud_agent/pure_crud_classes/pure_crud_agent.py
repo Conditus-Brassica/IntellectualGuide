@@ -196,3 +196,26 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_landmarks_of_categories_in_map_sectors(self, json_params: Dict):
+        """
+            Returns landmarks that refer to the given categories and are located in the given map sectors.
+            Finds map sectors by names. Finds categories by names.
+            Works asynchronously.
+
+            :param json_params: Dict in form {
+                "map_sectors_names": List[str],
+                "categories_names": List[str],
+                "optional_limit": int | None
+            }
+            :return: Coroutine
+            List[
+                Dict[
+                    "landmark": Dict | None,
+                    "map_sector": Dict | None,
+                    "category": Dict | None
+                ]
+            ]
+        """
+        raise NotImplementedError
+

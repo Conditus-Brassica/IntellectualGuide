@@ -163,3 +163,22 @@ class CRUDAgent(PureCRUDAgent):
         except ValidationError as ex:
             await logger.info(f"get_map_sectors_of_points. "
                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+
+    async def get_landmarks_of_categories_in_map_sectors(self, json_params: Dict):
+        async def session(map_sectors_names: List[str], categories_names: List[str], optional_limit: int = None):
+            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
+                return await self._reader.read_landmarks_of_categories_in_map_sectors(
+                    session, map_sectors_names, categories_names, optional_limit
+                )
+
+        try:
+            # TODO validate(json_params, get_landmarks_by_region_json)
+            json_params["optional_limit"] = json_params.get("optional_limit", None)
+            return await asyncio.shield(
+                session(
+                    json_params["map_sectors_names"], json_params["categories_names"], json_params["optional_limit"]
+                )
+            )
+        except ValidationError as ex:
+            await logger.info(f"get_landmarks_of_categories_in_map_sectors. "
+                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")

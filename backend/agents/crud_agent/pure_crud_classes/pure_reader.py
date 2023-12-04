@@ -197,7 +197,7 @@ class PureReader(ABC):
         Works asynchronously.
 
         :param session: async session of knowledge base driver
-        :param coordinates_of_points: List of Dict. Dict represent point for which the map sector is defining.
+        :param coordinates_of_points: List[Dict]. Dict represent point for which the map sector is defining.
         Must include latitude and longitude.
         :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
@@ -207,5 +207,29 @@ class PureReader(ABC):
                     "located_at": Dict
                 ]
             ], where "located_at" is the region, where landmark is located
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    async def read_landmarks_of_categories_in_map_sectors(
+            session, map_sectors_names: List[str], categories_names: List[str], optional_limit: int = None
+    ):
+        """
+        Returns from kb landmarks, that\'re located in the given map sectors and refer to the given categories.
+        Works asynchronously.
+
+        :param session: async session of knowledge base driver
+        :param map_sectors_names: List[str] names of map sectors where landmarks are located.
+        :param categories_names: List[str] names of categories that are referred by landmarks
+        :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
+        :return: Coroutine
+            List[
+                Dict[
+                    "landmark": Dict | None,
+                    "map_sector": Dict | None,
+                    "category": Dict | None
+                ]
+            ]
         """
         raise NotImplementedError
