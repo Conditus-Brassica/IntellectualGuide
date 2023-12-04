@@ -80,5 +80,5 @@ class GetLandmarksInSector(Sender):
 #     }
 #     await test_class.get_landmarks(test_dict)
 #
-#
+# task = asyncio.create_task(tescom())
 # asyncio.run(tescom())
