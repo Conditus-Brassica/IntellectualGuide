@@ -190,7 +190,7 @@ class PureReader(ABC):
     @staticmethod
     @abstractmethod
     async def read_map_sectors_of_points(
-            session, coordinates_of_points: List[Dict[str: float]], optional_limit: int = None
+            session, coordinates_of_points: List[Dict[str, float]], optional_limit: int = None
     ):
         """
         Returns from kb map sectors where given points are located.

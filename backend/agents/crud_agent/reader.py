@@ -391,7 +391,7 @@ class Reader(PureReader):
 
     @staticmethod
     async def _read_map_sectors_of_points(
-            tx, coordinates_of_points: List[Dict[str: float]], optional_limit: int = None
+            tx, coordinates_of_points: List[Dict[str, float]], optional_limit: int = None
     ):
         """Transaction handler for read_map_sectors_of_points"""
         result = await tx.run(
@@ -427,7 +427,7 @@ class Reader(PureReader):
 
     @staticmethod
     async def read_map_sectors_of_points(
-            session: AsyncSession, coordinates_of_points: List[Dict[str: float]], optional_limit: int = None
+            session: AsyncSession, coordinates_of_points: List[Dict[str, float]], optional_limit: int = None
     ):
         result = await session.execute_read(
             Reader._read_map_sectors_of_points, coordinates_of_points, optional_limit

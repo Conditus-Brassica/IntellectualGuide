@@ -152,7 +152,7 @@ class CRUDAgent(PureCRUDAgent):
             raise ValidationError
 
     async def get_map_sectors_of_points(self, json_params: Dict):
-        async def session(coordinates_of_points: List[Dict[str: float]], optional_limit: int = None):
+        async def session(coordinates_of_points: List[Dict[str, float]], optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_map_sectors_of_points(session, coordinates_of_points, optional_limit)
 

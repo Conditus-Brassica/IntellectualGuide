@@ -40,4 +40,4 @@ class MapSectorsOfPointsCommand(BaseCommand):
                 ]
             ]
         """
-        return await self._target_agent.get_landmarks_refers_to_categories(self._json_params)
+        return await self._target_agent.get_map_sectors_of_points(self._json_params)

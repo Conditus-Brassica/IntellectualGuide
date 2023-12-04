@@ -1,8 +1,8 @@
 #Author: Vodohleb04
 """Commands fabric of CRUDAgent"""
 from typing import Dict
-from crud_commands import *
-from pure_crud_classes import PureCRUDAgent
+from backend.agents.crud_agent.crud_commands import *
+from backend.agents.crud_agent.pure_crud_classes import PureCRUDAgent
 
 
 class CRUDCommandsFabric:
@@ -145,4 +145,3 @@ class CRUDCommandsFabric:
         :return: MapSectorsOfPointsCommand for CRUD
         """
         return MapSectorsOfPointsCommand(crud_agent, json_params)
-    
