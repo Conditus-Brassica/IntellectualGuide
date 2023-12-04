@@ -18,6 +18,7 @@ class GetLandmarksInSector(Sender):
     LONG_DIFFERENCE = 0.611
 
     def __init__(self, Agent: PureCRUDAgent):
+        self.squares_in_sector = {"sector_names": []}
         self.crud = Agent
         self.cache = {}
 
@@ -30,27 +31,25 @@ class GetLandmarksInSector(Sender):
                 f"Validation error on json, args: {e.args[0]}, json_params: {get_coords_of_map_sectors_json}")
             raise ValidationError
 
-        sectors_in_view = {}
         # Cash
         if len(self.cache) != 0:
-            for element in self.cache:
-                if (element["TL"]["longitude"] <= coords_of_square["TL"]["longitude"] < coords_of_square["BR"]["longitude"] <=
-                        element["BR"]["longitude"]) and (
-                        element["BR"]["latitude"] <= coords_of_square["BR"]["latitude"] < coords_of_square["TL"]["latitude"] <=
-                        element["TL"]["latitude"]):  # Cash using, first occurrence: when new square fully in the old square
-                    sectors_in_view = self.cache
-                elif (self.cache is None):  # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
-                    sectors_in_view = None
+            if (self.cache["TL"]["longitude"] <= coords_of_square["TL"]["longitude"] < coords_of_square["BR"]["longitude"] <=
+                    self.cache["BR"]["longitude"]) and (
+                    self.cache["BR"]["latitude"] <= coords_of_square["BR"]["latitude"] < coords_of_square["TL"]["latitude"] <=
+                    self.cache["TL"]["latitude"]):  # Cash using, first occurrence: when new square fully in the old square
+                pass
+            # elif (self.cache is None):  # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
+            #     self.squares_in_sector = {"sector_names": []}
         else:  # No cash at all
-            sectors_in_view = self.__get_squares_in_sector(coords_of_square)
-        result = await self.send_command(CRUDCommandsFabric.create_landmarks_in_map_sectors_command(self.crud, sectors_in_view))
+            self.__get_squares_in_sector(coords_of_square)
+        result = await self.send_command(CRUDCommandsFabric.create_landmarks_in_map_sectors_command(self.crud, self.squares_in_sector))
         return result
 
     async def send_command(self, command: BaseCommand):
         await command.execute()
 
     def __get_squares_in_sector(self, coords_of_square: dict):
-        sectors_in_view = {"sector_names": []}
+        self.squares_in_sector = {"sector_names": []}
         data = json.load(open("new_squares.json"))
         for element in data:
             if (coords_of_square["TL"]["longitude"] - self.LONG_DIFFERENCE <= element["TL"]["longitude"] <
@@ -59,10 +58,11 @@ class GetLandmarksInSector(Sender):
                     coords_of_square["BR"]["latitude"] - self.LAT_DIFFERENCE <= element["BR"]["latitude"] <
                     element["TL"]["latitude"] <=
                     coords_of_square["TL"]["latitude"] + self.LAT_DIFFERENCE):
-                sectors_in_view["sector_names"].append(element["name"])
-        self.cache = sectors_in_view
-        return sectors_in_view
+                self.squares_in_sector["sector_names"].append(element["name"])
+        self.cache = coords_of_square
 
+    def __partial_cash_using_check(self):
+        pass
 
 # async def tescom():
 #     test_class = GetLandmarksInSector()
