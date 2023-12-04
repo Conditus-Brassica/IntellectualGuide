@@ -4,7 +4,7 @@ from typing import Dict, List
 from jsonschema import ValidationError, validate
 from neo4j import AsyncDriver
 from aiologger.loggers.json import JsonLogger
-from backend.agents.crud_agent.pure_classes import PureCRUDAgent, PureReader
+from backend.agents.crud_agent.pure_crud_classes import PureCRUDAgent, PureReader
 from backend.agents.crud_agent.param_json_validation import *
 
 

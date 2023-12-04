@@ -4,7 +4,7 @@ from typing import List, Dict
 from aiologger.logger import LogLevel
 from aiologger.loggers.json import JsonLogger
 from neo4j import AsyncSession
-from .pure_classes import PureReader
+from .pure_crud_classes import PureReader
 
 
 logger = JsonLogger.with_default_handlers(

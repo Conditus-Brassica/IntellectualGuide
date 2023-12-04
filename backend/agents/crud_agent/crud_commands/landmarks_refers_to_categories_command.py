@@ -1,7 +1,7 @@
 # Author: Vodohleb04
 from typing import Dict
 from backend.command_bases.base_command import BaseCommand
-from backend.agents.crud_agent.pure_classes.pure_crud_agent import PureCRUDAgent
+from backend.agents.crud_agent.pure_crud_classes.pure_crud_agent import PureCRUDAgent
 
 
 class LandmarksRefersToCategoriesCommand(BaseCommand):
@@ -14,7 +14,7 @@ class LandmarksRefersToCategoriesCommand(BaseCommand):
         Creates Command to get landmarks that refer to any of given categories from PureCRUDAgent children classes.
 
         :param crud_agent: PureCRUDAgent child class entity to get from
-        :param json_params: Dict in form {"landmark_names": List[str], "optional_limit": int | None}
+        :param json_params: Dict in form {"categories_names": List[str], "optional_limit": int | None}
         """
         self._json_params = json_params
         super().__init__(crud_agent)

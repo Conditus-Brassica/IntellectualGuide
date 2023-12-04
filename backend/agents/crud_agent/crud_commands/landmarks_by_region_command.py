@@ -1,7 +1,7 @@
 # Author: Vodohleb04
 from typing import Dict
 from backend.command_bases.base_command import BaseCommand
-from backend.agents.crud_agent.pure_classes.pure_crud_agent import PureCRUDAgent
+from backend.agents.crud_agent.pure_crud_classes.pure_crud_agent import PureCRUDAgent
 
 
 class LandmarksByRegionCommand(BaseCommand):
