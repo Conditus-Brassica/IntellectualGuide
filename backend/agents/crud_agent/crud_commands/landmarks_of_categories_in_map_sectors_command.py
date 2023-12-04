@@ -4,7 +4,7 @@ from backend.command_bases.base_command import BaseCommand
 from backend.agents.crud_agent.pure_crud_classes.pure_crud_agent import PureCRUDAgent
 
 
-class LandmarksInMapSectorsCommand(BaseCommand):
+class LandmarksOfCategoriesInMapSectorsCommand(BaseCommand):
     """
     Command to get landmarks that located in given map sectors and refer to given categories from PureCRUDAgent children
     classes.

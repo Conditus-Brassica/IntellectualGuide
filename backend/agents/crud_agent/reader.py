@@ -444,7 +444,7 @@ class Reader(PureReader):
                 WITH map_sector_name
                 CALL db.index.fulltext.queryNodes('map_sector_name_fulltext_index', map_sector_name)
                     YIELD score, node AS mapSector
-                WITH score, mapSector
+                RETURN mapSector
                     ORDER BY score DESC
                     LIMIT 1
             }

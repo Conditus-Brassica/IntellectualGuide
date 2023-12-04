@@ -149,7 +149,7 @@ class CRUDCommandsFabric:
     @staticmethod
     def create_landmarks_of_categories_in_map_sectors_command(
         crud_agent: PureCRUDAgent, json_params: Dict
-    ) -> LandmarksInMapSectorsCommand:
+    ) -> LandmarksOfCategoriesInMapSectorsCommand:
         """
         Creates Command to get landmarks that located in given map sectors and refer to given categories from
         PureCRUDAgent children classes.
@@ -162,4 +162,4 @@ class CRUDCommandsFabric:
         }
         :return: MapSectorsOfPointsCommand for CRUD
         """
-        return LandmarksInMapSectorsCommand(crud_agent, json_params)
+        return LandmarksOfCategoriesInMapSectorsCommand(crud_agent, json_params)
