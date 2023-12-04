@@ -40,6 +40,8 @@ class GetLandmarksInSector(Sender):
                 pass
             # elif (self.cache is None):  # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
             #     self.squares_in_sector = {"sector_names": []}
+            else:
+                self.__get_squares_in_sector(coords_of_square)
         else:  # No cash at all
             self.__get_squares_in_sector(coords_of_square)
         result = await self.send_command(CRUDCommandsFabric.create_landmarks_in_map_sectors_command(self.crud, self.squares_in_sector))
