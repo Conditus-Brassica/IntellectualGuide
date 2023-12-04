@@ -400,12 +400,9 @@ class Reader(PureReader):
             OPTIONAL MATCH (mapSector: MapSector)
                 WHERE
                     mapSector.tl_longitude <= toFloat(coordinates_of_point.longitude) AND
-                    mapSector.tl_latitude <= toFloat(coordinates_of_point.latitude) AND
+                    mapSector.tl_latitude >= toFloat(coordinates_of_point.latitude) AND
                     point.withinBBox(
-                        point({
-                            latitude: coordinates_of_point.latitude,
-                            longitude: coordinates_of_point.latitude, crs:'WGS-84'
-                        }),
+                        point({latitude: coordinates_of_point.latitude, longitude: coordinates_of_point.longitude, crs:'WGS-84'}),
                         point({latitude: mapSector.br_latitude, longitude: mapSector.tl_longitude, crs:'WGS-84'}),
                         point({latitude: mapSector.tl_latitude, longitude: mapSector.br_longitude, crs:'WGS-84'})
                     )
