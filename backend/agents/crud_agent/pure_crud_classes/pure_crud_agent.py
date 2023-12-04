@@ -171,5 +171,84 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_map_sectors_of_points(self, json_params: Dict):
+        """
+            Returns map sectors where given points are located.
+            Works asynchronously.
 
+            :param json_params: Dict in form {
+                "coordinates_of_points": List[
+                    Dict [
+                        "longitude": float,
+                        "latitude": float
+                    ]
+                ],
+                "optional_limit": int | None
+            }
+            :return: Coroutine
+            List[
+                Dict[
+                    "of_point": Dict ["longitude": float, "latitude": float]
+                    "map_sector": Dict | None,
+                ]
+            ]
+        """
+        raise NotImplementedError
 
+    @abstractmethod
+    async def get_landmarks_of_categories_in_map_sectors(self, json_params: Dict):
+        """
+            Returns landmarks that refer to the given categories and are located in the given map sectors.
+            Finds map sectors by names. Finds categories by names.
+            Works asynchronously.
+
+            :param json_params: Dict in form {
+                "map_sectors_names": List[str],
+                "categories_names": List[str],
+                "optional_limit": int | None
+            }
+            :return: Coroutine
+            List[
+                Dict[
+                    "landmark": Dict | None,
+                    "map_sector": Dict | None,
+                    "category": Dict | None
+                ]
+            ]
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_recommendations_by_coordinates_and_categories(self, json_params: Dict):
+        """
+            Returns recommended landmarks for given user, given coordinates and given categories. Finds given landmark
+            by its name and coordinates; finds user by his/her login. Returns recommended landmark, categories of
+            recommended landmark, node of the given User account, "wish" mark, if user left it on recommended landmark
+            (else None), "visited" mark with the amount of visits, if user already visited this landmark (else None)/
+            Works asynchronously.
+
+            :param json_params: Dict in form {
+                "coordinates_of_points": List [
+                    Dict [
+                        "latitude": float,
+                        "longitude": float
+                    ]
+                ],
+                "categories_names": List[str],
+                "user_login": str,
+                "amount_of_recommendations": int
+            }, where current_name is the name of given landmark
+            :return: Coroutine
+            List[
+                Dict[
+                    recommended_landmark: Dict | None,
+                    recommendation_category_is_main: True | None,
+                    category: Dict | None,
+                    user_account: Dict | None,
+                    wish_ref: Dict | None,
+                    visited_ref: Dict | None;
+                ]
+            ]
+        """
+        raise NotImplementedError

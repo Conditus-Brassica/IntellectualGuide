@@ -1,8 +1,8 @@
 #Author: Vodohleb04
 """Commands fabric of CRUDAgent"""
 from typing import Dict
-from crud_commands import *
-from pure_crud_classes import PureCRUDAgent
+from backend.agents.crud_agent.crud_commands import *
+from backend.agents.crud_agent.pure_crud_classes import PureCRUDAgent
 
 
 class CRUDCommandsFabric:
@@ -111,7 +111,7 @@ class CRUDCommandsFabric:
             crud_agent: PureCRUDAgent, json_params: Dict
     ) -> RecommendationsForLandmarkByRegionCommand:
         """
-        Creates Command to get recommendations for landmark by region from PureCRUDAgent children classes
+        Creates Command to get recommendations for landmark by region from PureCRUDAgent children classes.
 
         :param crud_agent: PureCRUDAgent child class entity to get from
         :param json_params: Dict in form {
@@ -125,3 +125,65 @@ class CRUDCommandsFabric:
         """
         return RecommendationsForLandmarkByRegionCommand(crud_agent, json_params)
 
+    @staticmethod
+    def create_map_sectors_of_points_command(
+        crud_agent: PureCRUDAgent, json_params: Dict
+    ) -> MapSectorsOfPointsCommand:
+        """
+        Creates Command to get map sectors where given points are located from PureCRUDAgent children classes.
+
+        :param crud_agent: PureCRUDAgent child class entity to get from
+        :param json_params: Dict in form {
+            "coordinates_of_points": List[
+                Dict [
+                    "longitude": float,
+                    "latitude": float
+                ]
+            ],
+            "optional_limit": int | None
+        }
+        :return: MapSectorsOfPointsCommand for CRUD
+        """
+        return MapSectorsOfPointsCommand(crud_agent, json_params)
+
+    @staticmethod
+    def create_landmarks_of_categories_in_map_sectors_command(
+        crud_agent: PureCRUDAgent, json_params: Dict
+    ) -> LandmarksOfCategoriesInMapSectorsCommand:
+        """
+        Creates Command to get landmarks that located in given map sectors and refer to given categories from
+        PureCRUDAgent children classes.
+
+        :param crud_agent: PureCRUDAgent child class entity to get from
+        :param json_params: Dict in form {
+                "map_sectors_names": List[str],
+                "categories_names": List[str],
+                "optional_limit": int | None
+        }
+        :return: MapSectorsOfPointsCommand for CRUD
+        """
+        return LandmarksOfCategoriesInMapSectorsCommand(crud_agent, json_params)
+
+    @staticmethod
+    def create_recommendations_by_coordinates_and_categories_command(
+        crud_agent: PureCRUDAgent, json_params: Dict
+    ) -> RecommendationsByCoordinatesAndCategoriesCommand:
+        """
+        Creates Command to get landmarks that located in given map sectors and refer to given categories from
+        PureCRUDAgent children classes.
+
+        :param crud_agent: PureCRUDAgent child class entity to get from
+        :param json_params: Dict in form {
+            "coordinates_of_points": List [
+                Dict [
+                    "latitude": float,
+                    "longitude": float
+                ]
+            ],
+            "categories_names": List[str],
+            "user_login": str,
+            "amount_of_recommendations": int
+        }, where current_name is the name of given landmark
+        :return: RecommendationsByCoordinatesAndCategoriesCommand for CRUD
+        """
+        return RecommendationsByCoordinatesAndCategoriesCommand(crud_agent, json_params)
