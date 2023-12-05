@@ -20,7 +20,7 @@ class GetLandmarksInSectors(Sender):
 
     def __init__(self, Agent: PureCRUDAgent):
         self.squares_in_sector = {"sector_names": [], "map_sector_names": []}
-        self.crud = Agent
+        self.crud = Agent  # TODO Агента получают извне, а не хранят у себя
         self.cache = {}
         self.result = {}
         self.full_cache = {}
