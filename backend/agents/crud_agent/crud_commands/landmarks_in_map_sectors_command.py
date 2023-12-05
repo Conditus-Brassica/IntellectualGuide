@@ -14,7 +14,7 @@ class LandmarksInMapSectorsCommand(BaseCommand):
         Creates Command to get landmarks that located in given map sectors from PureCRUDAgent children classes.
 
         :param crud_agent: PureCRUDAgent child class entity to get from
-        :param json_params: Dict in form {"sector_names": List[str], "optional_limit": int | None}
+        :param json_params: Dict in form {"map_sectors_names": List[str], "optional_limit": int | None}
         """
         self._json_params = json_params
         super().__init__(crud_agent)
@@ -28,8 +28,9 @@ class LandmarksInMapSectorsCommand(BaseCommand):
             List [
                 {
                     "landmark": Dict | None,
-                    "sector": Dict | None
+                    "sector": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
                 }
-            ]
+            ], where categories_names are categories of landmark
         """
         return await self._target_agent.get_landmarks_in_map_sectors(self._json_params)

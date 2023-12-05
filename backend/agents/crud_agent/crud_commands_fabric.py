@@ -70,7 +70,7 @@ class CRUDCommandsFabric:
         Creates Command to get landmarks that located in given map sectors from PureCRUDAgent children classes.
 
         :param crud_agent: PureCRUDAgent child class entity to get from
-        :param json_params: Dict in form {"sector_names": List[str], "optional_limit": int | None}
+        :param json_params: Dict in form {"map_sectors_names": List[str], "optional_limit": int | None}
         :return: LandmarksInMapSectorsCommand for CRUD
         """
         return LandmarksInMapSectorsCommand(crud_agent, json_params)

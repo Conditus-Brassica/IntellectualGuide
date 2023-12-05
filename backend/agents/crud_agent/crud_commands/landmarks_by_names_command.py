@@ -26,7 +26,10 @@ class LandmarksByNamesCommand(BaseCommand):
 
         :return: Coroutine
             List [
-                Dict["landmark": Dict | None]
-            ]
+                Dict[
+                    "landmark": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
+                ]
+            ],  where categories_names are categories of landmark
         """
         return await self._target_agent.get_landmarks_by_names(self._json_params)

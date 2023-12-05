@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
 
             command1 = CRUDCommandsFabric.create_categories_of_region_command(crud, {"region_name": "Мядзельскі раён"})
-            command2 = CRUDCommandsFabric.create_landmarks_in_map_sectors_command(crud, {"sector_names": ["a1", "a2"], "optional_limit": 3})
+            command2 = CRUDCommandsFabric.create_landmarks_in_map_sectors_command(crud, {"map_sectors_names": ["a1", "a2"], "optional_limit": 3})
             command3 = CRUDCommandsFabric.create_landmarks_refers_to_categories_command(crud, {"categories_names": ["озёра мядельского района", "национальные парки белоруссии"], "optional_limit": 3})
             command4 = CRUDCommandsFabric.create_landmarks_by_coordinates_command(crud, {"coordinates": [{"longitude": 26.91887917, "latitude": 54.84001}, {"longitude": 26.8629, "latitude":54.955}, {"longitude":26.8684 , "latitude":54.9683}], "optional_limit": 3})
             command5 = CRUDCommandsFabric.create_landmarks_by_names_command(crud, {"landmark_names": ["свирь", "рудаково", "нарочь"], "optional_limit": 3})

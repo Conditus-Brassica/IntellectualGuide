@@ -20,7 +20,7 @@ get_landmarks_in_map_sectors_json = \
     {
         "type": "object",
         "properties": {
-            "sector_names":
+            "map_sectors_names":
                 {
                     "type": "array",
                     "items": {
@@ -31,7 +31,7 @@ get_landmarks_in_map_sectors_json = \
             "optional_limit": {"type": ["number", "null"]},
             "additionalProperties": False
         },
-        "required": ["sector_names"],
+        "required": ["map_sectors_names"],
         "maxProperties": 2,
         "additionalProperties": False
     }

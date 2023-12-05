@@ -30,18 +30,22 @@ class PureReader(ABC):
 
     @staticmethod
     @abstractmethod
-    async def read_landmarks_in_map_sectors(session, sector_names: List[str], optional_limit: int = None):
+    async def read_landmarks_in_map_sectors(session, map_sectors_names: List[str], optional_limit: int = None):
         """
         Returns from kb landmarks, located in passed map sectors. Finds map sectors by their names.
         Works asynchronously.
 
         :param session: async session of knowledge base driver
-        :param sector_names: List[str] names of map sectors, where target landmarks are located
+        :param map_sectors_names: List[str] names of map sectors, where target landmarks are located  # TODO
         :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List [
-                Dict["landmark": Dict, "sector": Dict]
-            ]
+                {
+                    "landmark": Dict | None,
+                    "sector": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
+                }
+            ],  where categories_names are categories of landmark
         """
         raise NotImplementedError
 
@@ -63,8 +67,11 @@ class PureReader(ABC):
         :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List [
-                Dict["landmark": Dict]
-            ]
+                Dict[
+                    "landmark": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
+                ]
+            ], where categories_names are categories of landmark
         """
         raise NotImplementedError
 
@@ -97,8 +104,11 @@ class PureReader(ABC):
         :param optional_limit: int | None the maximum number of returning records (not specified if None is given)
         :return: Coroutine
             List [
-                Dict["landmark": Dict]
-            ]
+                Dict[
+                    "landmark": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
+                ]
+            ], where categories_names are categories of landmark
         """
         raise NotImplementedError
 
@@ -180,10 +190,11 @@ class PureReader(ABC):
         :return: Coroutine
             List[
                 Dict[
-                    "landmark": Dict,
-                    "located_at": Dict
+                    "landmark": Dict | None,
+                    "located_at": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
                 ]
-            ], where "located_at" is the region, where landmark is located
+            ],  where "located_at" is the region, where landmark is located, categories_names are categories of landmark
         """
         raise NotImplementedError
 

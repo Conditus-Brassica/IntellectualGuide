@@ -34,14 +34,18 @@ class PureCRUDAgent(ABC):
         Returns from kb landmarks, located in passed map sectors. Finds map sectors by their names.
         Works asynchronously.
 
-        :param json_params: Dict in form {"sector_names": List[str], "optional_limit": int | None}
+        :param json_params: Dict in form {
+            "map_sectors_names": List[str],
+            "optional_limit": int | None
+            }
         :return: Coroutine
             List [
                 {
                     "landmark": Dict | None,
-                    "sector": Dict | None
+                    "sector": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
                 }
-            ]
+            ], where categories_names are categories of landmark
         """
         raise NotImplementedError
 
@@ -79,8 +83,11 @@ class PureCRUDAgent(ABC):
             }
         :return: Coroutine
             List [
-                Dict["landmark": Dict | None]
-            ]
+                Dict[
+                    "landmark": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
+                ]
+            ],  where categories_names are categories of landmark
         """
         raise NotImplementedError
 
@@ -93,8 +100,11 @@ class PureCRUDAgent(ABC):
         :param json_params: Dict in form {"landmark_names": List[str], "optional_limit": int | None}
         :return: Coroutine
             List [
-                Dict["landmark": Dict | None]
-            ]
+                Dict[
+                    "landmark": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
+                ]
+            ],  where categories_names are categories of landmark
         """
         raise NotImplementedError
 
@@ -132,9 +142,10 @@ class PureCRUDAgent(ABC):
             List[
                 Dict[
                     "landmark": Dict | None,
-                    "located_at": Dict | None
+                    "located_at": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
                 ]
-            ],  where "located_at" is the region, where landmark is located
+            ],  where "located_at" is the region, where landmark is located, categories_names are categories of landmark
         """
         raise NotImplementedError
 

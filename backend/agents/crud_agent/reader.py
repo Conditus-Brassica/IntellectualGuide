@@ -62,11 +62,11 @@ class Reader(PureReader):
         return result
 
     @staticmethod
-    async def _read_landmarks_in_map_sectors(tx, sector_names: List[str], optional_limit: int = None):
+    async def _read_landmarks_in_map_sectors(tx, map_sectors_names: List[str], optional_limit: int = None):
         """Transaction handler for read_categories_of_region"""
         result = await tx.run(
             """
-            UNWIND $sector_names AS sector_name
+            UNWIND $map_sectors_names AS sector_name
             CALL {
                 WITH sector_name
                 CALL db.index.fulltext.queryNodes('map_sector_name_fulltext_index', sector_name)
@@ -76,16 +76,25 @@ class Reader(PureReader):
                     LIMIT 1
             }
             OPTIONAL MATCH (landmark: Landmark)-[:IN_SECTOR]->(sector)
-            RETURN landmark, sector
+            RETURN
+                landmark,
+                sector,
+                COLLECT {
+                    MATCH (landmark)-[:REFERS]->(category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS categories_names
                 ORDER BY sector.name;
             """,
-            sector_names=sector_names
+            map_sectors_names=map_sectors_names
         )
         try:
             if optional_limit:
-                result_values = [record.data("landmark", "sector") for record in await result.fetch(optional_limit)]
+                result_values = [
+                    record.data("landmark", "categories_names", "sector")
+                    for record in await result.fetch(optional_limit)
+                ]
             else:
-                result_values = [record.data("landmark", "sector") async for record in result]
+                result_values = [record.data("landmark", "categories_names", "sector") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -94,8 +103,10 @@ class Reader(PureReader):
         return result_values
 
     @staticmethod
-    async def read_landmarks_in_map_sectors(session: AsyncSession, sector_names: List[str], optional_limit: int = None):
-        result = await session.execute_read(Reader._read_landmarks_in_map_sectors, sector_names, optional_limit)
+    async def read_landmarks_in_map_sectors(
+            session: AsyncSession, map_sectors_names: List[str], optional_limit: int = None
+    ):
+        result = await session.execute_read(Reader._read_landmarks_in_map_sectors, map_sectors_names, optional_limit)
         await logger.info(f"method:\tread_landmarks_in_map_sectors,\nresult:\t{result}")
         return result
 
@@ -109,15 +120,22 @@ class Reader(PureReader):
                 WHERE
                     landmark.latitude = toFloat(coordinate.latitude) AND 
                     landmark.longitude = toFloat(coordinate.longitude)
-            RETURN landmark; 
+            RETURN
+                landmark,
+                COLLECT {
+                    MATCH (landmark)-[:REFERS]->(category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS categories_names;
             """,
             coordinates=coordinates
         )
         try:
             if optional_limit:
-                result_values = [record.data("landmark") for record in await result.fetch(optional_limit)]
+                result_values = [
+                    record.data("landmark", "categories_names") for record in await result.fetch(optional_limit)
+                ]
             else:
-                result_values = [record.data("landmark") async for record in result]
+                result_values = [record.data("landmark", "categories_names") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -189,15 +207,22 @@ class Reader(PureReader):
                     ORDER BY score DESC
                     LIMIT 1
             }
-            RETURN landmark; 
+            RETURN
+                landmark,
+                COLLECT {
+                    MATCH (landmark)-[:REFERS]->(category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS categories_names; 
             """,
             landmark_names=landmark_names
         )
         try:
             if optional_limit:
-                result_values = [record.data("landmark") for record in await result.fetch(optional_limit)]
+                result_values = [
+                    record.data("landmark", "categories_names") for record in await result.fetch(optional_limit)
+                ]
             else:
-                result_values = [record.data("landmark") async for record in result]
+                result_values = [record.data("landmark", "categories_names") async for record in result]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -367,15 +392,26 @@ class Reader(PureReader):
                 (final_region:Region)
                     <-[:LOCATED]-
                 (landmark:Landmark)
-            RETURN landmark, final_region AS located_at;
+            RETURN
+                landmark,
+                COLLECT {
+                    MATCH (landmark)-[:REFERS]->(category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS categories_names,
+                final_region AS located_at;
             """,
             region_name=region_name
         )
         try:
             if optional_limit:
-                result_values = [record.data("landmark", "located_at") for record in await result.fetch(optional_limit)]
+                result_values = [
+                    record.data("landmark", "categories_names", "located_at")
+                    for record in await result.fetch(optional_limit)
+                ]
             else:
-                result_values = [record.data("landmark", "located_at") async for record in result]
+                result_values = [
+                    record.data("landmark", "categories_names", "located_at") async for record in result
+                ]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
