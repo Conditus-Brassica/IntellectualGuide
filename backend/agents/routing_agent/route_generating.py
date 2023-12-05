@@ -8,6 +8,8 @@ class RoutingAgent:
     Agent for finding route points.
     Usage: when you need to create optimized
     route between several points.
+
+    Uses api_key in api_key.py
     """
     def __init__(self):
         self.__client__ = ors.Client(key=api_key.__key__)
