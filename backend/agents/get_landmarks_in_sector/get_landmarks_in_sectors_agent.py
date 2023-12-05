@@ -3,7 +3,7 @@ import json
 from aiologger.loggers.json import JsonLogger
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
-from backend.agents import PureCRUDAgent, CRUDCommandsFabric
+from backend.agents import PureCRUDAgent
 from backend.agents.get_landmarks_in_sector.get_landmarks_commands_fabric import GetLandmarksInSectorCommandsFabric
 from backend.agents.get_landmarks_in_sector.squares_params_json_validation import *
 from backend.command_bases import Sender, BaseCommand
@@ -62,11 +62,11 @@ class GetLandmarksInSectors(Sender):
             else:
                 coords_of_squares = self.__partial_cache_handling(coords_of_square)
                 for element in coords_of_squares:
-                    self.__get_squares_in_sector(element)
+                    self.__get_sectors_in_sector(element)
         else:  # No cash at all
-            self.__get_squares_in_sector(coords_of_square)
+            self.__get_sectors_in_sector(coords_of_square)
 
-    def __get_squares_in_sector(self, coords_of_square: dict):
+    def __get_sectors_in_sector(self, coords_of_square: dict):
         data = json.load(open("new_squares.json"))
         for element in data:
             if (coords_of_square["TL"]["longitude"] - self.LONG_DIFFERENCE <= element["TL"]["longitude"] <
