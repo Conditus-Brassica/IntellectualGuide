@@ -13,21 +13,25 @@ class PureRecommendationsAgent(Sender, ABC):
     """
 
     @abstractmethod
-    async def get_recommendations(self, json_params: Dict):
+    async def get_recommendations_by_coordinates_and_categories(self, json_params: Dict):
         """
         Method to get recommendations from agent.
 
         :param json_params: Dict in form {
+             "coordinates_of_points": List [
+                Dict [
+                    "latitude": float,
+                    "longitude": float
+                ]
+            ],
+            "categories_names": List[str],
             "user_login": str,
-            "current_latitude": float,
-            "current_longitude": float,
-            "current_name": str,
-            "recommendations_amount": int
+            "amount_of_recommendations": int
         }, where current_name is the name of given landmark
         :return: Coroutine
             List[
                 {
-                    recommended:
+                    recommended: Dict | None
                 }
             ]
         """

@@ -28,8 +28,9 @@ class LandmarksByRegionCommand(BaseCommand):
             List[
                 Dict[
                     "landmark": Dict | None,
-                    "located_at": Dict | None
+                    "located_at": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
                 ]
-            ],  where "located_at" is the region, where landmark is located
+            ],  where "located_at" is the region, where landmark is located, categories_names are categories of landmark
         """
         return await self._target_agent.get_landmarks_by_region(self._json_params)
