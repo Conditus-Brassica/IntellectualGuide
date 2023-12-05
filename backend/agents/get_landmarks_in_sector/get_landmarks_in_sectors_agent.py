@@ -4,7 +4,6 @@ from aiologger.loggers.json import JsonLogger
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from backend.agents import PureCRUDAgent, CRUDCommandsFabric
-from backend.agents.get_landmarks_in_sector.get_landmarks_commands_fabric import GetLandmarksInSectorCommandsFabric
 from backend.agents.get_landmarks_in_sector.squares_params_json_validation import *
 from backend.command_bases import Sender, BaseCommand
 
@@ -14,7 +13,7 @@ logger = JsonLogger.with_default_handlers(
 )
 
 
-class GetLandmarksInSectors(Sender):
+class GetLandmarksInSectorsAgent(Sender):
     LAT_DIFFERENCE = 0.312
     LONG_DIFFERENCE = 0.611
 
