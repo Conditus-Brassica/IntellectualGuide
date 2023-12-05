@@ -22,6 +22,8 @@ class GetLandmarksInSectors(Sender):
         self.squares_in_sector = {"sector_names": [], "map_sector_names": []}
         self.crud = Agent
         self.cache = {}
+        self.result = {}
+        self.full_cache = {}
 
     async def get_landmarks_in_sector(self, coords_of_square: dict):
         # Check if format of dictionary is right using validator
@@ -29,9 +31,10 @@ class GetLandmarksInSectors(Sender):
 
         self.__get_sectors_of_map(coords_of_square)
         self.squares_in_sector.pop("map_sectors_names")
-        return await self.send_command(
-            GetLandmarksInSectorCommandsFabric.create_landmarks_in_map_sectors_command(self.crud,
-                                                                                       self.squares_in_sector))
+        if not self.full_cache:
+            self.result = await self.send_command(GetLandmarksInSectorCommandsFabric.create_landmarks_in_map_sectors_command(self.crud,
+                                                                            self.squares_in_sector))
+        return self.result
 
 
     async def get_landmarks_by_categories_in_sector(self, coords_of_square: dict, categories: list[str]):
@@ -40,9 +43,10 @@ class GetLandmarksInSectors(Sender):
         self.__get_sectors_of_map(coords_of_square)
         self.squares_in_sector.pop("sector_names")
         self.squares_in_sector["categories_names"] = categories
-        return await self.send_command(
-            GetLandmarksInSectorCommandsFabric.create_landmarks_of_categories_in_map_sectors_command(self.crud, self.squares_in_sector))
-
+        if not self.full_cache:
+            self.result = await self.send_command(
+                GetLandmarksInSectorCommandsFabric.create_landmarks_of_categories_in_map_sectors_command(self.crud, self.squares_in_sector))
+        return self.result
 
     async def send_command(self, command: BaseCommand):
         await command.execute()
@@ -54,16 +58,15 @@ class GetLandmarksInSectors(Sender):
                 self.cache["BR"]["longitude"]) and (
                     self.cache["BR"]["latitude"] <= coords_of_square["BR"]["latitude"] < coords_of_square["TL"]["latitude"] <=
                     self.cache["TL"]["latitude"]):  # Cash using, first occurrence: when new square fully in the old square
-                pass
-            # elif (self.cache is None):  # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
-            #     self.squares_in_sector = {"map_sectors_names": []}
+                self.full_cache = True
             else:
-                self.__get_squares_in_sector(coords_of_square)
+                coords_of_squares = self.__partial_cash_handling(coords_of_square)
+                for element in coords_of_squares:
+                    self.__get_squares_in_sector(element)
         else:  # No cash at all
             self.__get_squares_in_sector(coords_of_square)
 
     def __get_squares_in_sector(self, coords_of_square: dict):
-        self.squares_in_sector = {"map_sectors_names": []}
         data = json.load(open("new_squares.json"))
         for element in data:
             if (coords_of_square["TL"]["longitude"] - self.LONG_DIFFERENCE <= element["TL"]["longitude"] <
@@ -76,8 +79,22 @@ class GetLandmarksInSectors(Sender):
                 self.squares_in_sector["sector_names"].append(element["name"])
         self.cache = coords_of_square
 
-    def __partial_cash_using_check(self):
-        pass
+    # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
+    # Uncomplete
+    def __partial_cash_handling(self, coords_of_square: dict) -> list:
+        tick = 0
+        test_coords = []
+        if self.cache["TL"]["longitude"] <= coords_of_square["TL"]["longitude"]:
+            tick += 1
+            pass
+        if coords_of_square["BR"]["longitude"] <= self.cache["BR"]["longitude"]:
+            pass
+        if self.cache["BR"]["latitude"] <= coords_of_square["BR"]["latitude"]:
+            pass
+        if coords_of_square["TL"]["latitude"] <= self.cache["TL"]["latitude"]:
+            pass
+        if tick == 0:
+            return [coords_of_square]
 
     async def __validation(self, coords_of_square: dict):
         try:
