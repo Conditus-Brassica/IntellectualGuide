@@ -29,6 +29,12 @@ class LandmarksOfCategoriesInUserViewCommand(BaseCommand):
         getLandmarksInSectorsAgent.
 
         :return: Coroutine
-            # TODO Fill
+            List[
+                Dict[
+                    "landmark": Dict | None,
+                    "map_sector": Dict | None,
+                    "category": Dict | None
+                ]
+            ]
         """
         return await self._target_agent.get_landmarks_of_categories_in_map_sectors(self._json_params)

@@ -27,7 +27,9 @@ class LandmarksInUserViewCommand(BaseCommand):
         :return: Coroutine
             List [
                 {
-                    # TODO Fill
+                    "landmark": Dict | None,
+                    "sector": Dict | None,
+                    "categories_names": List[str] | [] (empty list)
                 }
             ], where categories_names are categories of landmark
         """
