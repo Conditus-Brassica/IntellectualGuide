@@ -60,7 +60,7 @@ class GetLandmarksInSectors(Sender):
                     self.cache["TL"]["latitude"]):  # Cash using, first occurrence: when new square fully in the old square
                 self.full_cache = True
             else:
-                coords_of_squares = self.__partial_cash_handling(coords_of_square)
+                coords_of_squares = self.__partial_cache_handling(coords_of_square)
                 for element in coords_of_squares:
                     self.__get_squares_in_sector(element)
         else:  # No cash at all
@@ -81,7 +81,7 @@ class GetLandmarksInSectors(Sender):
 
     # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
     # Uncomplete
-    def __partial_cash_handling(self, coords_of_square: dict) -> list:
+    def __partial_cache_handling(self, coords_of_square: dict) -> list:
         tick = 0
         test_coords = []
         if self.cache["TL"]["longitude"] <= coords_of_square["TL"]["longitude"]:
