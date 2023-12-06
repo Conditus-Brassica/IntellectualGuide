@@ -1,4 +1,5 @@
 import asyncio
+import json
 from crud_commands import *
 from pprint import pprint
 from backend.agents.crud_agent.reader import Reader
@@ -10,9 +11,9 @@ from backend.agents.crud_agent.crud_commands_fabric import CRUDCommandsFabric
 
 if __name__ == '__main__':
 
-    async def test():
+    async def test(login, password):
 
-        async with AsyncGraphDatabase.driver('bolt://localhost:7687', auth=('neo4j', 'ostisGovno')) as driver:
+        async with AsyncGraphDatabase.driver('bolt://localhost:7687', auth=(login, password)) as driver:
             reader = Reader()
             crud = CRUDAgent(reader, driver, 'neo4j')
 
@@ -46,7 +47,8 @@ if __name__ == '__main__':
                     ],
                     "categories_names": ["озёра поставского района"], #["историко-культурные ценности республики беларусь", "озёра поставского района"],
                     "user_login": "user",
-                    "amount_of_recommendations": 10
+                    "amount_of_recommendations_for_point": 3,
+                    "amount_of_recommendations": 6
                 }
             )
 
@@ -74,4 +76,8 @@ if __name__ == '__main__':
             pprint(await task10)
             pprint(await task11)
 
-    asyncio.run(test())
+
+    with open("basic_login.json", 'r') as fout:
+        basic_login = json.load(fout)
+
+    asyncio.run(test(basic_login["login"], basic_login["password"]))

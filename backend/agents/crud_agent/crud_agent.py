@@ -32,6 +32,8 @@ class CRUDAgent(PureCRUDAgent):
         try:
             validate(json_params, get_categories_of_region_json)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(session(json_params["region_name"], json_params["optional_limit"]))
         except ValidationError as ex:
             await logger.info(f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
@@ -45,6 +47,8 @@ class CRUDAgent(PureCRUDAgent):
         try:
             validate(json_params, get_landmarks_in_map_sectors_json)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(session(json_params["map_sectors_names"], json_params["optional_limit"]))
         except ValidationError as ex:
             await logger.info(f"get_landmarks_in_map_sectors. "
@@ -61,6 +65,8 @@ class CRUDAgent(PureCRUDAgent):
         try:
             validate(json_params, get_landmarks_refers_to_categories_json)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(session(json_params["categories_names"], json_params["optional_limit"]))
         except ValidationError as ex:
             await logger.info(f"get_landmarks_refers_to_categories. "
@@ -75,6 +81,8 @@ class CRUDAgent(PureCRUDAgent):
         try:
             validate(json_params, get_landmarks_by_coordinates_json)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(session(json_params["coordinates"], json_params["optional_limit"]))
         except ValidationError as ex:
             await logger.info(f"get_landmarks_by_coordinates. "
@@ -89,6 +97,8 @@ class CRUDAgent(PureCRUDAgent):
         try:
             validate(json_params, get_landmarks_by_names_json)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(session(json_params["landmark_names"], json_params["optional_limit"]))
         except ValidationError as ex:
             await logger.info(f"get_landmarks_by_names. "
@@ -105,6 +115,8 @@ class CRUDAgent(PureCRUDAgent):
         try:
             validate(json_params, get_landmarks_of_categories_in_region_json)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(
                 session(json_params["region_name"], json_params["categories_names"], json_params["optional_limit"])
             )
@@ -121,6 +133,8 @@ class CRUDAgent(PureCRUDAgent):
         try:
             validate(json_params, get_landmarks_by_region_json)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(session(json_params["region_name"], json_params["optional_limit"]))
         except ValidationError as ex:
             await logger.info(f"get_landmarks_by_region. "
@@ -161,6 +175,8 @@ class CRUDAgent(PureCRUDAgent):
         try:
             # TODO validate(json_params, get_landmarks_by_region_json)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(session(json_params["coordinates_of_points"], json_params["optional_limit"]))
         except ValidationError as ex:
             await logger.info(f"get_map_sectors_of_points. "
@@ -176,6 +192,8 @@ class CRUDAgent(PureCRUDAgent):
         try:
             # TODO validate(json_params, get_landmarks_by_region_json)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(
                 session(
                     json_params["map_sectors_names"], json_params["categories_names"], json_params["optional_limit"]
@@ -190,19 +208,24 @@ class CRUDAgent(PureCRUDAgent):
                 coordinates_of_points: List[Dict[str, float]],
                 categories_names: List[str],
                 user_login: str,
-                amount_of_recommendations: int
+                amount_of_recommendations_for_point: int,
+                optional_limit: int | None
         ):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_recommendations_by_coordinates_and_categories(
-                    session, coordinates_of_points, categories_names, user_login, amount_of_recommendations
+                    session, coordinates_of_points, categories_names, user_login, amount_of_recommendations_for_point,
+                    optional_limit
                 )
 
         try:
             # TODO validate(json_params, get_recommendations_for_landmark_by_region_json)
+            json_params["optional_limit"] = json_params.get("optional_limit", None)
+            if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
+                raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(
                 session(
                     json_params["coordinates_of_points"], json_params["categories_names"], json_params["user_login"],
-                    json_params["amount_of_recommendations"]
+                    json_params["amount_of_recommendations_for_point"], json_params["optional_limit"]
                 )
             )
         except ValidationError as ex:

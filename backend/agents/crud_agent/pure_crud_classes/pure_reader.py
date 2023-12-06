@@ -164,14 +164,14 @@ class PureReader(ABC):
             :return: Coroutine
             List[
                 Dict[
-                    "recommendation": Dict,
-                    "recommendation_category_is_main": bool,
-                    "distance": float,
-                    "current_landmark_category_is_main": bool,
-                    "category": Dict,
-                    "userAccount": Dict,
-                    "wish_ref": Dict,
-                    "visited_ref": Dict
+                    "recommendation": Dict | None,
+                    "recommendation_category_is_main": bool | None,
+                    "distance": float | None,
+                    "current_landmark_category_is_main": bool | None,
+                    "category": Dict | None,
+                    "user_account": Dict | None,
+                    "wish_to_visit": bool | None,
+                    "visited_amount": int | None
                 ]
             ]
         """
@@ -252,7 +252,8 @@ class PureReader(ABC):
             coordinates_of_points: List[Dict[str, float]],
             categories_names: List[str],
             user_login: str,
-            amount_of_recommendations: int
+            amount_of_recommendations_for_point: int,
+            optional_limit: int | None
     ):
         """
             Returns recommended landmarks for given user, given coordinates and given categories. Finds given landmark
@@ -270,10 +271,15 @@ class PureReader(ABC):
             ] coordinates of given points
             :param categories_names: List[str] names of categories of target landmarks
             :param user_login: str login of user for whom recommendations will be found
-            :param amount_of_recommendations: int max amount of recommended landmarks
+            :param amount_of_recommendations_for_point: int max amount of recommended landmarks for every point
+            :param optional_limit: int | None max amount of recommended landmarks
             :return: Coroutine
             List[
                 Dict[
+                    for_point: Dict [
+                        "latitude": float,
+                        "longitude": float
+                    ],
                     recommended_landmark: Dict | None,
                     recommendation_category_is_main: True | None,
                     category: Dict | None,

@@ -170,13 +170,13 @@ class PureCRUDAgent(ABC):
             List[
                 Dict[
                     "recommendation": Dict | None,
-                    "recommendation_landmark_category_ref": Dict | None,
+                    "recommendation_category_is_main": bool | None,
                     "distance": float | None,
-                    "current_landmark_category_ref": Dict | None,
+                    "current_landmark_category_is_main": bool | None,
                     "category": Dict | None,
-                    "userAccount": Dict | None,
-                    "wish_ref": Dict | None,
-                    "visited_ref": Dict | None
+                    "user_account": Dict | None,
+                    "wish_to_visit": bool | None,
+                    "visited_amount": int | None
                 ]
             ]
         """
@@ -248,11 +248,16 @@ class PureCRUDAgent(ABC):
                 ],
                 "categories_names": List[str],
                 "user_login": str,
-                "amount_of_recommendations": int
+                "amount_of_recommendations_for_point": int
+                "optional_limit": int | None
             }, where current_name is the name of given landmark
             :return: Coroutine
             List[
                 Dict[
+                    for_point: Dict [
+                        "latitude": float,
+                        "longitude": float
+                    ],
                     recommended_landmark: Dict | None,
                     recommendation_category_is_main: True | None,
                     category: Dict | None,

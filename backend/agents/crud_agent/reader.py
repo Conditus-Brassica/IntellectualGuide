@@ -304,16 +304,16 @@ class Reader(PureReader):
             """
             MATCH (current_landmark: Landmark) 
                 WHERE
-                    current_landmark.latitude = $current_latitude AND
-                    current_landmark.longitude = $current_longitude AND
-                    current_landmark.name STARTS WITH $current_name
+                    current_landmark.latitude = toFloat(52.5899) AND
+                    current_landmark.longitude = toFloat(29.07) AND
+                    current_landmark.name STARTS WITH "бабинец"
             OPTIONAL MATCH
                 (category:LandmarkCategory)<-[current_landmark_category_ref:REFERS]-(current_landmark)
                     -[:LOCATED]->
-                (:Region)((:Region&!State)-[:INCLUDE|NEIGHBOR]-(:Region&!State)){0,4}(:Region)
+                (:Region)((:Region&!State)-[:INCLUDE|NEIGHBOUR]-(:Region&!State)){0,4}(:Region)
                     <-[:LOCATED]-
                 (recommendation:Landmark)-[recommendation_landmark_category_ref:REFERS]->(category)
-            OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = $user_login)
+            OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = "user")
             OPTIONAL MATCH (userAccount)-[wish_ref:WISH_TO_VISIT]->(recommendation)
             OPTIONAL MATCH (userAccount)-[visited_ref:VISITED]->(recommendation)
             WITH 
@@ -328,22 +328,28 @@ class Reader(PureReader):
                 current_landmark_category_ref.main_category_flag DESC,
                 recommendation_landmark_category_ref.main_category_flag DESC,
                 point.distance(
-                    point({latitude: $current_latitude, longitude: $current_longitude}),
+                    point({latitude: toFloat(52.5899), longitude: toFloat(29.07)}),
                     point({latitude: recommendation.latitude, longitude: recommendation.longitude})
                 ) ASC
-            LIMIT $amount_of_recommendations
+            LIMIT 25
             RETURN DISTINCT 
                 recommendation,
                 recommendation_landmark_category_ref.main_category_flag AS recommendation_category_is_main,
                 point.distance(
-                    point({latitude: $current_latitude, longitude: $current_longitude}),
+                    point({latitude: toFloat(52.5899), longitude: toFloat(29.07)}),
                     point({latitude: recommendation.latitude, longitude: recommendation.longitude})
                 ) AS distance,
                 current_landmark_category_ref.main_category_flag AS current_landmark_category_is_main,
                 category,
                 userAccount AS user_account,
-                wish_ref,
-                visited_ref;
+                CASE
+                    WHEN wish_ref IS NULL THEN False
+                    ELSE True
+                END AS wish_to_visit,
+                CASE
+                    WHEN visited_ref.amount IS NULL THEN 0
+                    ELSE visited_ref.amount
+                END AS visited_amount;
             """,
             user_login=user_login, current_latitude=current_latitude, current_longitude=current_longitude,
             current_name=current_name, amount_of_recommendations=amount_of_recommendations
@@ -354,7 +360,8 @@ class Reader(PureReader):
                 result_values.append(
                     record.data(
                         "recommendation", "recommendation_category_is_main", "distance",
-                        "current_landmark_category_is_main", "category", "user_account", "wish_ref", "visited_ref"
+                        "current_landmark_category_is_main", "category", "user_account", "wish_to_visit",
+                        "visited_amount"
                     )
                 )
         except IndexError as ex:
@@ -538,134 +545,177 @@ class Reader(PureReader):
             coordinates_of_points: List[Dict[str, float]],
             categories_names: List[str],
             user_login: str,
-            amount_of_recommendations: int
+            amount_of_recommendations_for_point: int,
+            optional_limit: int | None
     ):
         """Transaction handler for read_recommendations_by_coordinates_and_categories"""
         result = await tx.run(
             """
             UNWIND $coordinates_of_points AS coordinates_of_point
-            OPTIONAL MATCH (mapSector: MapSector)
-                WHERE
-                    mapSector.tl_longitude <= toFloat(coordinates_of_point.longitude) AND
-                    mapSector.tl_latitude >= toFloat(coordinates_of_point.latitude) AND
-                    point.withinBBox(
-                        point({latitude: coordinates_of_point.latitude, longitude: coordinates_of_point.longitude, crs:'WGS-84'}),
-                        point({latitude: mapSector.br_latitude, longitude: mapSector.tl_longitude, crs:'WGS-84'}),
-                        point({latitude: mapSector.tl_latitude, longitude: mapSector.br_longitude, crs:'WGS-84'})
-                    )
-            WITH mapSector, coordinates_of_point
-            UNWIND $categories_names AS category_name
             CALL {
-                WITH category_name
-                CALL db.index.fulltext.queryNodes("landmark_category_name_fulltext_index", category_name)
-                    YIELD score, node AS category
-                RETURN category
-                    ORDER BY score DESC
-                    LIMIT 1
-            }
-            OPTIONAL MATCH
-                (mapSector)
-                    <-[:IN_SECTOR]-
-                (recommendedLandmark:Landmark)
-                    -[recommendation_landmark_category_ref:REFERS]->
-                (category)
-            OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = $user_login)
-            OPTIONAL MATCH (userAccount)-[wish_ref:WISH_TO_VISIT]->(recommendedLandmark)
-            OPTIONAL MATCH (userAccount)-[visited_ref:VISITED]->(recommendedLandmark)
-            WITH
-                coordinates_of_point,
-                recommendedLandmark,
-                recommendation_landmark_category_ref,
+                WITH coordinates_of_point
+                OPTIONAL MATCH (mapSector: MapSector)
+                    WHERE
+                        mapSector.tl_longitude <= toFloat(coordinates_of_point.longitude) AND
+                        mapSector.tl_latitude >= toFloat(coordinates_of_point.latitude) AND
+                        point.withinBBox(
+                            point({latitude: coordinates_of_point.latitude, longitude: coordinates_of_point.longitude, crs:'WGS-84'}),
+                            point({latitude: mapSector.br_latitude, longitude: mapSector.tl_longitude, crs:'WGS-84'}),
+                            point({latitude: mapSector.tl_latitude, longitude: mapSector.br_longitude, crs:'WGS-84'})
+                        )
+                WITH mapSector, coordinates_of_point
+                UNWIND $categories_names AS category_name
+                CALL {
+                    WITH category_name
+                    CALL db.index.fulltext.queryNodes("landmark_category_name_fulltext_index", category_name)
+                        YIELD score, node AS category
+                    RETURN category
+                        ORDER BY score DESC
+                        LIMIT 1
+                }
+                OPTIONAL MATCH
+                    (mapSector)
+                        <-[:IN_SECTOR]-
+                    (recommendedLandmark:Landmark)
+                        -[recommendation_landmark_category_ref:REFERS]->
+                    (category)
+                OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = $user_login)
+                OPTIONAL MATCH (userAccount)-[wish_ref:WISH_TO_VISIT]->(recommendedLandmark)
+                OPTIONAL MATCH (userAccount)-[visited_ref:VISITED]->(recommendedLandmark)
+                WITH
+                    coordinates_of_point,
+                    recommendedLandmark,
+                    recommendation_landmark_category_ref,
+                    category,
+                    userAccount,
+                    wish_ref,
+                    visited_ref
+                ORDER BY
+                    point.distance(
+                        point({latitude: coordinates_of_point.latitude, longitude: coordinates_of_point.longitude, crs:'WGS-84'}),
+                        point({latitude: recommendedLandmark.latitude, longitude: recommendedLandmark.longitude})
+                    ) ASC
+                LIMIT $amount_of_recommendations_for_point
+                RETURN DISTINCT
+                    recommendedLandmark AS recommended_landmark,
+                    recommendation_landmark_category_ref.main_category_flag AS recommendation_category_is_main,
+                    category,
+                    userAccount AS user_account,
+                    CASE
+                        WHEN wish_ref IS NULL THEN False
+                        ELSE True
+                    END AS wish_to_visit,
+                    CASE
+                        WHEN visited_ref.amount IS NULL THEN 0
+                        ELSE visited_ref.amount
+                    END AS visited_amount
+            } RETURN
+                coordinates_of_point AS for_point,
+                recommended_landmark, 
+                recommendation_category_is_main,
                 category,
-                userAccount,
-                wish_ref,
-                visited_ref
-            ORDER BY
-                point.distance(
-                    point({latitude: coordinates_of_point.latitude, longitude: coordinates_of_point.longitude, crs:'WGS-84'}),
-                    point({latitude: recommendedLandmark.latitude, longitude: recommendedLandmark.longitude})
-                ) ASC
-            LIMIT $amount_of_recommendations
-            RETURN DISTINCT
-                recommendedLandmark AS recommended_landmark,
-                recommendation_landmark_category_ref.main_category_flag AS recommendation_category_is_main,
-                category,
-                userAccount AS user_account,
-                wish_ref,
-                visited_ref
+                user_account,
+                wish_to_visit,
+                visited_amount
+                
                 
             UNION
             
+            
             UNWIND $coordinates_of_points AS coordinates_of_point
-            OPTIONAL MATCH (mapSector: MapSector)
-                WHERE
-                    mapSector.tl_longitude <= toFloat(coordinates_of_point.longitude) AND
-                    mapSector.tl_latitude >= toFloat(coordinates_of_point.latitude) AND
-                    point.withinBBox(
-                        point({latitude: coordinates_of_point.latitude, longitude: coordinates_of_point.longitude, crs:'WGS-84'}),
-                        point({latitude: mapSector.br_latitude, longitude: mapSector.tl_longitude, crs:'WGS-84'}),
-                        point({latitude: mapSector.tl_latitude, longitude: mapSector.br_longitude, crs:'WGS-84'})
-                    )
-            WITH mapSector, coordinates_of_point
-            UNWIND $categories_names AS category_name
             CALL {
-                WITH category_name
-                CALL db.index.fulltext.queryNodes("landmark_category_name_fulltext_index", category_name)
-                    YIELD score, node AS categoryFromInput
-                RETURN categoryFromInput
-                    ORDER BY score DESC
-                    LIMIT 1
-            }
-            OPTIONAL MATCH
-                (mapSector)
-                    <-[:IN_SECTOR]-
-                (current_landmark:Landmark)
-                    -[:REFERS]->
-                (categoryFromInput)
-            OPTIONAL MATCH
-                (category:LandmarkCategory)<-[current_landmark_category_ref:REFERS]-(current_landmark)
-                    -[:LOCATED]->
-                (:Region)((:Region&!State)-[:INCLUDE|NEIGHBOR]-(:Region&!State)){0,4}(:Region)
-                    <-[:LOCATED]-
-                (recommendedLandmark:Landmark)-[recommendation_landmark_category_ref:REFERS]->(category)
-            OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = $user_login)
-            OPTIONAL MATCH (userAccount)-[wish_ref:WISH_TO_VISIT]->(recommendedLandmark)
-            OPTIONAL MATCH (userAccount)-[visited_ref:VISITED]->(recommendedLandmark)
-            WITH
-                recommendedLandmark,
-                recommendation_landmark_category_ref,
-                current_landmark,
-                current_landmark_category_ref,
+                WITH coordinates_of_point
+                OPTIONAL MATCH (mapSector: MapSector)
+                    WHERE
+                        mapSector.tl_longitude <= toFloat(coordinates_of_point.longitude) AND
+                        mapSector.tl_latitude >= toFloat(coordinates_of_point.latitude) AND
+                        point.withinBBox(
+                            point({latitude: coordinates_of_point.latitude, longitude: coordinates_of_point.longitude, crs:'WGS-84'}),
+                            point({latitude: mapSector.br_latitude, longitude: mapSector.tl_longitude, crs:'WGS-84'}),
+                            point({latitude: mapSector.tl_latitude, longitude: mapSector.br_longitude, crs:'WGS-84'})
+                        )
+                WITH mapSector, coordinates_of_point
+                UNWIND $categories_names AS category_name
+                CALL {
+                    WITH category_name
+                    CALL db.index.fulltext.queryNodes("landmark_category_name_fulltext_index", category_name)
+                        YIELD score, node AS categoryFromInput
+                    RETURN categoryFromInput
+                        ORDER BY score DESC
+                        LIMIT 1
+                }
+                OPTIONAL MATCH
+                    (mapSector)
+                        <-[:IN_SECTOR]-
+                    (current_landmark:Landmark)
+                        -[:REFERS]->
+                    (categoryFromInput)
+                OPTIONAL MATCH
+                    (category:LandmarkCategory)<-[current_landmark_category_ref:REFERS]-(current_landmark)
+                        -[:LOCATED]->
+                    (:Region)((:Region&!State)-[:INCLUDE|NEIGHBOUR]-(:Region&!State)){0,4}(:Region)
+                        <-[:LOCATED]-
+                    (recommendedLandmark:Landmark)-[recommendation_landmark_category_ref:REFERS]->(category)
+                OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = $user_login)
+                OPTIONAL MATCH (userAccount)-[wish_ref:WISH_TO_VISIT]->(recommendedLandmark)
+                OPTIONAL MATCH (userAccount)-[visited_ref:VISITED]->(recommendedLandmark)
+                WITH
+                    recommendedLandmark,
+                    recommendation_landmark_category_ref,
+                    current_landmark,
+                    current_landmark_category_ref,
+                    category,
+                    userAccount,
+                    wish_ref,
+                    visited_ref
+                ORDER BY
+                    current_landmark_category_ref.main_category_flag DESC,
+                    recommendation_landmark_category_ref.main_category_flag DESC,
+                    point.distance(
+                        point({latitude: current_landmark.latitude, longitude: current_landmark.longitude}),
+                        point({latitude: recommendedLandmark.latitude, longitude: recommendedLandmark.longitude})
+                    ) ASC
+                LIMIT $amount_of_recommendations_for_point
+                RETURN DISTINCT
+                    recommendedLandmark AS recommended_landmark,
+                    recommendation_landmark_category_ref.main_category_flag AS recommendation_category_is_main,
+                    category,
+                    userAccount AS user_account,
+                    CASE
+                        WHEN wish_ref IS NULL THEN False
+                        ELSE True
+                    END AS wish_to_visit,
+                    CASE
+                        WHEN visited_ref.amount IS NULL THEN 0
+                        ELSE visited_ref.amount
+                    END AS visited_amount
+            } RETURN
+                coordinates_of_point AS for_point,
+                recommended_landmark, 
+                recommendation_category_is_main,
                 category,
-                userAccount,
-                wish_ref,
-                visited_ref
-            ORDER BY
-                current_landmark_category_ref.main_category_flag DESC,
-                recommendation_landmark_category_ref.main_category_flag DESC,
-                point.distance(
-                    point({latitude: current_landmark.latitude, longitude: current_landmark.longitude}),
-                    point({latitude: recommendedLandmark.latitude, longitude: recommendedLandmark.longitude})
-                ) ASC
-            LIMIT $amount_of_recommendations
-            RETURN DISTINCT
-                recommendedLandmark AS recommended_landmark,
-                recommendation_landmark_category_ref.main_category_flag AS recommendation_category_is_main,
-                category,
-                userAccount AS user_account,
-                wish_ref,
-                visited_ref
+                user_account,
+                wish_to_visit,
+                visited_amount
             """,
             coordinates_of_points=coordinates_of_points, categories_names=categories_names, user_login=user_login,
-            amount_of_recommendations=amount_of_recommendations
+            amount_of_recommendations_for_point=amount_of_recommendations_for_point
         )
         try:
-            result_values = [
-                record.data(
-                        "recommended_landmark", "recommendation_category_is_main", "category", "user_account",
-                        "wish_ref", "visited_ref"
-                ) for record in await result.fetch(amount_of_recommendations)
-            ]
+            if optional_limit:
+                result_values = [
+                    record.data(
+                        "for_point", "recommended_landmark", "recommendation_category_is_main", "category",
+                        "user_account", "wish_ref", "visited_ref"
+                    ) for record in await result.fetch(optional_limit)
+                ]
+            else:
+                result_values = [
+                    record.data(
+                        "for_point", "recommended_landmark", "recommendation_category_is_main", "category",
+                        "user_account", "wish_ref", "visited_ref"
+                    ) async for record in result
+                ]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -681,11 +731,12 @@ class Reader(PureReader):
             coordinates_of_points: List[Dict[str, float]],
             categories_names: List[str],
             user_login: str,
-            amount_of_recommendations: int
+            amount_of_recommendations_for_point: int,
+            optional_limit: int | None
     ):
         result = await session.execute_read(
             Reader._read_recommendations_by_coordinates_and_categories, coordinates_of_points,
-            categories_names, user_login, amount_of_recommendations
+            categories_names, user_login, amount_of_recommendations_for_point, optional_limit
         )
         await logger.info(f"method:\tread_recommendations_by_coordinates_and_categories,\nresult:\t{result}")
         return result
