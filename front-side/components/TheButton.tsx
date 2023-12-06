@@ -4,20 +4,16 @@ import { useRouter } from "next/navigation";
 
 interface TheButtonInterface{
     title: string;
-    href: string;
+    func: Function;
 };
 
 
 
-const TheButton: React.FC<TheButtonInterface> = ({title, href}) => {
+const TheButton: React.FC<TheButtonInterface> = ({title, func}) => {
     const router = useRouter(); 
 
-    const handleRoute = () =>{
-        router.push( href );
-    };
-
     return(
-    <div className={styles.button} onClick={handleRoute}>
+    <div className={styles.button} onClick={() => func}>
         <span className={styles.title}>{title}</span>
     </div>
 );

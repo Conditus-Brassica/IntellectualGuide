@@ -3,8 +3,7 @@ import json
 from aiologger.loggers.json import JsonLogger
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
-from backend.agents import PureCRUDAgent
-from backend.agents.get_landmarks_in_sector.get_landmarks_commands_fabric import GetLandmarksInSectorCommandsFabric
+from backend.agents import PureCRUDAgent, CRUDCommandsFabric
 from backend.agents.get_landmarks_in_sector.squares_params_json_validation import *
 from backend.command_bases import Sender, BaseCommand
 
@@ -14,38 +13,35 @@ logger = JsonLogger.with_default_handlers(
 )
 
 
-class GetLandmarksInSectors(Sender):
+class GetLandmarksInSectorsAgent(Sender):
     LAT_DIFFERENCE = 0.312
     LONG_DIFFERENCE = 0.611
 
-    def __init__(self, Agent: PureCRUDAgent):
-        self.squares_in_sector = {"sector_names": [], "map_sector_names": []}
-        self.crud = Agent  # TODO Агента получают извне, а не хранят у себя
+    def __init__(self, ):
+        self.squares_in_sector = {"map_sector_names": []}
         self.cache = {}
         self.result = {}
         self.full_cache = {}
 
-    async def get_landmarks_in_sector(self, coords_of_square: dict):
+    async def get_landmarks_in_sector(self, coords_of_square: dict, agent: PureCRUDAgent):
         # Check if format of dictionary is right using validator
         await self.__validation(coords_of_square)
 
         self.__get_sectors_of_map(coords_of_square)
-        self.squares_in_sector.pop("map_sectors_names")
-        if not self.full_cache:
-            self.result = await self.send_command(GetLandmarksInSectorCommandsFabric.create_landmarks_in_map_sectors_command(self.crud,
-                                                                            self.squares_in_sector))
-        return self.result
-
-
-    async def get_landmarks_by_categories_in_sector(self, coords_of_square: dict, categories: list[str]):
-        await self.__validation(coords_of_square)
-
-        self.__get_sectors_of_map(coords_of_square)
-        self.squares_in_sector.pop("sector_names")
-        self.squares_in_sector["categories_names"] = categories
         if not self.full_cache:
             self.result = await self.send_command(
-                GetLandmarksInSectorCommandsFabric.create_landmarks_of_categories_in_map_sectors_command(self.crud, self.squares_in_sector))
+                CRUDCommandsFabric.create_landmarks_in_map_sectors_command(agent, self.squares_in_sector))
+        return self.result
+
+    async def get_landmarks_by_categories_in_sector(self, coords_of_square: dict, categories: dict,
+                                                    agent: PureCRUDAgent):
+        await self.__validation(coords_of_square)
+        # TODO Валидация категорий
+        self.__get_sectors_of_map(coords_of_square)
+        self.squares_in_sector.update(categories)
+        if not self.full_cache:
+            self.result = await self.send_command(
+                CRUDCommandsFabric.create_landmarks_of_categories_in_map_sectors_command(agent, self.squares_in_sector))
         return self.result
 
     async def send_command(self, command: BaseCommand):
@@ -54,10 +50,13 @@ class GetLandmarksInSectors(Sender):
     def __get_sectors_of_map(self, coords_of_square: dict):
         # Cash
         if len(self.cache) != 0:
-            if (self.cache["TL"]["longitude"] <= coords_of_square["TL"]["longitude"] < coords_of_square["BR"]["longitude"] <=
+            if (self.cache["TL"]["longitude"] <= coords_of_square["TL"]["longitude"] < coords_of_square["BR"][
+                "longitude"] <=
                 self.cache["BR"]["longitude"]) and (
-                    self.cache["BR"]["latitude"] <= coords_of_square["BR"]["latitude"] < coords_of_square["TL"]["latitude"] <=
-                    self.cache["TL"]["latitude"]):  # Cash using, first occurrence: when new square fully in the old square
+                    self.cache["BR"]["latitude"] <= coords_of_square["BR"]["latitude"] < coords_of_square["TL"][
+                "latitude"] <=
+                    self.cache["TL"][
+                        "latitude"]):  # Cash using, first occurrence: when new square fully in the old square
                 self.full_cache = True
             else:
                 coords_of_squares = self.__partial_cache_handling(coords_of_square)
@@ -76,11 +75,9 @@ class GetLandmarksInSectors(Sender):
                     element["TL"]["latitude"] <=
                     coords_of_square["TL"]["latitude"] + self.LAT_DIFFERENCE):
                 self.squares_in_sector["map_sectors_names"].append(element["name"])
-                self.squares_in_sector["sector_names"].append(element["name"])
         self.cache = coords_of_square
 
-    # Еще один вид кэша, при котором новый квадрат частично совпадает со старым
-    # Uncomplete
+    # TODO Еще один вид кэша, при котором новый квадрат частично совпадает со старым
     def __partial_cache_handling(self, coords_of_square: dict) -> list:
         tick = 0
         test_coords = []
@@ -105,7 +102,6 @@ class GetLandmarksInSectors(Sender):
             raise ValidationError
 
         self.__get_sectors_of_map(coords_of_square)
-
 
 # async def tescom():
 #     test_class = GetLandmarksInSector()

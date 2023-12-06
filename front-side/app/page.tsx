@@ -1,8 +1,10 @@
+"use client"
 import Head from "next/head";
-import styles from "@/styles/main_page.module.css"
-import TheButton from "@/components/TheButton";
+import styles from "@/styles/main_page.module.css";
+import Link from "next/link";
 
 export default function Home() {
+  
   return (
     <>
       <Head>
@@ -14,7 +16,8 @@ export default function Home() {
         <div className={styles.welcome_block}>
           <h1>✈TRAVELER.AI</h1>
           <h3>Ваш персональный гид по достопримечательностям Беларуси</h3>
-          <TheButton title={'Поехали!'} href={'/map_route'}/>
+          {/* <TheButton title={'Поехали!'} func={() => Routing('/map_route')}/> */}
+          <Link href={'/map_route'}>Поехали</Link>
         </div>
       </main>
     </>

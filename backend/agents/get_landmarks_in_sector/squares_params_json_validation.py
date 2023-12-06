@@ -38,3 +38,10 @@ get_coords_of_map_sectors_json = \
         "maxProperties": 2,
         "additionalProperties": False
     }
+"""
+get_categories_of_landmarks
+"""
+get_categories_of_landmarks_json = \
+    {
+
+    }
