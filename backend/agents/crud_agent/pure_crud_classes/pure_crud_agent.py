@@ -17,7 +17,10 @@ class PureCRUDAgent(ABC):
         Returns from kb categories of region with included regions. Finds region by its name.
         Works asynchronously.
 
-        :param json_params: Dict in form {"region_name": str, "optional_limit": int | None}
+        :param json_params: Dict in form {
+                "region_name": str,
+                "optional_limit": int | None
+            }
         :return: Coroutine
             List[
                 {
@@ -35,8 +38,8 @@ class PureCRUDAgent(ABC):
         Works asynchronously.
 
         :param json_params: Dict in form {
-            "map_sectors_names": List[str],
-            "optional_limit": int | None
+                "map_sectors_names": List[str],
+                "optional_limit": int | None
             }
         :return: Coroutine
             List [
@@ -55,7 +58,10 @@ class PureCRUDAgent(ABC):
         Returns from kb landmarks, that refers to given categories. Finds categories by their names
         Works asynchronously.
 
-        :param json_params: Dict in form {"categories_names": List[str], "optional_limit": int | None}
+        :param json_params: Dict in form {
+                "categories_names": List[str],
+                "optional_limit": int | None
+            }
         :return: Coroutine
             List [
                 {
@@ -97,7 +103,10 @@ class PureCRUDAgent(ABC):
         Returns from kb landmarks with given names.
         Works asynchronously.
 
-        :param json_params: Dict in form {"landmark_names": List[str], "optional_limit": int | None}
+        :param json_params: Dict in form {
+                "landmark_names": List[str],
+                "optional_limit": int | None
+            }
         :return: Coroutine
             List [
                 Dict[
@@ -137,7 +146,10 @@ class PureCRUDAgent(ABC):
         Returns from kb landmarks, located in region. Finds region by its name.
         Works asynchronously.
 
-        :param json_params: Dict in form {"region_name": str, "optional_limit": int | None}
+        :param json_params: Dict in form {
+                "region_name": str,
+                "optional_limit": int | None
+            }
         :return: Coroutine
             List[
                 Dict[

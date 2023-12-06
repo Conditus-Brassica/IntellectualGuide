@@ -1,7 +1,5 @@
 #Author: Vodohleb04
-import asyncio
 from typing import List, Dict
-from aiologger.logger import LogLevel
 from aiologger.loggers.json import JsonLogger
 from neo4j import AsyncSession
 from .pure_crud_classes import PureReader

@@ -25,7 +25,7 @@ class CRUDAgent(PureCRUDAgent):
         self._knowledgebase_name = knowledgebase_name
 
     async def get_categories_of_region(self, json_params: Dict):
-        async def session(region_name: str, optional_limit: int = None):
+        async def session_runner(region_name: str, optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_categories_of_region(session, region_name, optional_limit)
 
@@ -34,13 +34,15 @@ class CRUDAgent(PureCRUDAgent):
             json_params["optional_limit"] = json_params.get("optional_limit", None)
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
-            return await asyncio.shield(session(json_params["region_name"], json_params["optional_limit"]))
+            return await asyncio.shield(
+                session_runner(json_params["region_name"], json_params["optional_limit"])
+            )
         except ValidationError as ex:
-            await logger.info(f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
-            raise ValidationError
+            await logger.error(f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_landmarks_in_map_sectors(self, json_params: Dict):
-        async def session(map_sectors_names: List[str], optional_limit: int = None):
+        async def session_runner(map_sectors_names: List[str], optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_landmarks_in_map_sectors(session, map_sectors_names, optional_limit)
 
@@ -49,14 +51,16 @@ class CRUDAgent(PureCRUDAgent):
             json_params["optional_limit"] = json_params.get("optional_limit", None)
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
-            return await asyncio.shield(session(json_params["map_sectors_names"], json_params["optional_limit"]))
+            return await asyncio.shield(
+                session_runner(json_params["map_sectors_names"], json_params["optional_limit"])
+            )
         except ValidationError as ex:
-            await logger.info(f"get_landmarks_in_map_sectors. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
-            raise ValidationError
+            await logger.error(f"get_landmarks_in_map_sectors. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_landmarks_refers_to_categories(self, json_params: Dict):
-        async def session(map_sectors_names: List[str], optional_limit: int = None):
+        async def session_runner(map_sectors_names: List[str], optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_landmarks_refers_to_categories(
                     session, map_sectors_names, optional_limit
@@ -67,14 +71,16 @@ class CRUDAgent(PureCRUDAgent):
             json_params["optional_limit"] = json_params.get("optional_limit", None)
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
-            return await asyncio.shield(session(json_params["categories_names"], json_params["optional_limit"]))
+            return await asyncio.shield(
+                session_runner(json_params["categories_names"], json_params["optional_limit"])
+            )
         except ValidationError as ex:
-            await logger.info(f"get_landmarks_refers_to_categories. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
-            raise ValidationError
+            await logger.error(f"get_landmarks_refers_to_categories. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_landmarks_by_coordinates(self, json_params: Dict):
-        async def session(coordinates: List[Dict[str, float]], optional_limit: int = None):
+        async def session_runner(coordinates: List[Dict[str, float]], optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_landmarks_by_coordinates(session, coordinates, optional_limit)
 
@@ -83,14 +89,16 @@ class CRUDAgent(PureCRUDAgent):
             json_params["optional_limit"] = json_params.get("optional_limit", None)
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
-            return await asyncio.shield(session(json_params["coordinates"], json_params["optional_limit"]))
+            return await asyncio.shield(
+                session_runner(json_params["coordinates"], json_params["optional_limit"])
+            )
         except ValidationError as ex:
-            await logger.info(f"get_landmarks_by_coordinates. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
-            raise ValidationError
+            await logger.error(f"get_landmarks_by_coordinates. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_landmarks_by_names(self, json_params: Dict):
-        async def session(landmark_names: List[str], optional_limit: int = None):
+        async def session_runner(landmark_names: List[str], optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_landmarks_by_names(session, landmark_names, optional_limit)
 
@@ -99,14 +107,16 @@ class CRUDAgent(PureCRUDAgent):
             json_params["optional_limit"] = json_params.get("optional_limit", None)
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
-            return await asyncio.shield(session(json_params["landmark_names"], json_params["optional_limit"]))
+            return await asyncio.shield(
+                session_runner(json_params["landmark_names"], json_params["optional_limit"])
+            )
         except ValidationError as ex:
-            await logger.info(f"get_landmarks_by_names. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
-            raise ValidationError
+            await logger.error(f"get_landmarks_by_names. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_landmarks_of_categories_in_region(self, json_params: Dict):
-        async def session(region_name: str, categories_names: List[str], optional_limit: int = None):
+        async def session_runner(region_name: str, categories_names: List[str], optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_landmarks_of_categories_in_region(
                     session, region_name, categories_names, optional_limit
@@ -118,15 +128,17 @@ class CRUDAgent(PureCRUDAgent):
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(
-                session(json_params["region_name"], json_params["categories_names"], json_params["optional_limit"])
+                session_runner(
+                    json_params["region_name"], json_params["categories_names"], json_params["optional_limit"]
+                )
             )
         except ValidationError as ex:
-            await logger.info(f"get_landmarks_of_categories_in_region. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
-            raise ValidationError
+            await logger.error(f"get_landmarks_of_categories_in_region. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_landmarks_by_region(self, json_params: Dict):
-        async def session(region_name: str, optional_limit: int = None):
+        async def session_runner(region_name: str, optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_landmarks_by_region(session, region_name, optional_limit)
 
@@ -135,14 +147,16 @@ class CRUDAgent(PureCRUDAgent):
             json_params["optional_limit"] = json_params.get("optional_limit", None)
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
-            return await asyncio.shield(session(json_params["region_name"], json_params["optional_limit"]))
+            return await asyncio.shield(
+                session_runner(json_params["region_name"], json_params["optional_limit"])
+            )
         except ValidationError as ex:
-            await logger.info(f"get_landmarks_by_region. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
-            raise ValidationError
+            await logger.error(f"get_landmarks_by_region. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_recommendations_for_landmark_by_region(self, json_params: Dict):
-        async def session(
+        async def session_runner(
                 user_login: str,
                 current_latitude: float,
                 current_longitude: float,
@@ -157,54 +171,61 @@ class CRUDAgent(PureCRUDAgent):
         try:
             validate(json_params, get_recommendations_for_landmark_by_region_json)
             return await asyncio.shield(
-                session(
+                session_runner(
                     json_params["user_login"], json_params["current_latitude"], json_params["current_longitude"],
                     json_params["current_name"], json_params["amount_of_recommendations"]
                 )
             )
         except ValidationError as ex:
-            await logger.info(f"get_recommendations_for_landmark_by_region. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
-            raise ValidationError
+            await logger.error(f"get_recommendations_for_landmark_by_region. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_map_sectors_of_points(self, json_params: Dict):
-        async def session(coordinates_of_points: List[Dict[str, float]], optional_limit: int = None):
+        async def session_runner(coordinates_of_points: List[Dict[str, float]], optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_map_sectors_of_points(session, coordinates_of_points, optional_limit)
 
         try:
-            # TODO validate(json_params, get_landmarks_by_region_json)
+
+            validate(json_params, get_map_sectors_of_points)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
-            return await asyncio.shield(session(json_params["coordinates_of_points"], json_params["optional_limit"]))
+            return await asyncio.shield(
+                session_runner(json_params["coordinates_of_points"], json_params["optional_limit"])
+            )
         except ValidationError as ex:
-            await logger.info(f"get_map_sectors_of_points. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            await logger.error(f"get_map_sectors_of_points. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_landmarks_of_categories_in_map_sectors(self, json_params: Dict):
-        async def session(map_sectors_names: List[str], categories_names: List[str], optional_limit: int = None):
+        async def session_runner(map_sectors_names: List[str], categories_names: List[str], optional_limit: int = None):
             async with self._kb_driver.session(database=self._knowledgebase_name) as session:
                 return await self._reader.read_landmarks_of_categories_in_map_sectors(
                     session, map_sectors_names, categories_names, optional_limit
                 )
 
         try:
-            # TODO validate(json_params, get_landmarks_by_region_json)
+            validate(json_params, get_landmarks_of_categories_in_map_sectors)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(
-                session(
-                    json_params["map_sectors_names"], json_params["categories_names"], json_params["optional_limit"]
+                session_runner(
+                    json_params["map_sectors_names"],
+                    json_params["categories_names"],
+                    json_params["optional_limit"]
                 )
             )
         except ValidationError as ex:
-            await logger.info(f"get_landmarks_of_categories_in_map_sectors. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            await logger.error(f"get_landmarks_of_categories_in_map_sectors. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
 
     async def get_recommendations_by_coordinates_and_categories(self, json_params: Dict):
-        async def session(
+        async def session_runner(
                 coordinates_of_points: List[Dict[str, float]],
                 categories_names: List[str],
                 user_login: str,
@@ -218,17 +239,17 @@ class CRUDAgent(PureCRUDAgent):
                 )
 
         try:
-            # TODO validate(json_params, get_recommendations_for_landmark_by_region_json)
+            validate(json_params, get_recommendations_by_coordinates_and_categories)
             json_params["optional_limit"] = json_params.get("optional_limit", None)
             if json_params["optional_limit"] and json_params["optional_limit"] <= 0:
                 raise ValidationError("optional_limit can\'t be less or equal to zero")
             return await asyncio.shield(
-                session(
+                session_runner(
                     json_params["coordinates_of_points"], json_params["categories_names"], json_params["user_login"],
                     json_params["amount_of_recommendations_for_point"], json_params["optional_limit"]
                 )
             )
         except ValidationError as ex:
-            await logger.info(f"get_recommendations_by_coordinates_and_categories. "
-                              f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
-            raise ValidationError
+            await logger.error(f"get_recommendations_by_coordinates_and_categories. "
+                               f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
+            return []  # raise ValidationError
