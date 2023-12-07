@@ -30,9 +30,7 @@ class PureRecommendationsAgent(Sender, ABC):
         }, where current_name is the name of given landmark
         :return: Coroutine
             List[
-                {
-                    recommended: Dict | None
-                }
+                {recommendation: Dict | None}
             ]
         """
         raise NotImplementedError

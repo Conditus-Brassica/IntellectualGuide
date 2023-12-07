@@ -302,23 +302,22 @@ class Reader(PureReader):
             """
             MATCH (current_landmark: Landmark) 
                 WHERE
-                    current_landmark.latitude = toFloat(52.5899) AND
-                    current_landmark.longitude = toFloat(29.07) AND
-                    current_landmark.name STARTS WITH "бабинец"
+                    current_landmark.latitude = $current_latitude AND
+                    current_landmark.longitude = $current_longitude AND
+                    current_landmark.name STARTS WITH $current_name
             OPTIONAL MATCH
                 (category:LandmarkCategory)<-[current_landmark_category_ref:REFERS]-(current_landmark)
                     -[:LOCATED]->
                 (:Region)((:Region&!State)-[:INCLUDE|NEIGHBOUR]-(:Region&!State)){0,4}(:Region)
                     <-[:LOCATED]-
                 (recommendation:Landmark)-[recommendation_landmark_category_ref:REFERS]->(category)
-            OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = "user")
+            OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = $user_login)
             OPTIONAL MATCH (userAccount)-[wish_ref:WISH_TO_VISIT]->(recommendation)
             OPTIONAL MATCH (userAccount)-[visited_ref:VISITED]->(recommendation)
             WITH 
                 recommendation,
                 recommendation_landmark_category_ref,
                 current_landmark_category_ref,
-                category,
                 userAccount,
                 wish_ref,
                 visited_ref
@@ -326,19 +325,28 @@ class Reader(PureReader):
                 current_landmark_category_ref.main_category_flag DESC,
                 recommendation_landmark_category_ref.main_category_flag DESC,
                 point.distance(
-                    point({latitude: toFloat(52.5899), longitude: toFloat(29.07)}),
+                    point({latitude: $current_latitude, longitude: $current_longitude}),
                     point({latitude: recommendation.latitude, longitude: recommendation.longitude})
                 ) ASC
-            LIMIT 25
+            LIMIT $amount_of_recommendations
             RETURN DISTINCT 
                 recommendation,
-                recommendation_landmark_category_ref.main_category_flag AS recommendation_category_is_main,
+                COLLECT {
+                    MATCH (recommendation)
+                        -[refer:REFERS WHERE refer.main_category_flag = True]->
+                    (category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS main_categories_names,
+                COLLECT {
+                    MATCH (recommendation)
+                        -[refer:REFERS WHERE refer.main_category_flag = False]->
+                    (category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS subcategories_names,
                 point.distance(
-                    point({latitude: toFloat(52.5899), longitude: toFloat(29.07)}),
+                    point({latitude: $current_latitude, longitude: $current_longitude}),
                     point({latitude: recommendation.latitude, longitude: recommendation.longitude})
                 ) AS distance,
-                current_landmark_category_ref.main_category_flag AS current_landmark_category_is_main,
-                category,
                 userAccount AS user_account,
                 CASE
                     WHEN wish_ref IS NULL THEN False
@@ -357,9 +365,8 @@ class Reader(PureReader):
             async for record in result:
                 result_values.append(
                     record.data(
-                        "recommendation", "recommendation_category_is_main", "distance",
-                        "current_landmark_category_is_main", "category", "user_account", "wish_to_visit",
-                        "visited_amount"
+                        "recommendation", "main_categories_names", "subcategories_names",
+                        "distance", "user_account", "wish_to_visit", "visited_amount"
                     )
                 )
         except IndexError as ex:
@@ -595,9 +602,12 @@ class Reader(PureReader):
                     ) ASC
                 LIMIT $amount_of_recommendations_for_point
                 RETURN DISTINCT
-                    recommendedLandmark AS recommended_landmark,
+                    recommendedLandmark AS recommendation,
                     recommendation_landmark_category_ref.main_category_flag AS recommendation_category_is_main,
-                    category,
+                    point.distance(
+                        point({latitude: coordinates_of_point.latitude, longitude: coordinates_of_point.longitude}),
+                        point({latitude: recommendedLandmark.latitude, longitude: recommendedLandmark.longitude})
+                    ) AS distance,
                     userAccount AS user_account,
                     CASE
                         WHEN wish_ref IS NULL THEN False
@@ -608,10 +618,20 @@ class Reader(PureReader):
                         ELSE visited_ref.amount
                     END AS visited_amount
             } RETURN
-                coordinates_of_point AS for_point,
-                recommended_landmark, 
-                recommendation_category_is_main,
-                category,
+                recommendation,
+                COLLECT {
+                    MATCH (recommendation)
+                        -[refer:REFERS WHERE refer.main_category_flag = True]->
+                    (category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS main_categories_names,
+                COLLECT {
+                    MATCH (recommendation)
+                        -[refer:REFERS WHERE refer.main_category_flag = False]->
+                    (category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS subcategories_names,
+                distance,
                 user_account,
                 wish_to_visit,
                 visited_amount
@@ -675,9 +695,12 @@ class Reader(PureReader):
                     ) ASC
                 LIMIT $amount_of_recommendations_for_point
                 RETURN DISTINCT
-                    recommendedLandmark AS recommended_landmark,
+                    recommendedLandmark AS recommendation,
                     recommendation_landmark_category_ref.main_category_flag AS recommendation_category_is_main,
-                    category,
+                    point.distance(
+                        point({latitude: current_landmark.latitude, longitude: current_landmark.longitude}),
+                        point({latitude: recommendedLandmark.latitude, longitude: recommendedLandmark.longitude})
+                    ) AS distance,
                     userAccount AS user_account,
                     CASE
                         WHEN wish_ref IS NULL THEN False
@@ -688,10 +711,20 @@ class Reader(PureReader):
                         ELSE visited_ref.amount
                     END AS visited_amount
             } RETURN
-                coordinates_of_point AS for_point,
-                recommended_landmark, 
-                recommendation_category_is_main,
-                category,
+                recommendation,
+                COLLECT {
+                    MATCH (recommendation)
+                        -[refer:REFERS WHERE refer.main_category_flag = True]->
+                    (category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS main_categories_names,
+                COLLECT {
+                    MATCH (recommendation)
+                        -[refer:REFERS WHERE refer.main_category_flag = False]->
+                    (category:LandmarkCategory)
+                    RETURN category.name AS category_name
+                } AS subcategories_names,
+                distance,
                 user_account,
                 wish_to_visit,
                 visited_amount
@@ -703,15 +736,15 @@ class Reader(PureReader):
             if optional_limit:
                 result_values = [
                     record.data(
-                        "for_point", "recommended_landmark", "recommendation_category_is_main", "category",
-                        "user_account", "wish_ref", "visited_ref"
+                        "recommendation", "main_categories_names", "subcategories_names", "distance", "user_account",
+                        "wish_to_visit", "visited_amount"
                     ) for record in await result.fetch(optional_limit)
                 ]
             else:
                 result_values = [
                     record.data(
-                        "for_point", "recommended_landmark", "recommendation_category_is_main", "category",
-                        "user_account", "wish_ref", "visited_ref"
+                        "recommendation", "main_categories_names", "subcategories_names", "distance", "user_account",
+                        "wish_to_visit", "visited_amount"
                     ) async for record in result
                 ]
         except IndexError as ex:
