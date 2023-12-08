@@ -1,9 +1,13 @@
 При создании функции агента, которая может быть вызвана другим агентом,
-необходимо создать для нее broker task-и в модуле agents_tasks и метод в AgentsBroker для вызова этого task-а.
-Метод, вызывающий task, так же должен быть объявлен в PureBroker с реализацией raise NotImplementedError
-(метод имеет спецификацию @classmethod и в PureBroker, и в AgentsBroker).
+необходимо создавать ее с декоратором @BROKER.task, где BROKER - переменная в модуле agents_broker.
+В task-е вызывается метод конкретного агента, а не абстрактного. Для вызова task-а необходимо передать его в качестве
+параметра в метод AgentBroker.call_agent_tasks(agent_task, json_params)
 
-taskiq broker:broker agents_tasks:my_task agents_task:my_task1
+При текущей реализации call_agent_task при вызове скорее всего будет оборачиваться в asyncio.create_task(...)
 
-Где my_task, my_task1 - это название py файлов где лежат task для конкретного агента.
-Необходимо перечислить все.
+run from course directory:
+
+taskiq worker backend.broker.agents_broker:BROKER backend.broker.agents_tasks
+
+
+Возможно, таски придется в один файл закинуть, но пока что пишем файл с тасками на агента.

@@ -9,8 +9,8 @@ class Sender(ABC):
         Agent can be a sender.
     """
 
-    @abstractmethod
-    async def send_command(self, command: BaseCommand):
+    @staticmethod
+    async def send_command(command: BaseCommand):
         """
             Sends command to the target agent. Command defines by itself what agent is the target.
             Works asynchronously.

@@ -16,6 +16,12 @@ logger = JsonLogger.with_default_handlers(
 
 class CRUDAgent(PureCRUDAgent):
     __instances_amount = 0
+    _kb_driver = None
+
+    @classmethod
+    async def close(cls):
+        if cls._kb_driver:
+            await cls._kb_driver.close()
 
     @classmethod
     def class__init__(cls, reader: PureReader, async_kb_driver: AsyncDriver, knowledgebase_name: str):
