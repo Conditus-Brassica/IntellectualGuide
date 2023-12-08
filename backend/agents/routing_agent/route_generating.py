@@ -55,3 +55,8 @@ class RoutingAgent:
         )
 
         return route['features'][0]['geometry']['coordinates']
+
+
+a = RoutingAgent
+
+print(a.set_points(53.25, 33))
