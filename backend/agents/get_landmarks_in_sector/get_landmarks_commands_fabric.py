@@ -1,4 +1,6 @@
 from typing import Dict
+
+from backend.agents import PureCRUDAgent
 from backend.agents.get_landmarks_in_sector import GetLandmarksInSectorsAgent
 from backend.agents.get_landmarks_in_sector.get_landmarks_in_sectors_commands.get_landmarks_by_categories_in_sector import \
     LandmarksOfCategoriesInUserViewCommand
@@ -10,16 +12,27 @@ class GetLandmarksInSectorCommandsFabric:
     """Fabric used to create commands for Agent"""
 
     @staticmethod
-    def create_get_landmarks_in_sector_command(get_landmarks_in_sectors_agent: GetLandmarksInSectorsAgent, json_params: Dict) \
+    def create_get_landmarks_in_sector_command(get_landmarks_in_sectors_agent: GetLandmarksInSectorsAgent, coords_of_square: Dict,
+                                               crud_agent: PureCRUDAgent) \
             -> LandmarksInUserViewCommand:
         """
         Creates command to get landmarks that located in given map sectors from
         getLandmarksInSectorsAgent.
 
-        :param get_landmarks_in_sectors_agent: PureCRUDAgent child class entity to get from
-        :param json_params: # TODO Fill
+        :param get_landmarks_in_sectors_agent: Get landmarks in sectors agent
+        :param coords_of_square: Dict in form {
+        "TL": {
+            "latitude": double,
+            "longitude": double
+        },
+        "BR": {
+            "latitude": double,
+            "longitude": double
+        }
+      }
+        :param crud_agent: PureCRUDAgent child class entity to get from
         """
-        return LandmarksInUserViewCommand(get_landmarks_in_sectors_agent, json_params)
+        return LandmarksInUserViewCommand(get_landmarks_in_sectors_agent, coords_of_square, crud_agent)
 
     @staticmethod
     def create_get_landmarks_by_categories_in_sector_command(
