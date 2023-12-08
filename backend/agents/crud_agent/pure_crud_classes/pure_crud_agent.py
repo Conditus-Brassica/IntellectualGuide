@@ -58,7 +58,7 @@ class PureCRUDAgent(ABC):
     @abstractmethod
     async def get_landmarks_refers_to_categories(cls, json_params: Dict):
         """
-        Returns from kb landmarks, that refers to given categories. Finds categories by their names
+        Returns from kb landmarks, that refers to given categories. Finds categories by their names.
         Works asynchronously.
 
         :param json_params: Dict in form {
