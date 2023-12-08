@@ -25,27 +25,30 @@ class GetLandmarksInSectorsAgent(Sender):
 
     async def get_landmarks_in_sector(self, coords_of_square: dict, agent: PureCRUDAgent):
         # Check if format of dictionary is right using validator
-        await self.__coords_of_square_validation(coords_of_square)
+        await self.__coords_of_square_validation(self, coords_of_square)
         self.__get_sectors_in_sector(coords_of_square)
         # Comparing with cache, then updating of cache
         self.squares_in_sector[0] = [i for i in self.squares_in_sector[0] not in self.cache[0]]
         self.cache["map_sector_names"].append(self.squares_in_sector[0])
-        if not self.full_cache:
+        # To have only unique elements
+        self.cache["map_sector_names"] = list(set(self.cache["map_sector_names"]))
+        if len(self.cache["map_sector_names"]) != 0:
             self.result = await self.send_command(
                 CRUDCommandsFabric.create_landmarks_in_map_sectors_command(agent, self.squares_in_sector))
         return self.result
 
     async def get_landmarks_by_categories_in_sector(self, coords_of_square: dict, categories: dict,
                                                     agent: PureCRUDAgent):
-        await self.__categories_validation(categories)
-        await self.__coords_of_square_validation(coords_of_square)
+        await self.__categories_validation(self, categories)
+        await self.__coords_of_square_validation(self, coords_of_square)
         self.__get_sectors_in_sector(coords_of_square)
         self.squares_in_sector[0] = [i for i in self.squares_in_sector[0] not in self.cache[0]]
+        # To have only unique elements
         self.cache["map_sector_names"].append(self.squares_in_sector[0])
         self.squares_in_sector.update(categories)
 
         self.cache = self.squares_in_sector
-        if not self.full_cache:
+        if len(self.cache["map_sector_names"]) != 0:
             self.result = await self.send_command(
                 CRUDCommandsFabric.create_landmarks_of_categories_in_map_sectors_command(agent, self.squares_in_sector))
         return self.result
@@ -66,6 +69,10 @@ class GetLandmarksInSectorsAgent(Sender):
                 self.squares_in_sector["map_sectors_names"].append(element["name"])
 
 
+    async def cache_cleaning(self):
+        pass
+
+    @staticmethod
     async def __categories_validation(self, categories: dict):
         try:
             validate(categories, get_categories_of_landmarks_json)
@@ -74,6 +81,7 @@ class GetLandmarksInSectorsAgent(Sender):
                 f"Validation error on json, args: {e.args[0]}, json_params: {get_categories_of_landmarks_json}")
             raise ValidationError
 
+    @staticmethod
     async def __coords_of_square_validation(self, coords_of_square: dict):
         try:
             validate(coords_of_square, get_coords_of_map_sectors_json)
@@ -82,7 +90,6 @@ class GetLandmarksInSectorsAgent(Sender):
                 f"Validation error on json, args: {e.args[0]}, json_params: {get_coords_of_map_sectors_json}")
             raise ValidationError
 
-        self.__get_sectors_of_map(coords_of_square)
 
 # async def tescom():
 #     test_class = GetLandmarksInSector()
