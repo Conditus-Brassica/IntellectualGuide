@@ -635,11 +635,11 @@ class Reader(PureReader):
                 user_account,
                 wish_to_visit,
                 visited_amount
-                
-                
+
+
             UNION
-            
-            
+
+
             UNWIND $coordinates_of_points AS coordinates_of_point
             CALL {
                 WITH coordinates_of_point

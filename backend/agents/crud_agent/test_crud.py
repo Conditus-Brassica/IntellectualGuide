@@ -17,8 +17,6 @@ if __name__ == '__main__':
             reader = Reader()
             crud = CRUDAgent(reader, driver, 'neo4j')
 
-
-
             command1 = CRUDCommandsFabric.create_categories_of_region_command(
                 crud, {"region_name": "Мядзельскі раён"}
             )
@@ -95,6 +93,9 @@ if __name__ == '__main__':
                 }
             )
 
+            task11 = asyncio.create_task(command11.execute())
+            task12 = asyncio.create_task(command11_2.execute())
+
             task1 = asyncio.create_task(command1.execute())
             task2 = asyncio.create_task(command2.execute())
             task3 = asyncio.create_task(command3.execute())
@@ -105,8 +106,10 @@ if __name__ == '__main__':
             task8 = asyncio.create_task(command8.execute())
             task9 = asyncio.create_task(command9.execute())
             task10 = asyncio.create_task(command10.execute())
-            task11 = asyncio.create_task(command11.execute())
-            task12 = asyncio.create_task(command11_2.execute())
+
+
+            pprint(await task11)
+            pprint(await task12)
 
             pprint(await task1)
             pprint(await task2)
@@ -118,7 +121,6 @@ if __name__ == '__main__':
             pprint(await task8)
             pprint(await task9)
             pprint(await task10)
-            pprint(await task11)
 
 
     with open("basic_login.json", 'r') as fout:
