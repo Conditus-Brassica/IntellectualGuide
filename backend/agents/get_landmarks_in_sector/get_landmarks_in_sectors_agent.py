@@ -25,8 +25,7 @@ class GetLandmarksInSectorsAgent(Sender):
 
     async def get_landmarks_in_sector(self, coords_of_square: dict, agent: PureCRUDAgent):
         # Check if format of dictionary is right using validator
-        await self.__validation(coords_of_square)
-
+        await self.__coords_of_square_validation(coords_of_square)
         self.__get_sectors_of_map(coords_of_square)
         if not self.full_cache:
             self.result = await self.send_command(
@@ -35,8 +34,8 @@ class GetLandmarksInSectorsAgent(Sender):
 
     async def get_landmarks_by_categories_in_sector(self, coords_of_square: dict, categories: dict,
                                                     agent: PureCRUDAgent):
-        await self.__validation(coords_of_square)
-        # TODO Валидация категорий
+        await self.__categories_validation(categories)
+        await self.__coords_of_square_validation(coords_of_square)
         self.__get_sectors_of_map(coords_of_square)
         self.squares_in_sector.update(categories)
         if not self.full_cache:
@@ -48,7 +47,7 @@ class GetLandmarksInSectorsAgent(Sender):
         await command.execute()
 
     def __get_sectors_of_map(self, coords_of_square: dict):
-        # Cash
+        # Cache
         if len(self.cache) != 0:
             if (self.cache["TL"]["longitude"] <= coords_of_square["TL"]["longitude"] < coords_of_square["BR"][
                 "longitude"] <=
@@ -56,7 +55,7 @@ class GetLandmarksInSectorsAgent(Sender):
                     self.cache["BR"]["latitude"] <= coords_of_square["BR"]["latitude"] < coords_of_square["TL"][
                 "latitude"] <=
                     self.cache["TL"][
-                        "latitude"]):  # Cash using, first occurrence: when new square fully in the old square
+                        "latitude"]):  # Cache using, first occurrence: when new square fully in the old square
                 self.full_cache = True
             else:
                 coords_of_squares = self.__partial_cache_handling(coords_of_square)
@@ -93,7 +92,15 @@ class GetLandmarksInSectorsAgent(Sender):
         if tick == 0:
             return [coords_of_square]
 
-    async def __validation(self, coords_of_square: dict):
+    async def __categories_validation(self, categories: dict):
+        try:
+            validate(categories, get_categories_of_landmarks_json)
+        except ValidationError as e:
+            await logger.info(
+                f"Validation error on json, args: {e.args[0]}, json_params: {get_categories_of_landmarks_json}")
+            raise ValidationError
+
+    async def __coords_of_square_validation(self, coords_of_square: dict):
         try:
             validate(coords_of_square, get_coords_of_map_sectors_json)
         except ValidationError as e:
