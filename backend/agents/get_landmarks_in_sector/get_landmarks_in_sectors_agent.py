@@ -1,4 +1,4 @@
-# import asyncio
+import asyncio
 import json
 from aiologger.loggers.json import JsonLogger
 from jsonschema import validate
@@ -25,13 +25,11 @@ class GetLandmarksInSectorsAgent(Sender):
 
     async def get_landmarks_in_sector(self, coords_of_square: dict, agent: PureCRUDAgent):
         # Check if format of dictionary is right using validator
-        await self.__coords_of_square_validation(self, coords_of_square)
+        await self.__coords_of_square_validation(coords_of_square)
         self.__get_sectors_in_sector(coords_of_square)
         # Comparing with cache, then updating of cache
         self.squares_in_sector[0] = [i for i in self.squares_in_sector[0] not in self.cache[0]]
-        self.cache["map_sector_names"].append(self.squares_in_sector[0])
-        # To have only unique elements
-        self.cache["map_sector_names"] = list(set(self.cache["map_sector_names"]))
+        self.__set_cache()
         if len(self.cache["map_sector_names"]) != 0:
             self.result = await self.send_command(
                 CRUDCommandsFabric.create_landmarks_in_map_sectors_command(agent, self.squares_in_sector))
@@ -39,15 +37,11 @@ class GetLandmarksInSectorsAgent(Sender):
 
     async def get_landmarks_by_categories_in_sector(self, coords_of_square: dict, categories: dict,
                                                     agent: PureCRUDAgent):
-        await self.__categories_validation(self, categories)
-        await self.__coords_of_square_validation(self, coords_of_square)
+        await self.__categories_validation(categories)
+        await self.__coords_of_square_validation(coords_of_square)
         self.__get_sectors_in_sector(coords_of_square)
         self.squares_in_sector[0] = [i for i in self.squares_in_sector[0] not in self.cache[0]]
-        # To have only unique elements
-        self.cache["map_sector_names"].append(self.squares_in_sector[0])
-        self.squares_in_sector.update(categories)
-
-        self.cache = self.squares_in_sector
+        self.__set_cache()
         if len(self.cache["map_sector_names"]) != 0:
             self.result = await self.send_command(
                 CRUDCommandsFabric.create_landmarks_of_categories_in_map_sectors_command(agent, self.squares_in_sector))
@@ -56,6 +50,13 @@ class GetLandmarksInSectorsAgent(Sender):
     async def send_command(self, command: BaseCommand):
         await command.execute()
 
+    def __set_cache(self):
+        self.cache["map_sector_names"].append(self.squares_in_sector[0])
+        # To have only unique elements
+        self.cache["map_sector_names"] = list(set(self.cache["map_sector_names"]))
+        if len(self.cache.get("map_sector_names", [])) > 60:
+            # Truncate the cache to the desired size
+            self.cache["map_sector_names"] = self.cache["map_sector_names"][-60:]
 
     def __get_sectors_in_sector(self, coords_of_square: dict):
         data = json.load(open("new_squares.json"))
@@ -68,12 +69,8 @@ class GetLandmarksInSectorsAgent(Sender):
                     coords_of_square["TL"]["latitude"] + self.LAT_DIFFERENCE):
                 self.squares_in_sector["map_sectors_names"].append(element["name"])
 
-
-    async def cache_cleaning(self):
-        pass
-
     @staticmethod
-    async def __categories_validation(self, categories: dict):
+    async def __categories_validation(categories: dict):
         try:
             validate(categories, get_categories_of_landmarks_json)
         except ValidationError as e:
@@ -82,7 +79,7 @@ class GetLandmarksInSectorsAgent(Sender):
             raise ValidationError
 
     @staticmethod
-    async def __coords_of_square_validation(self, coords_of_square: dict):
+    async def __coords_of_square_validation(coords_of_square: dict):
         try:
             validate(coords_of_square, get_coords_of_map_sectors_json)
         except ValidationError as e:
@@ -92,7 +89,7 @@ class GetLandmarksInSectorsAgent(Sender):
 
 
 # async def tescom():
-#     test_class = GetLandmarksInSector()
+#     test_class = GetLandmarksInSectorsAgent()
 #     test_dict = {
 #         "TL": {
 #             "latitude": 56.232289,
@@ -103,7 +100,8 @@ class GetLandmarksInSectorsAgent(Sender):
 #             "longitude": 25.5222235
 #         }
 #     }
-#     await test_class.get_landmarks(test_dict)
+#     await test_class.get_landmarks_in_sector(test_dict)
+#     await test_class.get_landmarks_in_sector(test_dict)
 #
 # task = asyncio.create_task(tescom())
 # asyncio.run(tescom())
