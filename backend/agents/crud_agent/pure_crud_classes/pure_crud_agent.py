@@ -11,8 +11,9 @@ class PureCRUDAgent(ABC):
     All methods work asynchronously.
     """
 
+    @classmethod
     @abstractmethod
-    async def get_categories_of_region(self, json_params: Dict):
+    async def get_categories_of_region(cls, json_params: Dict):
         """
         Returns from kb categories of region with included regions. Finds region by its name.
         Works asynchronously.
@@ -31,8 +32,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_landmarks_in_map_sectors(self, json_params: Dict):
+    async def get_landmarks_in_map_sectors(cls, json_params: Dict):
         """
         Returns from kb landmarks, located in passed map sectors. Finds map sectors by their names.
         Works asynchronously.
@@ -52,8 +54,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_landmarks_refers_to_categories(self, json_params: Dict):
+    async def get_landmarks_refers_to_categories(cls, json_params: Dict):
         """
         Returns from kb landmarks, that refers to given categories. Finds categories by their names
         Works asynchronously.
@@ -72,8 +75,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_landmarks_by_coordinates(self, json_params: Dict):
+    async def get_landmarks_by_coordinates(cls, json_params: Dict):
         """
         Returns from kb landmarks with given coordinates.
         Works asynchronously.
@@ -97,8 +101,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_landmarks_by_names(self, json_params: Dict):
+    async def get_landmarks_by_names(cls, json_params: Dict):
         """
         Returns from kb landmarks with given names.
         Works asynchronously.
@@ -117,8 +122,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_landmarks_of_categories_in_region(self, json_params: Dict):
+    async def get_landmarks_of_categories_in_region(cls, json_params: Dict):
         """
         Returns from kb landmarks, located in given region, that refer to given categories.
         Finds region by its name. Finds categories by their names.
@@ -140,8 +146,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_landmarks_by_region(self, json_params: Dict):
+    async def get_landmarks_by_region(cls, json_params: Dict):
         """
         Returns from kb landmarks, located in region. Finds region by its name.
         Works asynchronously.
@@ -161,8 +168,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_recommendations_for_landmark_by_region(self, json_params: Dict):
+    async def get_recommendations_for_landmark_by_region(cls, json_params: Dict):
         """
             Returns recommended landmarks for given landmark and given user. Finds given landmark by its name and
             coordinates; finds user by his/her login. Returns recommended landmark, categories of recommended landmark,
@@ -193,8 +201,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_map_sectors_of_points(self, json_params: Dict):
+    async def get_map_sectors_of_points(cls, json_params: Dict):
         """
             Returns map sectors where given points are located.
             Works asynchronously.
@@ -218,8 +227,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_landmarks_of_categories_in_map_sectors(self, json_params: Dict):
+    async def get_landmarks_of_categories_in_map_sectors(cls, json_params: Dict):
         """
             Returns landmarks that refer to the given categories and are located in the given map sectors.
             Finds map sectors by names. Finds categories by names.
@@ -241,8 +251,9 @@ class PureCRUDAgent(ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    async def get_recommendations_by_coordinates_and_categories(self, json_params: Dict):
+    async def get_recommendations_by_coordinates_and_categories(cls, json_params: Dict):
         """
             Returns recommended landmarks for given user, given coordinates and given categories. Finds given landmark
             by its name and coordinates; finds user by his/her login. Returns recommended landmark, categories of

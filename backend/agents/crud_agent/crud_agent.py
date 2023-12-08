@@ -15,19 +15,36 @@ logger = JsonLogger.with_default_handlers(
 
 
 class CRUDAgent(PureCRUDAgent):
+    __instances_amount = 0
+
+    @classmethod
+    def class__init__(cls, reader: PureReader, async_kb_driver: AsyncDriver, knowledgebase_name: str):
+        """
+        :param reader: reader for agent
+        :param async_kb_driver: async driver of knowledge base
+        :param knowledgebase_name: name of knowledgebase to query
+        """
+        cls._reader = reader
+        cls._kb_driver = async_kb_driver
+        cls._knowledgebase_name = knowledgebase_name
 
     def __init__(self, reader: PureReader, async_kb_driver: AsyncDriver, knowledgebase_name: str):
         """
+        :param reader: reader for agent
+        :param async_kb_driver: async driver of knowledge base
         :param knowledgebase_name: name of knowledgebase to query
         """
-        self._reader = reader
-        self._kb_driver = async_kb_driver
-        self._knowledgebase_name = knowledgebase_name
+        if self.__instances_amount == 0:
+            self.class__init__(reader, async_kb_driver, knowledgebase_name)
+            self.__instances_amount += 1
+        else:
+            raise RuntimeError("Unexpected behaviour, this method can have only one instance")
 
-    async def get_categories_of_region(self, json_params: Dict):
+    @classmethod
+    async def get_categories_of_region(cls, json_params: Dict):
         async def session_runner(region_name: str, optional_limit: int = None):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_categories_of_region(session, region_name, optional_limit)
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_categories_of_region(session, region_name, optional_limit)
 
         try:
             validate(json_params, get_categories_of_region_json)
@@ -41,10 +58,11 @@ class CRUDAgent(PureCRUDAgent):
             await logger.error(f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_landmarks_in_map_sectors(self, json_params: Dict):
+    @classmethod
+    async def get_landmarks_in_map_sectors(cls, json_params: Dict):
         async def session_runner(map_sectors_names: List[str], optional_limit: int = None):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_landmarks_in_map_sectors(session, map_sectors_names, optional_limit)
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_landmarks_in_map_sectors(session, map_sectors_names, optional_limit)
 
         try:
             validate(json_params, get_landmarks_in_map_sectors_json)
@@ -59,10 +77,11 @@ class CRUDAgent(PureCRUDAgent):
                                f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_landmarks_refers_to_categories(self, json_params: Dict):
+    @classmethod
+    async def get_landmarks_refers_to_categories(cls, json_params: Dict):
         async def session_runner(map_sectors_names: List[str], optional_limit: int = None):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_landmarks_refers_to_categories(
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_landmarks_refers_to_categories(
                     session, map_sectors_names, optional_limit
                 )
 
@@ -79,10 +98,11 @@ class CRUDAgent(PureCRUDAgent):
                                f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_landmarks_by_coordinates(self, json_params: Dict):
+    @classmethod
+    async def get_landmarks_by_coordinates(cls, json_params: Dict):
         async def session_runner(coordinates: List[Dict[str, float]], optional_limit: int = None):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_landmarks_by_coordinates(session, coordinates, optional_limit)
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_landmarks_by_coordinates(session, coordinates, optional_limit)
 
         try:
             validate(json_params, get_landmarks_by_coordinates_json)
@@ -97,10 +117,11 @@ class CRUDAgent(PureCRUDAgent):
                                f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_landmarks_by_names(self, json_params: Dict):
+    @classmethod
+    async def get_landmarks_by_names(cls, json_params: Dict):
         async def session_runner(landmark_names: List[str], optional_limit: int = None):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_landmarks_by_names(session, landmark_names, optional_limit)
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_landmarks_by_names(session, landmark_names, optional_limit)
 
         try:
             validate(json_params, get_landmarks_by_names_json)
@@ -115,10 +136,11 @@ class CRUDAgent(PureCRUDAgent):
                                f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_landmarks_of_categories_in_region(self, json_params: Dict):
+    @classmethod
+    async def get_landmarks_of_categories_in_region(cls, json_params: Dict):
         async def session_runner(region_name: str, categories_names: List[str], optional_limit: int = None):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_landmarks_of_categories_in_region(
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_landmarks_of_categories_in_region(
                     session, region_name, categories_names, optional_limit
                 )
 
@@ -137,10 +159,11 @@ class CRUDAgent(PureCRUDAgent):
                                f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_landmarks_by_region(self, json_params: Dict):
+    @classmethod
+    async def get_landmarks_by_region(cls, json_params: Dict):
         async def session_runner(region_name: str, optional_limit: int = None):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_landmarks_by_region(session, region_name, optional_limit)
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_landmarks_by_region(session, region_name, optional_limit)
 
         try:
             validate(json_params, get_landmarks_by_region_json)
@@ -155,7 +178,8 @@ class CRUDAgent(PureCRUDAgent):
                                f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_recommendations_for_landmark_by_region(self, json_params: Dict):
+    @classmethod
+    async def get_recommendations_for_landmark_by_region(cls, json_params: Dict):
         async def session_runner(
                 user_login: str,
                 current_latitude: float,
@@ -163,8 +187,8 @@ class CRUDAgent(PureCRUDAgent):
                 current_name: str,
                 amount_of_recommendations: int
         ):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_recommendations_for_landmark_by_region(
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_recommendations_for_landmark_by_region(
                     session, user_login, current_latitude, current_longitude, current_name, amount_of_recommendations
                 )
 
@@ -181,10 +205,11 @@ class CRUDAgent(PureCRUDAgent):
                                f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_map_sectors_of_points(self, json_params: Dict):
+    @classmethod
+    async def get_map_sectors_of_points(cls, json_params: Dict):
         async def session_runner(coordinates_of_points: List[Dict[str, float]], optional_limit: int = None):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_map_sectors_of_points(session, coordinates_of_points, optional_limit)
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_map_sectors_of_points(session, coordinates_of_points, optional_limit)
 
         try:
 
@@ -200,10 +225,11 @@ class CRUDAgent(PureCRUDAgent):
                                f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_landmarks_of_categories_in_map_sectors(self, json_params: Dict):
+    @classmethod
+    async def get_landmarks_of_categories_in_map_sectors(cls, json_params: Dict):
         async def session_runner(map_sectors_names: List[str], categories_names: List[str], optional_limit: int = None):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_landmarks_of_categories_in_map_sectors(
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_landmarks_of_categories_in_map_sectors(
                     session, map_sectors_names, categories_names, optional_limit
                 )
 
@@ -224,7 +250,8 @@ class CRUDAgent(PureCRUDAgent):
                                f"Validation error on json, args: {ex.args[0]}, json_params: {json_params}")
             return []  # raise ValidationError
 
-    async def get_recommendations_by_coordinates_and_categories(self, json_params: Dict):
+    @classmethod
+    async def get_recommendations_by_coordinates_and_categories(cls, json_params: Dict):
         async def session_runner(
                 coordinates_of_points: List[Dict[str, float]],
                 categories_names: List[str],
@@ -232,8 +259,8 @@ class CRUDAgent(PureCRUDAgent):
                 amount_of_recommendations_for_point: int,
                 optional_limit: int | None
         ):
-            async with self._kb_driver.session(database=self._knowledgebase_name) as session:
-                return await self._reader.read_recommendations_by_coordinates_and_categories(
+            async with cls._kb_driver.session(database=cls._knowledgebase_name) as session:
+                return await cls._reader.read_recommendations_by_coordinates_and_categories(
                     session, coordinates_of_points, categories_names, user_login, amount_of_recommendations_for_point,
                     optional_limit
                 )
