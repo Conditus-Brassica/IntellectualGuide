@@ -13,6 +13,12 @@ class PureCRUDAgent(ABC):
 
     @classmethod
     @abstractmethod
+    async def close(cls) -> None:
+        """Method to close the connection to the kb."""
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
     async def get_categories_of_region(cls, json_params: Dict):
         """
         Returns from kb categories of region with included regions. Finds region by its name.
