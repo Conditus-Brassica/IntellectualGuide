@@ -18,19 +18,19 @@ if __name__ == '__main__':
         # This this emulation of code from another agent
         # Async tasks that kicks broker tasks
         categories_of_region_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 categories_of_region_task,
                 {"region_name": "Мядзельскі раён"}
             )
         )
         landmarks_in_map_sectors_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 landmarks_in_map_sectors_task,
                 {"map_sectors_names": ["a1", "a2", "g2"], "optional_limit": 3}
             )
         )
         landmarks_refers_to_categories_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 landmarks_refers_to_categories_task,
                 {
                     "categories_names": ["озёра мядельского района", "национальные парки белоруссии"],
@@ -39,7 +39,7 @@ if __name__ == '__main__':
             )
         )
         landmarks_by_coordinates_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 landmarks_by_coordinates_task,
                 {
                     "coordinates": [
@@ -51,25 +51,25 @@ if __name__ == '__main__':
             )
         )
         landmarks_by_names_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 landmarks_by_names_task,
                 {"landmark_names": ["свирь", "рудаково", "нарочь"], "optional_limit": 3}
             )
         )
         landmarks_of_categories_in_region_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 landmarks_of_categories_in_region_task,
                 {"region_name": "Мядзельскі раён", "categories_names": ["национальные парки белоруссии"]}
             )
         )
         landmarks_by_region_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 landmarks_by_region_task,
                 {"region_name": "Мядзел", "optional_limit": 3}
             )
         )
         recommendations_for_landmark_by_region_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 recommendations_for_landmark_by_region_task,
                 {
                     "user_login": "user",
@@ -81,7 +81,7 @@ if __name__ == '__main__':
             )
         )
         map_sectors_of_points_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 map_sectors_of_points_task,
                 {
                     "coordinates_of_points": [
@@ -94,7 +94,7 @@ if __name__ == '__main__':
             )
         )
         landmarks_of_categories_in_map_sectors_asyncio_task = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 landmarks_of_categories_in_map_sectors_task,
                 {
                     "map_sectors_names": ["a8", "h4"],
@@ -108,7 +108,7 @@ if __name__ == '__main__':
             )
         )
         recommendations_by_coordinates_and_categories_asyncio_task_1 = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 recommendations_by_coordinates_and_categories_task,
                 {
                     "coordinates_of_points": [
@@ -124,7 +124,7 @@ if __name__ == '__main__':
             )
         )
         recommendations_by_coordinates_and_categories_asyncio_task_2 = asyncio.create_task(
-            AgentsBroker.get_broker().call_agent_task(
+            AgentsBroker.call_agent_task(
                 recommendations_by_coordinates_and_categories_task,
                 {
                     "coordinates_of_points": [
