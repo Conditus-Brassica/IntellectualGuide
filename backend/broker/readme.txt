@@ -1,13 +1,41 @@
-При создании функции агента, которая может быть вызвана другим агентом,
-необходимо создавать ее с декоратором @BROKER.task, где BROKER - переменная в модуле agents_broker.
-В task-е вызывается метод конкретного агента, а не абстрактного. Для вызова task-а необходимо передать его в качестве
-параметра в метод AgentBroker.call_agent_tasks(agent_task, json_params)
+Если функционал агента готов, добавляем экземпляр агента в конструктор класса AgentsBroker (лучше всего передавать
+интерфейс или абстрактный класс). Создаем экземпляр агента в broker_initializer.py РЯДОМ с CRUD агентом (в else части)
 
-При текущей реализации call_agent_task при вызове скорее всего будет оборачиваться в asyncio.create_task(...)
+При создании функции агента, которая может быть вызвана другим агентом, для нее создается task. Все task-и, относящиеся
+к одному и тому же агенту размещаются в своем файле
 
-run from course directory:
+Путь к task-ам: backend/broker/agents_tasks/example_agent_tasks.py
 
-taskiq worker backend.broker.agents_broker:BROKER backend.broker.agents_tasks
+task - асинхронная функция с декоратором @BROKER.task, где BROKER - глобальная переменная импортируемая с модулем broker
+(она находится в файле broker_initializer, но не обязательно испортировать ее напрямую оттуда).
 
 
-Возможно, таски придется в один файл закинуть, но пока что пишем файл с тасками на агента.
+@BROKER.task
+async def example_task(json_params: Dict):
+"""
+Docstring
+
+:param json_params: Dict in form {
+    "param": param_type
+}, params for target function of agent
+:return: Coroutine ...
+"""
+    return await BROKER.example_agent.target_method(json_params)
+
+
+В task-е вызывается метод конкретного агента, а не абстрактного. При вызове передаются параметры метода агента. Сам
+task другими агентами не вызывается. Вызов осуществляется через асинхронный метод
+
+    AgentsBroker.call_agent_task(target_task, json_params: Dict)
+
+Метод вызывается через await, либо, что вероятнее всего (зависит от контекста), оборачивается asyncio.create_task.
+
+Для вызова task-а необходимо передать его в качестве параметра в метод AgentBroker.call_agent_tasks(agent_task, json_params)
+
+Для запуска Broker-а необходимо в терминале из директории course запустить скрипт
+
+    taskiq worker backend.broker.broker_initializer:BROKER backend.broker.agents_tasks --no-configure-logging
+
+
+Пример создания task-ов в файле backend/broker/agents_tasks/crud_agent_tasks.py
+Пример вызова этих же task-ов в файле backend/agents/crud_agent/crud_test.py

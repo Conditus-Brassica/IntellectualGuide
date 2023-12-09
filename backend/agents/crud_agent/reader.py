@@ -442,6 +442,7 @@ class Reader(PureReader):
             tx, coordinates_of_points: List[Dict[str, float]], optional_limit: int = None
     ):
         """Transaction handler for read_map_sectors_of_points"""
+
         result = await tx.run(
             """
             UNWIND $coordinates_of_points AS coordinates_of_point

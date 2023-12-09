@@ -1,14 +1,42 @@
-#import json
+#Author: Vodohleb04
 from typing import Dict
-from taskiq_redis import ListQueueBroker, RedisAsyncResultBackend
-from backend.agents.crud_agent import CRUDAgent, Reader
-from neo4j import AsyncGraphDatabase
+from taskiq_redis import ListQueueBroker
+from backend.agents.crud_agent import PureCRUDAgent
 
 
 class AgentsBroker(ListQueueBroker):
-    def __init__(self, crud: CRUDAgent, *args, **kwargs):
-        self.crud = crud
-        super().__init__(*args, **kwargs)
+    """
+    Custom broker class to work with agents.
+    Class is singleton.
+    """
+    __single_broker = None
+
+    @classmethod
+    def get_broker(cls):
+        """
+        Method to take broker object. Returns None in case when broker is not exists.
+        :return: None | AgentsBroker
+        """
+        return cls.__single_broker
+
+    @classmethod
+    def broker_exists(cls) -> bool:
+        """Method to check if broker object already exists"""
+        if cls.__single_broker:
+            return True
+        else:
+            return False
+
+    def __init__(self, crud: PureCRUDAgent, *args, **kwargs):
+        """
+        Init method
+
+        :param crud: child class of PureCRUDAgent
+        """
+        if not self.__single_broker:
+            self.crud = crud
+            super().__init__(*args, **kwargs)
+            self.__single_broker = self
 
     async def shutdown(self) -> None:
         await self.crud.close()
@@ -17,26 +45,14 @@ class AgentsBroker(ListQueueBroker):
     @staticmethod
     async def call_agent_task(agent_task, json_params: Dict):
         """
-        Wrapper to call task using broker. Call tasks only using this method.
+        Wrapper to call task using broker. Call tasks only using this function.
         Works asynchronously.
 
-        :param agent_task: task to call (check broker/agents_tasks/... for available tasks)
-        :param json_params: Dict with parameters for agent_task
-        :return: agent_task.wait_result()
+        :param agent_task: task to call (check broker/agents_tasks/... for available tasks). Takes only function name
+        without arguments
+        :param json_params: Dict with arguments to run the agent\'s function.
+        :return: agent_task.wait_result(). Use return_value property to get result of agent_task
         """
         agent_task = await agent_task.kiq(json_params)
         return await agent_task.wait_result()
 
-
-#with open("backend/broker/basic_login.json", 'r') as fout:
-#basic_login = json.load(fout)
-driver = AsyncGraphDatabase.driver('bolt://localhost:7687', auth=("neo4j", "ostisGovno"))
-reader = Reader()
-crud = CRUDAgent(reader, driver, 'neo4j')
-
-BROKER = AgentsBroker(
-    crud,
-    url="redis://localhost:6379"
-).with_result_backend(RedisAsyncResultBackend(redis_url="redis://localhost:6379"))
-
-print("pank pank pank pank")
