@@ -318,7 +318,6 @@ class Reader(PureReader):
                 recommendation,
                 recommendation_landmark_category_ref,
                 current_landmark_category_ref,
-                userAccount,
                 wish_ref,
                 visited_ref
             ORDER BY 
@@ -347,7 +346,6 @@ class Reader(PureReader):
                     point({latitude: $current_latitude, longitude: $current_longitude}),
                     point({latitude: recommendation.latitude, longitude: recommendation.longitude})
                 ) AS distance,
-                userAccount AS user_account,
                 CASE
                     WHEN wish_ref IS NULL THEN False
                     ELSE True
@@ -365,8 +363,8 @@ class Reader(PureReader):
             async for record in result:
                 result_values.append(
                     record.data(
-                        "recommendation", "main_categories_names", "subcategories_names",
-                        "distance", "user_account", "wish_to_visit", "visited_amount"
+                        "recommendation", "main_categories_names", "subcategories_names", "distance", "wish_to_visit",
+                        "visited_amount"
                     )
                 )
         except IndexError as ex:
@@ -593,7 +591,6 @@ class Reader(PureReader):
                     recommendedLandmark,
                     recommendation_landmark_category_ref,
                     category,
-                    userAccount,
                     wish_ref,
                     visited_ref
                 ORDER BY
@@ -609,7 +606,6 @@ class Reader(PureReader):
                         point({latitude: coordinates_of_point.latitude, longitude: coordinates_of_point.longitude}),
                         point({latitude: recommendedLandmark.latitude, longitude: recommendedLandmark.longitude})
                     ) AS distance,
-                    userAccount AS user_account,
                     CASE
                         WHEN wish_ref IS NULL THEN False
                         ELSE True
@@ -633,7 +629,6 @@ class Reader(PureReader):
                     RETURN category.name AS category_name
                 } AS subcategories_names,
                 distance,
-                user_account,
                 wish_to_visit,
                 visited_amount
 
@@ -684,7 +679,6 @@ class Reader(PureReader):
                     current_landmark,
                     current_landmark_category_ref,
                     category,
-                    userAccount,
                     wish_ref,
                     visited_ref
                 ORDER BY
@@ -702,7 +696,6 @@ class Reader(PureReader):
                         point({latitude: current_landmark.latitude, longitude: current_landmark.longitude}),
                         point({latitude: recommendedLandmark.latitude, longitude: recommendedLandmark.longitude})
                     ) AS distance,
-                    userAccount AS user_account,
                     CASE
                         WHEN wish_ref IS NULL THEN False
                         ELSE True
@@ -726,7 +719,6 @@ class Reader(PureReader):
                     RETURN category.name AS category_name
                 } AS subcategories_names,
                 distance,
-                user_account,
                 wish_to_visit,
                 visited_amount
             """,
@@ -737,15 +729,15 @@ class Reader(PureReader):
             if optional_limit:
                 result_values = [
                     record.data(
-                        "recommendation", "main_categories_names", "subcategories_names", "distance", "user_account",
-                        "wish_to_visit", "visited_amount"
+                        "recommendation", "main_categories_names", "subcategories_names", "distance", "wish_to_visit",
+                        "visited_amount"
                     ) for record in await result.fetch(optional_limit)
                 ]
             else:
                 result_values = [
                     record.data(
-                        "recommendation", "main_categories_names", "subcategories_names", "distance", "user_account",
-                        "wish_to_visit", "visited_amount"
+                        "recommendation", "main_categories_names", "subcategories_names", "distance", "wish_to_visit",
+                        "visited_amount"
                     ) async for record in result
                 ]
         except IndexError as ex:

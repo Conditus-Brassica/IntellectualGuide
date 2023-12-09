@@ -199,7 +199,6 @@ class PureCRUDAgent(ABC):
                     "main_categories_names": List[str] | [] (empty list),
                     "subcategories_names": List[str] | [] (empty list),
                     "distance": float | None,
-                    "user_account": Dict | None,
                     "wish_to_visit": bool | None,
                     "visited_amount": int | None
                 ]
@@ -286,7 +285,6 @@ class PureCRUDAgent(ABC):
                     "main_categories_names": List[str] | [] (empty list),
                     "subcategories_names": List[str] | [] (empty list),
                     "distance": float | None,
-                    "user_account": Dict | None,
                     "wish_to_visit": bool | None,
                     "visited_amount": int | None
                 ]
