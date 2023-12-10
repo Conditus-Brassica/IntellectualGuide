@@ -1,7 +1,6 @@
 import werkzeug.exceptions as wer_exp
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from jsonschema import validate, ValidationError, SchemaError
 from werkzeug.datastructures import ImmutableMultiDict as imd
 
 import backend.agents.json_schemas as schemas
@@ -43,18 +42,7 @@ class RequestAgent:
                 self.__app__.logger.error("get_sector_points() returned BadRequest")
                 return wer_exp.BadRequest().code
 
-            if not self.__validate_sector_schema_receive__(gotten_json):
-                self.__app__.logger.error("get_sector_points() returned BadRequest")
-                return wer_exp.BadRequest().code
-
-            # TODO: there"s must be a function of receiving json from lower agents
-
-            # sending_json = {"a": "b"}
-            # try:
-            #     self.__validate_sector_schema_send__(self, sending_json)
-            # except SchemaError:
-            #     self.__app__.logger.error("get_sector_points() returned NotFound")
-            #     return wer_exp.NotFound()
+            # TODO: task calling
 
             sending_json = {"points": [{"name": "name1",
                                         "lat": 54.098865472796994,
@@ -76,18 +64,14 @@ class RequestAgent:
                 self.__app__.logger.error("get_point() returned BadRequest")
                 return wer_exp.BadRequest()
 
-            # TODO: there"s must be a function of receiving json of about one point
-            rout_points = {"A": "b"}
-            try:
-                self.__validate_point_schema_send__(rout_points)
-            except SchemaError:
-                self.__app__.logger.error("get_point() returned NotFound")
-                return wer_exp.NotFound()
+            # TODO: task calling
 
-            return jsonify(rout_points)
+            landmark = {}
+
+            return jsonify(landmark)
 
         @self.__app__.route("/api/v1/map/route", methods=["GET"])
-        def get_rout():
+        def get_route():
             """
             Method for getting list of routing points.
             return: jsonify response
@@ -99,63 +83,11 @@ class RequestAgent:
                 self.__app__.logger.error("get_rout() returned BadRequest")
                 return wer_exp.BadRequest()
 
-            # TODO: there"s must be a function of receiving json of route points
-            rout_points = {"A": "b"}
+            # TODO: task calling
 
-            try:
-                self.__validate_rout_points_schema_send__(rout_points)
-            except SchemaError:
-                self.__app__.logger.error("get_rout() returned NotFound")
-                return wer_exp.NotFound()
+            route_points = {}
 
-            return jsonify(rout_points)
-
-    def __validate_sector_schema_receive__(self, gotten_json):
-        """
-        Validate sector received json.
-        return bool
-        """
-        try:
-            validate(gotten_json, schemas.sector_schema_receive)
-            return True
-        except ValidationError:
-            self.__app__.logger.error("sector receive error")
-            return False
-
-    def __validate_sector_schema_send__(self, sending_json):
-        """
-        Validate sector sent json.
-        return bool
-        """
-        try:
-            validate(sending_json, schemas.sector_send_schema)
-            return True
-        except ValidationError:
-            self.__app__.logger.error("sector send", ValidationError)
-            return False
-
-    def __validate_rout_points_schema_send__(self, sending_json):
-        """
-        Validate rout points send json.
-        """
-        try:
-            validate(sending_json, schemas.send_rout_schema)
-            return True
-        except ValidationError:
-            self.__app__.logger.error("rout points send", ValidationError)
-            return False
-
-    def __validate_point_schema_send__(self, sending_json):
-        """
-        Validate point send json.
-        return: bool
-        """
-        try:
-            validate(sending_json, schemas.send_point)
-            return True
-        except ValidationError:
-            self.__app__.logger.error("point send", ValidationError)
-            return False
+            return jsonify(route_points)
 
 
 if __name__ == "__main__":
