@@ -114,20 +114,4 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
             return False
 
 
-# async def tescom():
-#     test_class = GetLandmarksInSectorsAgent()
-#     test_dict = {
-#         "TL": {
-#             "latitude": 56.232289,
-#             "longitude": 23.690447875
-#         },
-#         "BR": {
-#             "latitude": 53.113400874999996,
-#             "longitude": 25.5222235
-#         }
-#     }
-#     await test_class.landmarks_by_sectors_agent(test_dict)
-#     await test_class.landmarks_by_sectors_agent(test_dict)
-#
-# task = asyncio.create_task(tescom())
-# asyncio.run(tescom())
+
