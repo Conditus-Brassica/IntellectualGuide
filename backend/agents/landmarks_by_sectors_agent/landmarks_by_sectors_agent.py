@@ -41,7 +41,7 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
                     self.squares_in_sector
                 )
             )
-            self.result = await landmarks_sectors_async_task  # TODO .result_value ?
+            self.result = await landmarks_sectors_async_task  # TODO .return_value ?
         return self.result
 
     async def get_landmarks_by_categories_in_sector(self, jsom_params: dict):
@@ -56,7 +56,7 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
                     landmarks_of_categories_in_map_sectors_task, self.squares_in_sector
                 )
             )
-            self.result = await landmarks_sectors_categories_async_task  # TODO .result_value ?
+            self.result = await landmarks_sectors_categories_async_task  # TODO .return_value ?
         return self.result
 
     def __set_cache(self):

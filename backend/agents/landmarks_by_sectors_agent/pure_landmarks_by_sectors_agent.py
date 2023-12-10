@@ -1,8 +1,8 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Dict
 
 
-class PURELandmarksBySectorsAgent:
+class PURELandmarksBySectorsAgent(ABC):
     """
         Pure abstract class of Recommendations agent. Provides methods for commands from the other agents.
         All work with kb provided by child classes of this class.
@@ -12,18 +12,19 @@ class PURELandmarksBySectorsAgent:
 
     _single_landmarks_agent = None
 
+    @classmethod
     @abstractmethod
-    def get_landmarks_by_sectors_agent(self):
+    def get_landmarks_by_sectors_agent(cls):
         """
         Method to take landmarks by sectors agent object. Returns None in case when landmarks by sectors agent is not exists.
         :return: None | PURELandmarksBySectorsAgent
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def landmarks_by_sectors_agent_exists(self) -> bool:
+    def landmarks_by_sectors_agent_exists(cls) -> bool:
         """Method to check if landmarks by sectors agent object already exists"""
-
         raise NotImplementedError
 
     @abstractmethod
