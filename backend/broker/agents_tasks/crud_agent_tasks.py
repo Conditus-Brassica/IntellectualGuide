@@ -2,6 +2,7 @@
 """Tasks to work with crud agent. Use broker to run tasks"""
 from typing import Dict
 from ..broker_initializer import BROKER
+from backend.agents.crud_agent.crud_initializer import CRUD_AGENT
 
 
 @BROKER.task
@@ -23,7 +24,7 @@ async def categories_of_region_task(json_params: Dict):
             }
         ]
     """
-    return await BROKER.crud_agent.get_categories_of_region(json_params)
+    return await CRUD_AGENT.get_categories_of_region(json_params)
 
 
 @BROKER.task
@@ -46,7 +47,7 @@ async def landmarks_in_map_sectors_task(json_params: Dict):
             }
         ], where categories_names are categories of landmark
     """
-    return await BROKER.crud_agent.get_landmarks_in_map_sectors(json_params)
+    return await CRUD_AGENT.get_landmarks_in_map_sectors(json_params)
 
 
 @BROKER.task
@@ -68,7 +69,7 @@ async def landmarks_refers_to_categories_task(json_params: Dict):
             }
         ]
     """
-    return await BROKER.crud_agent.get_landmarks_refers_to_categories(json_params)
+    return await CRUD_AGENT.get_landmarks_refers_to_categories(json_params)
 
 
 @BROKER.task
@@ -95,7 +96,7 @@ async def landmarks_by_coordinates_task(json_params: Dict):
             ]
         ],  where categories_names are categories of landmark
     """
-    return await BROKER.crud_agent.get_landmarks_by_coordinates(json_params)
+    return await CRUD_AGENT.get_landmarks_by_coordinates(json_params)
 
 
 @BROKER.task
@@ -117,7 +118,7 @@ async def landmarks_by_names_task(json_params: Dict):
             ]
         ],  where categories_names are categories of landmark
     """
-    return await BROKER.crud_agent.get_landmarks_by_names(json_params)
+    return await CRUD_AGENT.get_landmarks_by_names(json_params)
 
 
 @BROKER.task
@@ -142,7 +143,7 @@ async def landmarks_of_categories_in_region_task(json_params: Dict):
             ]
         ], where "located_at" is the region, where landmark is located
     """
-    return await BROKER.crud_agent.get_landmarks_of_categories_in_region(json_params)
+    return await CRUD_AGENT.get_landmarks_of_categories_in_region(json_params)
 
 
 @BROKER.task
@@ -165,11 +166,11 @@ async def landmarks_by_region_task(json_params: Dict):
             ]
         ],  where "located_at" is the region, where landmark is located, categories_names are categories of landmark
     """
-    return await BROKER.crud_agent.get_landmarks_by_region(json_params)
+    return await CRUD_AGENT.get_landmarks_by_region(json_params)
 
 
 @BROKER.task
-async def recommendations_for_landmark_by_region_task(json_params: Dict):
+async def crud_recommendations_for_landmark_by_region_task(json_params: Dict):
     """
     Task to get recommended landmarks for given landmark and given user. Finds given landmark by its name and
     coordinates; finds user by his/her login. Returns recommended landmark, categories of recommended landmark,
@@ -201,7 +202,7 @@ async def recommendations_for_landmark_by_region_task(json_params: Dict):
         ]
     ]
     """
-    return await BROKER.crud_agent.get_recommendations_for_landmark_by_region(json_params)
+    return await CRUD_AGENT.get_recommendations_for_landmark_by_region(json_params)
 
 
 @BROKER.task
@@ -228,7 +229,7 @@ async def map_sectors_of_points_task(json_params: Dict):
         ]
     ]
     """
-    return await BROKER.crud_agent.get_map_sectors_of_points(json_params)
+    return await CRUD_AGENT.get_map_sectors_of_points(json_params)
 
 
 @BROKER.task
@@ -256,11 +257,11 @@ async def landmarks_of_categories_in_map_sectors_task(json_params: Dict):
         ]
     ]
     """
-    return await BROKER.crud_agent.get_landmarks_of_categories_in_map_sectors(json_params)
+    return await CRUD_AGENT.get_landmarks_of_categories_in_map_sectors(json_params)
 
 
 @BROKER.task
-async def recommendations_by_coordinates_and_categories_task(json_params: Dict):
+async def crud_recommendations_by_coordinates_and_categories_task(json_params: Dict):
     """
     Task to get recommended landmarks for given user, given coordinates and given categories. Finds given
     landmark by its name and coordinates; finds user by his/her login. Returns recommended landmark, categories of
@@ -296,4 +297,4 @@ async def recommendations_by_coordinates_and_categories_task(json_params: Dict):
         ]
     ]
     """
-    return await BROKER.crud_agent.get_recommendations_by_coordinates_and_categories(json_params)
+    return await CRUD_AGENT.get_recommendations_by_coordinates_and_categories(json_params)

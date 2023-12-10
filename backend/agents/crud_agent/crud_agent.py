@@ -1,10 +1,15 @@
 #Author: Vodohleb04
+"""
+CRUD Agent modul
+https://sefon.pro/mp3/474614-sektor-gaza-narkoman/
+"""
 import asyncio
 from typing import Dict, List
 from jsonschema import ValidationError, validate
 from neo4j import AsyncDriver
 from aiologger.loggers.json import JsonLogger
-from backend.agents.crud_agent.pure_crud_classes import PureCRUDAgent, PureReader
+from backend.agents.crud_agent.pure_crud_classes.pure_crud_agent import PureCRUDAgent
+from backend.agents.crud_agent.pure_crud_classes.pure_reader import PureReader
 from backend.agents.crud_agent.param_json_validation import *
 
 
@@ -15,16 +20,35 @@ logger = JsonLogger.with_default_handlers(
 
 
 class CRUDAgent(PureCRUDAgent):
-    __instances_amount = 0
+    _single_crud = None
+    _reader = None
     _kb_driver = None
+    _knowledgebase_name = None
 
     @classmethod
     async def close(cls):
         if cls._kb_driver:
             await cls._kb_driver.close()
+            await logger.info("Driver closed")
 
     @classmethod
-    def class__init__(cls, reader: PureReader, async_kb_driver: AsyncDriver, knowledgebase_name: str):
+    def get_crud(cls):
+        """
+        Method to take crud agent object. Returns None in case when crud is not exists.
+        :return: None | PureCRUDAgent
+        """
+        return cls._single_crud
+
+    @classmethod
+    def crud_exists(cls) -> bool:
+        """Method to check if crud object already exists"""
+        if cls._single_crud:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def _class_init(cls, reader: PureReader, async_kb_driver: AsyncDriver, knowledgebase_name: str):
         """
         :param reader: reader for agent
         :param async_kb_driver: async driver of knowledge base
@@ -40,11 +64,11 @@ class CRUDAgent(PureCRUDAgent):
         :param async_kb_driver: async driver of knowledge base
         :param knowledgebase_name: name of knowledgebase to query
         """
-        if self.__instances_amount == 0:
-            self.class__init__(reader, async_kb_driver, knowledgebase_name)
-            self.__instances_amount += 1
+        if not self._single_crud:
+            self._class_init(reader, async_kb_driver, knowledgebase_name)
+            self._single_crud = self
         else:
-            raise RuntimeError("Unexpected behaviour, this method can have only one instance")
+            raise RuntimeError("Unexpected behaviour, this class can have only one instance")
 
     @classmethod
     async def get_categories_of_region(cls, json_params: Dict):

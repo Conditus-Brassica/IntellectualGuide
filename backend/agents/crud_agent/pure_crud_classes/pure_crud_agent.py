@@ -1,4 +1,8 @@
 #Author: Vodohleb04
+"""
+PureCrudAgent modul
+https://sefon.pro/mp3/474614-sektor-gaza-narkoman/
+"""
 from typing import Dict
 from abc import ABC, abstractmethod
 
@@ -11,11 +15,33 @@ class PureCRUDAgent(ABC):
     All methods work asynchronously.
     """
 
+    # _single_crud = None
+
     @classmethod
     @abstractmethod
     async def close(cls) -> None:
         """Method to close the connection to the kb."""
         raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def get_crud(cls):
+        """
+        Method to take crud agent object. Returns None in case when crud is not exists.
+        :return: None | PureCRUDAgent
+        """
+        # return cls._single_crud
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def crud_exists(cls) -> bool:
+        """Method to check if crud object already exists"""
+        raise NotImplementedError
+        # if cls._single_crud:
+        #     return True
+        # else:
+        #     return False
 
     @classmethod
     @abstractmethod

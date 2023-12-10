@@ -6,7 +6,7 @@ agents/cache
 *.cypher
 
 backend/agents/crud_agent/test_crud.py
-backend/broker/basic_login.json
+backend/agents/crud_agent/basic_login.json
 
 ./export_data.py
 

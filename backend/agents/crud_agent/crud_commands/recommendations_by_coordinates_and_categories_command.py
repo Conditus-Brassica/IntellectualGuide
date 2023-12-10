@@ -46,4 +46,4 @@ class RecommendationsByCoordinatesAndCategoriesCommand(BaseCommand):
                 ]
             ]
         """
-        return await self._target_agent.get_recommendations_by_coordinates_and_categories(self._json_params)
+        return await self._target_agent.find_recommendations_for_coordinates_and_categories(self._json_params)

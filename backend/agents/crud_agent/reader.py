@@ -2,11 +2,11 @@
 from typing import List, Dict
 from aiologger.loggers.json import JsonLogger
 from neo4j import AsyncSession
-from .pure_crud_classes import PureReader
+from .pure_crud_classes.pure_reader import PureReader
 
 
 logger = JsonLogger.with_default_handlers(
-    level="DEBUG",
+    level="INFO",
     serializer_kwargs={'ensure_ascii': False},
 )
 
@@ -50,13 +50,13 @@ class Reader(PureReader):
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
-        await logger.info(f"method:\t_read_categories_of_region,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_categories_of_region,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
     async def read_categories_of_region(session: AsyncSession, region_name: str, optional_limit: int = None):
         result = await session.execute_read(Reader._read_categories_of_region, region_name, optional_limit)
-        await logger.info(f"method:\tread_categories_of_region,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_categories_of_region,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -97,7 +97,7 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(f"method:\t_read_landmarks_in_map_sectors,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_landmarks_in_map_sectors,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
@@ -105,7 +105,7 @@ class Reader(PureReader):
             session: AsyncSession, map_sectors_names: List[str], optional_limit: int = None
     ):
         result = await session.execute_read(Reader._read_landmarks_in_map_sectors, map_sectors_names, optional_limit)
-        await logger.info(f"method:\tread_landmarks_in_map_sectors,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_landmarks_in_map_sectors,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -138,7 +138,7 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(f"method:\t_read_landmarks_by_coordinates,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_landmarks_by_coordinates,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
@@ -146,7 +146,7 @@ class Reader(PureReader):
             session: AsyncSession, coordinates: List[Dict[str, float]], optional_limit: int = None
     ):
         result = await session.execute_read(Reader._read_landmarks_by_coordinates, coordinates, optional_limit)
-        await logger.info(f"method:\tread_landmarks_by_coordinates,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_landmarks_by_coordinates,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -178,7 +178,7 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(f"method:\t_read_landmarks_refers_to_categories,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_landmarks_refers_to_categories,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
@@ -188,7 +188,7 @@ class Reader(PureReader):
         result = await session.execute_read(
             Reader._read_landmarks_refers_to_categories, categories_names, optional_limit
         )
-        await logger.info(f"method:\read_landmarks_refers_to_categories,\nresult:\t{result}")
+        await logger.debug(f"method:\read_landmarks_refers_to_categories,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -225,13 +225,13 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(f"method:\t_read_landmarks_by_names,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_landmarks_by_names,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
     async def read_landmarks_by_names(session: AsyncSession, landmark_names: List[str], optional_limit: int = None):
         result = await session.execute_read(Reader._read_landmarks_by_names, landmark_names, optional_limit)
-        await logger.info(f"method:\tread_landmarks_by_names,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_landmarks_by_names,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -279,7 +279,7 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(f"method:\t_read_landmarks_of_categories_in_region,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_landmarks_of_categories_in_region,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
@@ -289,7 +289,7 @@ class Reader(PureReader):
         result = await session.execute_read(
             Reader._read_landmarks_of_categories_in_region, region_name, categories_names, optional_limit
         )
-        await logger.info(f"method:\tread_landmarks_of_categories_in_region,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_landmarks_of_categories_in_region,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -371,7 +371,7 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(f"method:\t_read_recommendations_for_landmark_by_region,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_recommendations_for_landmark_by_region,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
@@ -383,7 +383,7 @@ class Reader(PureReader):
             Reader._read_recommendations_for_landmark_by_region, user_login,  current_latitude, current_longitude,
             current_name, amount_of_recommendations
         )
-        await logger.info(f"method:\tread_recommendations_for_landmark_by_region,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_recommendations_for_landmark_by_region,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -426,13 +426,13 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(f"method:\t_read_landmarks_by_region,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_landmarks_by_region,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
     async def read_landmarks_by_region(session: AsyncSession, region_name: str, optional_limit: int = None):
         result = await session.execute_read(Reader._read_landmarks_by_region, region_name, optional_limit)
-        await logger.info(f"method:\tread_landmarks_by_region,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_landmarks_by_region,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -466,7 +466,7 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(f"method:\t_read_map_sectors_of_points,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_map_sectors_of_points,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
@@ -476,7 +476,7 @@ class Reader(PureReader):
         result = await session.execute_read(
             Reader._read_map_sectors_of_points, coordinates_of_points, optional_limit
         )
-        await logger.info(f"method:\tread_map_sectors_of_points,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_map_sectors_of_points,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -527,7 +527,7 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(f"method:\t_read_landmarks_of_categories_in_map_sectors,\nresult:\t{await result.consume()}")
+        await logger.debug(f"method:\t_read_landmarks_of_categories_in_map_sectors,\nresult:\t{await result.consume()}")
         return result_values
 
     @staticmethod
@@ -540,7 +540,7 @@ class Reader(PureReader):
             categories_names,
             optional_limit
         )
-        await logger.info(f"method:\tread_landmarks_of_categories_in_map_sectors,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_landmarks_of_categories_in_map_sectors,\nresult:\t{result}")
         return result
 
     @staticmethod
@@ -744,7 +744,7 @@ class Reader(PureReader):
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
 
-        await logger.info(
+        await logger.debug(
             f"method:\t_read_recommendations_by_coordinates_and_categories,\nresult:\t{await result.consume()}"
         )
         return result_values
@@ -762,6 +762,6 @@ class Reader(PureReader):
             Reader._read_recommendations_by_coordinates_and_categories, coordinates_of_points,
             categories_names, user_login, amount_of_recommendations_for_point, optional_limit
         )
-        await logger.info(f"method:\tread_recommendations_by_coordinates_and_categories,\nresult:\t{result}")
+        await logger.debug(f"method:\tread_recommendations_by_coordinates_and_categories,\nresult:\t{result}")
         return result
 
