@@ -30,17 +30,40 @@ class PURELandmarksBySectorsAgent(ABC):
     @abstractmethod
     async def get_landmarks_in_sector(self, json_params: Dict):
         """
-
+        Method to return landmarks in defined sector using PURELandmarksBySectorsAgent
         """
         """
-        # TODO Fill this
+        param json_params: Dict in form {
+         "TL": {
+             "latitude": Double,
+             "longitude": Double
+         },
+         "BR": {
+             "latitude": Double,
+             "longitude": Double
+         }
         """
         raise NotImplementedError
 
     @abstractmethod
     async def get_landmarks_by_categories_in_sector(self, json_params: Dict):
         """
-        # TODO Fill this
+        Method to return landmarks of certain categories in defined sector using PURELandmarksBySectorsAgent
+        """
+        """
+        :param json_params: Dict in form {
+         "TL": {
+             "latitude": Double,
+             "longitude": Double
+         },
+         "BR": {
+             "latitude": Double,
+             "longitude": Double
+         },
+         "categories_names": [
+            String
+        ]
+       }
         """
         raise NotImplementedError
 
