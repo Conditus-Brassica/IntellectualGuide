@@ -3,8 +3,9 @@ import json
 from aiologger.loggers.json import JsonLogger
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
-from backend.agents import PureCRUDAgent, CRUDCommandsFabric
-from backend.agents.get_landmarks_in_sector.squares_params_json_validation import *
+from backend.agents import PureCRUDAgent
+from backend.agents.crud_agent.crud_commands_fabric import CRUDCommandsFabric
+from backend.agents.landmarks_by_sectors_agent.squares_params_json_validation import *
 from backend.command_bases import Sender, BaseCommand
 
 logger = JsonLogger.with_default_handlers(
@@ -100,8 +101,8 @@ class GetLandmarksInSectorsAgent(Sender):
 #             "longitude": 25.5222235
 #         }
 #     }
-#     await test_class.get_landmarks_in_sector(test_dict)
-#     await test_class.get_landmarks_in_sector(test_dict)
+#     await test_class.landmarks_by_sectors_agent(test_dict)
+#     await test_class.landmarks_by_sectors_agent(test_dict)
 #
 # task = asyncio.create_task(tescom())
 # asyncio.run(tescom())
