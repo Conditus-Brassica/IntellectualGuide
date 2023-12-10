@@ -41,7 +41,6 @@ get_coords_of_map_sectors_json = \
 """
 get_categories_of_landmarks
 """
-# TODO Add categories parameter
 get_categories_of_landmarks_json = \
     {
         "type": "object",
@@ -75,7 +74,15 @@ get_categories_of_landmarks_json = \
                 "additionalProperties": False
             }
         },
-        "required": ["TL", "BR"],
-        "maxProperties": 2,
+        "categories_names":
+            {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                },
+                "additionalProperties": False
+            },
+        "required": ["TL", "BR", "categories_names"],
+        "maxProperties": 3,
         "additionalProperties": False
     }

@@ -30,6 +30,9 @@ class PURELandmarksBySectorsAgent(ABC):
     @abstractmethod
     async def get_landmarks_in_sector(self, json_params: Dict):
         """
+
+        """
+        """
         # TODO Fill this
         """
         raise NotImplementedError
