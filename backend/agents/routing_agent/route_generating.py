@@ -1,8 +1,4 @@
-from pprint import pprint
-
 import openrouteservice as ors
-
-import asyncio
 
 from pure_route_generating_agent import PureRoutingAgent
 import api_key
@@ -18,8 +14,8 @@ class RoutingAgent(PureRoutingAgent):
     """
 
     def __init__(self):
-        self.__client__ = ors.Client(key=api_key.__key__)
-        self.__landmarks = []
+        self._client_ = ors.Client(key=api_key.__key__)
+        self._landmarks = []
 
     async def get_optimized_route(self, landmark_list: list):
         """
@@ -27,11 +23,11 @@ class RoutingAgent(PureRoutingAgent):
         :param landmark_list: [[latitude: float, longitude: float], ...]
         :return: Route points, landmarks in route order
         """
-        self.__landmarks = landmark_list
+        self._landmarks = landmark_list
 
-        self.__landmarks = self.__reverse_coordinates(self.__landmarks)
-        route = await self.__create_optimized_route()[0]
-        route = self.__reverse_coordinates(route)
+        self._landmarks = self._reverse_coordinates(self._landmarks)
+        route = await self._create_optimized_route()
+        route = self._reverse_coordinates(route)
 
         return route
 
@@ -42,10 +38,10 @@ class RoutingAgent(PureRoutingAgent):
         :param landmark_list: [[latitude: float, longitude: float], ...]
         :return: Route points, landmarks in route order
         """
-        self.__landmarks = landmark_list
+        self._landmarks = landmark_list
 
-        self.__landmarks = self.__reverse_coordinates(self.__landmarks)
-        route = await self.__create_optimized_route()
+        self._landmarks = self._reverse_coordinates(self._landmarks)
+        route = await self._create_optimized_route()
 
         main_points = []
         k = 0
@@ -55,7 +51,7 @@ class RoutingAgent(PureRoutingAgent):
                 k = 0
             k += 1
 
-        main_points = self.__reverse_coordinates(main_points)
+        main_points = self._reverse_coordinates(main_points)
 
         if len(route) < 130:
             main_points.append(route[0])
@@ -64,7 +60,7 @@ class RoutingAgent(PureRoutingAgent):
         return main_points
 
     @staticmethod
-    def __reverse_coordinates(coordinates_list: list):
+    def _reverse_coordinates(coordinates_list: list):
         """
         Method revere coordinates because of osm (longitude, latitude),
         but normally it should be (latitude, longitude).
@@ -76,13 +72,13 @@ class RoutingAgent(PureRoutingAgent):
 
         return coordinates_list
 
-    async def __create_optimized_route(self):
+    async def _create_optimized_route(self):
         """
         Interaction with OpenRoutService API
         :return:
         """
-        route = self.__client__.directions(
-            coordinates=self.__landmarks,
+        route = self._client_.directions(
+            coordinates=self._landmarks,
             profile='driving-car',
             format='geojson',
             validate=False,

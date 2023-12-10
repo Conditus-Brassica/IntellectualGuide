@@ -41,7 +41,7 @@ class PureRoutingAgent(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def __create_optimized_route(self):
+    async def _create_optimized_route(self):
         """
         Interaction with OpenRoutService API
         :return:
