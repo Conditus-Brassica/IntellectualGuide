@@ -1,6 +1,6 @@
 import openrouteservice as ors
 
-from pure_route_generating_agent import PureRoutingAgent
+from pure_routing_agent_agent import PureRoutingAgent
 import api_key
 
 
@@ -13,9 +13,34 @@ class RoutingAgent(PureRoutingAgent):
     Uses api_key in api_key.py
     """
 
-    def __init__(self):
-        self._client_ = ors.Client(key=api_key.__key__)
-        self._landmarks = []
+    __single_routing_agent = None
+
+    @classmethod
+    def get_routing_agent(cls):
+        """
+        Method to take route generating agent object. Returns None in case when route generating agent is not exists.
+        :return: None | PureRoutingAgent
+        """
+        return cls.__single_routing_agent
+
+    @classmethod
+    def routing_agent_exists(cls) -> bool:
+        """
+        Method to check if route generating agent exists.
+        :return: Boolean
+        """
+        if cls.__single_routing_agent:
+            return True
+        else:
+            return False
+
+    def __init__(self, client: ors.Client):
+        if not self.__single_routing_agent:
+            self._client_ = client
+            self._landmarks = []
+            self.__single_routing_agent = self
+        else:
+            raise RuntimeError("Unexpected behaviour, this class can have only one instance")
 
     async def get_optimized_route(self, landmark_list: list):
         """
@@ -67,8 +92,7 @@ class RoutingAgent(PureRoutingAgent):
         :param coordinates_list:
         :return: list of reversed coordinates
         """
-        coordinates_list = \
-            [list(reversed(coord)) for coord in coordinates_list]
+        coordinates_list = [list(reversed(coord)) for coord in coordinates_list]
 
         return coordinates_list
 

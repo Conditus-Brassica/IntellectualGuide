@@ -10,26 +10,23 @@ class PureRoutingAgent(ABC):
     Uses api_key in api_key.py
     """
 
-    __single_routing_agent = None
-
     @classmethod
-    def get_route_generating_agent(cls):
+    @abstractmethod
+    def get_routing_agent(cls):
         """
         Method to take route generating agent object. Returns None in case when route generating agent is not exists.
         :return: None | PureRoutingAgent
         """
-        return cls.__single_routing_agent
+        raise NotImplementedError
 
     @classmethod
+    @abstractmethod
     def routing_agent_exists(cls) -> bool:
         """
         Method to check if route generating agent exists.
         :return: Boolean
         """
-        if cls.__single_routing_agent:
-            return True
-        else:
-            return False
+        raise NotImplementedError
 
     @abstractmethod
     async def get_optimized_route(self, landmark_list: list):
