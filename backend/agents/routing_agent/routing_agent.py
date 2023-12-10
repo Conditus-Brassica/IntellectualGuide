@@ -1,5 +1,6 @@
 import openrouteservice as ors
 
+from typing import Dict
 from pure_routing_agent_agent import PureRoutingAgent
 import api_key
 
@@ -42,28 +43,30 @@ class RoutingAgent(PureRoutingAgent):
         else:
             raise RuntimeError("Unexpected behaviour, this class can have only one instance")
 
-    async def get_optimized_route(self, landmark_list: list):
+    async def get_optimized_route(self, landmark_list: Dict):
         """
         Method finds all optimized route points for provided points.
-        :param landmark_list: [[latitude: float, longitude: float], ...]
+        :param landmark_list: ["coordinates": [latitude: float, longitude: float], ...]
         :return: Route points, landmarks in route order
         """
-        self._landmarks = landmark_list
+        for i in landmark_list['coordinates']:
+            self._landmarks.append([i['latitude'], i['longitude']])
 
         self._landmarks = self._reverse_coordinates(self._landmarks)
         route = await self._create_optimized_route()
         route = self._reverse_coordinates(route)
 
-        return route
+        return self._coordinates_wrap(route)
 
-    async def get_optimized_route_main_points(self, landmark_list: list):
+    async def get_optimized_route_main_points(self, landmark_list: Dict):
         """
         Method finds all optimized route points for provided points.
         Return one point per 30 km.
         :param landmark_list: [[latitude: float, longitude: float], ...]
         :return: Route points, landmarks in route order
         """
-        self._landmarks = landmark_list
+        for i in landmark_list['coordinates']:
+            self._landmarks.append([i['latitude'], i['longitude']])
 
         self._landmarks = self._reverse_coordinates(self._landmarks)
         route = await self._create_optimized_route()
@@ -82,7 +85,7 @@ class RoutingAgent(PureRoutingAgent):
 
         main_points = self._reverse_coordinates(main_points)
 
-        return main_points
+        return self._coordinates_wrap(main_points)
 
     @staticmethod
     def _reverse_coordinates(coordinates_list: list):
@@ -110,6 +113,21 @@ class RoutingAgent(PureRoutingAgent):
         )
         # await asyncio.sleep(5)
         return route['features'][0]['geometry']['coordinates']
+
+    @staticmethod
+    def _coordinates_wrap(landmark_list: list):
+        """
+        Create dictionary from list.
+        """
+        coordinates_dictionary = dict()
+
+        lst = []
+        for i in landmark_list:
+            lst.append({"latitude": i[0], "longitude": i[1]})
+
+        coordinates_dictionary['coordinates'] = lst
+
+        return coordinates_dictionary
 
 
 # async def main():
