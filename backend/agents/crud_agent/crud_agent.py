@@ -10,7 +10,7 @@ from neo4j import AsyncDriver
 from aiologger.loggers.json import JsonLogger
 from backend.agents.crud_agent.pure_crud_classes.pure_crud_agent import PureCRUDAgent
 from backend.agents.crud_agent.pure_crud_classes.pure_reader import PureReader
-from backend.agents.crud_agent.param_json_validation import *
+from backend.agents.crud_agent.crud_json_validation import *
 
 
 logger = JsonLogger.with_default_handlers(
