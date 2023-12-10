@@ -3,11 +3,10 @@
 from typing import Dict
 from ..broker_initializer import BROKER
 from backend.agents.landmarks_by_sectors_agent.landmarks_by_sectors_agent_initializer import LANDMARKS_BY_SECTORS_AGENT
-from ...agents.crud_agent.pure_crud_classes.pure_crud_agent import PureCRUDAgent
 
 
 @BROKER.task
-async def get_landmarks_in_sector(json_params: Dict):
+async def get_landmarks_in_sector_task(json_params: Dict):
     """
         :param json_params: Dict in form {
         "TL": {
@@ -21,11 +20,11 @@ async def get_landmarks_in_sector(json_params: Dict):
       }
       :return: LandmarksInMapSectorsCommand for CRUD
     """
-    return await LANDMARKS_BY_SECTORS_AGENT.get_landmarks_in_sector(json_params, PureCRUDAgent)
+    return await LANDMARKS_BY_SECTORS_AGENT.get_landmarks_in_sector(json_params)
 
 
 @BROKER.task
-async def get_landmarks_by_categories_in_sector(json_params: Dict):
+async def get_landmarks_by_categories_in_sector_task(json_params: Dict):
     """
     #TODO: add categories
     Kick this task to get landmarks, located in passed map sectors. Finds map sectors by their names.
@@ -40,4 +39,4 @@ async def get_landmarks_by_categories_in_sector(json_params: Dict):
         }
       }
     """
-    return await LANDMARKS_BY_SECTORS_AGENT.get_landmarks_by_categories_in_sector(json_params, PureCRUDAgent)
+    return await LANDMARKS_BY_SECTORS_AGENT.get_landmarks_by_categories_in_sector(json_params)

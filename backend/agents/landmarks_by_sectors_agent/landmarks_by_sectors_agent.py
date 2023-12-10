@@ -1,11 +1,9 @@
 import asyncio
 import json
-from abc import ABC
 
 from aiologger.loggers.json import JsonLogger
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
-from backend.agents.crud_agent.pure_crud_classes.pure_crud_agent import PureCRUDAgent
 from backend.agents.landmarks_by_sectors_agent.pure_landmarks_by_sectors_agent import PURELandmarksBySectorsAgent
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
 from backend.broker.agents_tasks.crud_agent_tasks import landmarks_of_categories_in_map_sectors_task, landmarks_in_map_sectors_task
@@ -17,7 +15,7 @@ logger = JsonLogger.with_default_handlers(
 )
 
 
-class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent, ABC):
+class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
     LAT_DIFFERENCE = 0.312
     LONG_DIFFERENCE = 0.611
 
@@ -29,7 +27,7 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent, ABC):
         self.result = {}
         self.full_cache = False
 
-    async def get_landmarks_in_sector(self, jsom_params: dict, agent: PureCRUDAgent):
+    async def get_landmarks_in_sector(self, jsom_params: dict):
         # Check if format of dictionary is right using validator
         await self.__coords_of_square_validation(jsom_params)
         self.__get_sectors_in_sector(jsom_params)
@@ -38,14 +36,15 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent, ABC):
         self.__set_cache()
         if len(self.cache["map_sector_names"]) != 0:
             landmarks_sectors_async_task = asyncio.create_task(
-                AbstractAgentsBroker.call_agent_task(landmarks_in_map_sectors_task,
-                                                     self.squares_in_sector)
+                AbstractAgentsBroker.call_agent_task(
+                    landmarks_in_map_sectors_task,
+                    self.squares_in_sector
+                )
             )
-            self.result = await landmarks_sectors_async_task
+            self.result = await landmarks_sectors_async_task  # TODO .result_value ?
         return self.result
 
-    async def get_landmarks_by_categories_in_sector(self, jsom_params: dict,
-                                                    agent: PureCRUDAgent):
+    async def get_landmarks_by_categories_in_sector(self, jsom_params: dict):
         await self.__coords_of_square_with_categories_validation(jsom_params)
         self.__get_sectors_in_sector(jsom_params)
         self.squares_in_sector[0] = [i for i in self.squares_in_sector[0] not in self.cache[0]]
@@ -53,10 +52,11 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent, ABC):
         self.__set_cache()
         if len(self.cache["map_sector_names"]) != 0:
             landmarks_sectors_categories_async_task = asyncio.create_task(
-                AbstractAgentsBroker.call_agent_task(landmarks_of_categories_in_map_sectors_task,
-                                                     self.squares_in_sector)
+                AbstractAgentsBroker.call_agent_task(
+                    landmarks_of_categories_in_map_sectors_task, self.squares_in_sector
+                )
             )
-            self.result = await landmarks_sectors_categories_async_task
+            self.result = await landmarks_sectors_categories_async_task  # TODO .result_value ?
         return self.result
 
     def __set_cache(self):

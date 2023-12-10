@@ -1,8 +1,6 @@
 from abc import abstractmethod
 from typing import Dict
 
-from backend.agents.crud_agent.pure_crud_classes.pure_crud_agent import PureCRUDAgent
-
 
 class PURELandmarksBySectorsAgent:
     """
@@ -29,14 +27,14 @@ class PURELandmarksBySectorsAgent:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_landmarks_in_sector(self, json_params: Dict, crud_agent: PureCRUDAgent):
+    async def get_landmarks_in_sector(self, json_params: Dict):
         """
         # TODO Fill this
         """
         raise NotImplementedError
 
     @abstractmethod
-    async def get_landmarks_by_categories_in_sector(self, json_params: Dict, crud_agent: PureCRUDAgent):
+    async def get_landmarks_by_categories_in_sector(self, json_params: Dict):
         """
         # TODO Fill this
         """
