@@ -6,7 +6,6 @@ class PureRoutingAgent(ABC):
     Agent for finding route points.
     Usage: when you need to create optimized
     route between several points.
-
     Uses api_key in api_key.py
     """
 
