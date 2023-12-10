@@ -62,8 +62,8 @@ class RoutingAgent(PureRoutingAgent):
         """
         Method finds all optimized route points for provided points.
         Return one point per 30 km.
-        :param landmark_list: [[latitude: float, longitude: float], ...]
-        :return: Route points, landmarks in route order
+        :param landmark_list: ["coordinates": [{"latitude": float, "longitude": float}, ...]]
+        :return: route points list: ["coordinates": [{"latitude": float, "longitude": float}, ...]]
         """
         for i in landmark_list['coordinates']:
             self._landmarks.append([i['latitude'], i['longitude']])
