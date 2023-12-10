@@ -51,11 +51,11 @@ class RoutingAgent(PureRoutingAgent):
                 k = 0
             k += 1
 
-        main_points = self._reverse_coordinates(main_points)
-
         if len(route) < 130:
             main_points.append(route[0])
             main_points.append(route[-1])
+
+        main_points = self._reverse_coordinates(main_points)
 
         return main_points
 
