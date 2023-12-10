@@ -1,10 +1,10 @@
 from typing import Dict
 
 from backend.agents import PureCRUDAgent
-from backend.agents.get_landmarks_in_sector import GetLandmarksInSectorsAgent
-from backend.agents.get_landmarks_in_sector.get_landmarks_in_sectors_commands.get_landmarks_by_categories_in_sector import \
+from backend.agents.landmarks_by_sectors_agent import GetLandmarksInSectorsAgent
+from backend.agents.landmarks_by_sectors_agent.get_landmarks_in_sectors_commands.get_landmarks_by_categories_in_sector import \
     LandmarksOfCategoriesInUserViewCommand
-from backend.agents.get_landmarks_in_sector.get_landmarks_in_sectors_commands.get_landmarks_in_sector import \
+from backend.agents.landmarks_by_sectors_agent.get_landmarks_in_sectors_commands.get_landmarks_in_sector import \
     LandmarksInUserViewCommand
 
 

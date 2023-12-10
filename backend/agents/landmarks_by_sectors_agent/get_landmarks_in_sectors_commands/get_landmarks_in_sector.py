@@ -2,7 +2,7 @@
 from typing import Dict
 
 from backend.agents import PureCRUDAgent
-from backend.agents.get_landmarks_in_sector import GetLandmarksInSectorsAgent
+from backend.agents.landmarks_by_sectors_agent import GetLandmarksInSectorsAgent
 from backend.command_bases.base_command import BaseCommand
 
 class LandmarksInUserViewCommand(BaseCommand):
