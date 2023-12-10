@@ -39,6 +39,7 @@ task другими агентами не вызывается. Вызов ос�
     taskiq worker backend.broker.broker_initializer:BROKER \
         backend.broker.agents_tasks.crud_agent_tasks \
         backend.broker.agents_tasks.recommendations_agent_tasks \
+        backend.broker.agents_tasks.landmarks_by_sectors_agent_tasks \
         --no-configure-logging
 
 

@@ -1,6 +1,8 @@
 # Author: Vodohleb04
 import asyncio
+import backend.agents.recommendations_agent.recommendations_json_validation as json_validation
 from typing import Dict, List
+from jsonschema import validate, ValidationError
 from aiologger.loggers.json import JsonLogger
 from backend.agents.recommendations_agent.pure_recommendations_agent import PureRecommendationsAgent
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
@@ -15,9 +17,35 @@ logger = JsonLogger.with_default_handlers(
 
 class RecommendationsAgent(PureRecommendationsAgent):
 
+    _single_recommendations_agent = None
+
+    @classmethod
+    def get_recommendations_agent(cls):
+        """
+        Method to take recommendations agent object. Returns None in case when recommendations agent is not exists.
+        :return: None | PureRecommendationsAgent
+        """
+        return cls._single_recommendations_agent
+
+    @classmethod
+    def recommendations_agent_exists(cls) -> bool:
+        """Method to check if recommendations agent object already exists"""
+        if cls._single_recommendations_agent:
+            return True
+        else:
+            return False
+
+    @property
+    def coefficients(self) -> Dict:
+        return self.__coefficients
+
     def __init__(self, coefficients: Dict[str, float]):
-        # TODO json validation of coefficients
-        self.__coefficients = coefficients
+        if not self.recommendations_agent_exists():
+            validate(coefficients, json_validation.recommendations_agent_coefficients_json)
+            self.__coefficients = coefficients
+            self._single_recommendations_agent = self
+        else:
+            raise RuntimeError("Unexpected behaviour, this class can have only one instance")
 
     @staticmethod
     def _find_params_unifiers(user_categories_preference, a_priori_recommended):
@@ -124,10 +152,22 @@ class RecommendationsAgent(PureRecommendationsAgent):
                     a_posteriori_recommended_indexes[position_to_replace] = i
         return a_posteriori_recommended_indexes
 
+    @staticmethod
+    def _json_params_validation(json_params):
+        """This method checks values only of special params. Other values will be checked in target agent."""
+        validate(json_params, json_validation.find_recommendations_for_coordinates_and_categories)
+        if json_params["maximum_amount_of_recommendations"] and json_params["maximum_amount_of_recommendations"] <= 0:
+            raise ValidationError("maximum_amount_of_recommendations can\'t be less or equal to zero")
+
     async def find_recommendations_for_coordinates_and_categories(self, json_params: Dict):
-        # TODO check params
-        maximum_amount_of_recommendations = json_params["maximum_amount_of_recommendations"]
-        json_params.pop("maximum_amount_of_recommendations")
+        try:
+            self._json_params_validation(json_params)
+            maximum_amount_of_recommendations = json_params["maximum_amount_of_recommendations"]
+            json_params.pop("maximum_amount_of_recommendations")
+        except ValidationError as ex:
+            await logger.error(f"find_recommendations_for_coordinates_and_categories, ValidationError({ex.args[0]})")
+            return []  # raise ValidationError
+
         recommendations_async_task = asyncio.create_task(
             AbstractAgentsBroker.call_agent_task(crud_recommendations_by_coordinates_and_categories_task, json_params)
         )
@@ -137,6 +177,8 @@ class RecommendationsAgent(PureRecommendationsAgent):
             f"a_priori_recommended: {a_priori_recommended}"
         )
         a_priori_recommended = self._remove_nones_from_kb_result(a_priori_recommended.return_value)
+        if not a_priori_recommended:
+            return a_priori_recommended
         user_categories_preference = {"озёра поставского района": 1}  # TODO cash request
         # TODO Cash request
         # TODO check cash on None values

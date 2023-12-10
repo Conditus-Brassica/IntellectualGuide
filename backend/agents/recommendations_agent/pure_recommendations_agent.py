@@ -11,23 +11,20 @@ class PureRecommendationsAgent(ABC):
     All methods work asynchronously.
     """
 
-    _single_recommendations_agent = None
-
     @classmethod
+    @abstractmethod
     def get_recommendations_agent(cls):
         """
         Method to take recommendations agent object. Returns None in case when recommendations agent is not exists.
         :return: None | PureRecommendationsAgent
         """
-        return cls._single_recommendations_agent
+        raise NotImplementedError
 
     @classmethod
+    @abstractmethod
     def recommendations_agent_exists(cls) -> bool:
         """Method to check if recommendations agent object already exists"""
-        if cls._single_recommendations_agent:
-            return True
-        else:
-            return False
+        raise NotImplementedError
 
     @abstractmethod
     async def find_recommendations_for_coordinates_and_categories(self, json_params: Dict):
@@ -52,6 +49,6 @@ class PureRecommendationsAgent(ABC):
                 {
                     recommendation: Dict | None
                 }
-            ]
+            ] | None
         """
         raise NotImplementedError

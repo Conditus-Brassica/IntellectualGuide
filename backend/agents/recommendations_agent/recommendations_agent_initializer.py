@@ -1,10 +1,6 @@
 from backend.agents.recommendations_agent.recommendations_agent import RecommendationsAgent
 
 
-#with open("backend/broker/basic_login.json", 'r') as fout:
-#basic_login = json.load(fout)
-
-
 if RecommendationsAgent.recommendations_agent_exists():
     RECOMMENDATIONS_AGENT = RecommendationsAgent.get_recommendations_agent()
     print("Recommendations agent wasn't created")  # TODO remove
