@@ -1,6 +1,6 @@
 import asyncio
 
-from pure_route_builder_agent import PureRouteBuilder
+from backend.agents.route_builder_agent.pure_route_builder_agent import PureRouteBuilder
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
 from backend.broker.agents_tasks.recommendations_agent_tasks import \
     find_recommendations_for_coordinates_and_categories_task

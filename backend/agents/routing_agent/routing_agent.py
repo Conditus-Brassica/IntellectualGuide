@@ -1,8 +1,7 @@
 import openrouteservice as ors
 
 from typing import Dict
-from pure_routing_agent_agent import PureRoutingAgent
-import api_key
+from backend.agents.routing_agent.pure_routing_agent import PureRoutingAgent
 
 
 class RoutingAgent(PureRoutingAgent):
@@ -128,7 +127,6 @@ class RoutingAgent(PureRoutingAgent):
         coordinates_dictionary['coordinates'] = lst
 
         return coordinates_dictionary
-
 
 # async def main():
 #     a = RoutingAgent()
