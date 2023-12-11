@@ -40,6 +40,8 @@ task другими агентами не вызывается. Вызов ос�
         backend.broker.agents_tasks.crud_agent_tasks \
         backend.broker.agents_tasks.recommendations_agent_tasks \
         backend.broker.agents_tasks.landmarks_by_sectors_agent_tasks \
+        backend.broker.agents_tasks.route_builder_task \
+        backend.broker.agents_tasks.route_generating_tasks \
         --no-configure-logging
 
 

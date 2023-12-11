@@ -31,4 +31,4 @@ async def build_route(route_params):
                 }
     )
     """
-    return await ROUTE_BUILDER_AGENT.build_route()
+    return await ROUTE_BUILDER_AGENT.build_route(route_params)

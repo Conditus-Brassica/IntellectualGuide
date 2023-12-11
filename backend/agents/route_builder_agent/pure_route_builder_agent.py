@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import Dict
-import asyncio
 
 
 class PureRouteBuilder(ABC):
@@ -27,11 +26,13 @@ class PureRouteBuilder(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def build_route(self, route_params):
+    async def build_route(self, route_params: Dict):
         """
         Get completed route.
-        :param route_params:  {"categories":["category1","category2",...],
-                                "coordinates":[{"latitude": float, "longitude": float},{"latitude": float, "longitude": float}],
-                                "user_login": string}
+        :param route_params:  {
+            "categories":["category1","category2",...],
+            "coordinates":[{"latitude": float, "longitude": float},{"latitude": float, "longitude": float}],
+            "user_login": string
+        }
         """
         raise NotImplementedError
