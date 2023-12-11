@@ -23,7 +23,7 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
 
     def __init__(self):
         self._squares_in_sector = {"map_sectors_names": [], "categories_names": []}
-        self._cache = {"map_sectors_names": []}
+        self._cache = {"map_sectors_names": set()}
         self._result = {}
 
     async def get_landmarks_in_sector(self, jsom_params: dict):
@@ -35,7 +35,7 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
             i for i in self._squares_in_sector["map_sectors_names"] if i not in self._cache["map_sectors_names"]
         ]
         self._set_cache()
-        if len(self._cache["map_sectors_names"]) != 0:
+        if len(self._squares_in_sector["map_sectors_names"]) != 0:
             landmarks_sectors_async_task = asyncio.create_task(
                 AbstractAgentsBroker.call_agent_task(
                     landmarks_in_map_sectors_task,
@@ -54,7 +54,7 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
         ]
         self._squares_in_sector["categories_names"].extend(jsom_params["categories_names"])
         self._set_cache()
-        if len(self._cache["map_sectors_names"]) != 0:
+        if len(self._squares_in_sector["map_sectors_names"]) != 0:
             landmarks_sectors_categories_async_task = asyncio.create_task(
                 AbstractAgentsBroker.call_agent_task(
                     landmarks_of_categories_in_map_sectors_task, self._squares_in_sector
@@ -65,9 +65,11 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
         return self._result
 
     def _set_cache(self):
-        self._cache["map_sectors_names"].append(self._squares_in_sector[0])
-        # To have only unique elements
-        self._cache["map_sectors_names"] = list(set(self._cache["map_sectors_names"]))
+        """
+        self._cache is set to prevent repeated elements in cache
+        """
+        for sector_name in self._squares_in_sector["map_sectors_names"]:
+            self._cache["map_sectors_names"].add(sector_name)
         if len(self._cache.get("map_sectors_names", [])) > 60:
             # Truncate the cache to the desired size
             self._cache["map_sectors_names"] = self._cache["map_sectors_names"][-60:]
