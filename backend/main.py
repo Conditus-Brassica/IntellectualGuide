@@ -3,8 +3,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.datastructures import ImmutableMultiDict as imd
 
-import backend.agents.json_schemas as schemas
-
 
 class RequestAgent:
     """
@@ -88,8 +86,6 @@ class RequestAgent:
             route_points = {}
 
             return jsonify(route_points)
-
-        
 
 
 if __name__ == "__main__":
