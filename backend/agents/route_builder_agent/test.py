@@ -7,8 +7,10 @@ from backend.broker.agents_tasks.route_builder_task import build_route
 
 async def main():
     param = {
-        "categories_names": ['Музеи Витебской области', "Категория:Театры Бреста", 'Скверы Белоруссии'],
-        "coordinates": [{"latitude":  53.871045, "longitude":  30.299173}, {"latitude": 52.63047029088026, "longitude": 29.731127278387117}],
+        "categories_names": ['Музеи Витебской области', "Театры Бреста", 'Скверы Белоруссии',
+                             'Историко-культурное наследие Республики Беларусь'],
+        "coordinates": [{"latitude": 53.871045, "longitude": 30.299173},
+                        {"latitude": 52.63047029088026, "longitude": 29.731127278387117}],
         "user_login": "",
         "start_end_points": {"coordinates": [{
             "latitude": 53.13069674685768,
