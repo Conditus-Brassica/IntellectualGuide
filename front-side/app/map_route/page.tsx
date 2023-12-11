@@ -6,6 +6,7 @@ import Map from "@/components/TheMap";
 import TheSidePanel from "@/components/TheSidePanel";
 import { useState } from "react";
 import TheLandmarkCard from "@/components/TheLandmarkCard";
+import TheRoutePanel from "@/components/TheRoutePanel";
 
 export default function MapRoute() {
 
@@ -32,7 +33,8 @@ export default function MapRoute() {
       <main className={styles.main_page}>
         <div>
           <TheSidePanel mapData={mapData} setMapData={setMapData}/>
-          <TheLandmarkCard markerState={markerState} landmark={landmark} setRoute={setRoute}/>
+          <TheLandmarkCard setLandmark={setLandmark} landmark={landmark} setRoute={setRoute} />
+          <TheRoutePanel setRoute={setRoute} route={route} mapData={mapData}/>
           <Map setMapData={setMapData} markerState={markerState} setMarkerState={setMarkerState} setLandmark={setLandmark} route={route}/> 
         </div>
       </main>

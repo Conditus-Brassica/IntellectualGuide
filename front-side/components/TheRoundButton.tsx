@@ -39,4 +39,4 @@ const TheButton: React.FC<TheButtonInterface> = ({image_path, type, mapData}) =>
 );
 };
 
-export default TheButton;
+export default TheButton

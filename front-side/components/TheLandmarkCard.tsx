@@ -3,29 +3,30 @@ import style from "@/styles/landmark_card.module.css"
 import sidepanel_style from "@/styles/sidepanel.module.css"
 import TheButton from "./TheButton";
 interface TheLandmarkCard {
-    markerState: any;
+    setLandmark: any;
     landmark: any;
     setRoute: any;
 }
 
-const TheLandmarkCard: React.FC<TheLandmarkCard> = ({ markerState, landmark, setRoute }) => {
-    async function getPointInfo() {
-        try {
-          const response = await fetch('https://example.com/data');
-          const data = await response.json();
-          console.log(data);
-          return data
-        } catch (error) {
-          alert("Что-то пошло не так! Проверьте соединение с интернетом!");
-        }
-      };
+const TheLandmarkCard: React.FC<TheLandmarkCard> = ({ setLandmark, landmark, setRoute }) => {
+    // async function getPointInfo() {
+    //     try {
+    //       const response = await fetch('https://example.com/data');
+    //       const data = await response.json();
+    //       console.log(data);
+    //       return data
+    //     } catch (error) {
+    //       alert("Что-то пошло не так! Проверьте соединение с интернетом!");
+    //     }
+    //   };
    
     const buildARoute = function () {
         setRoute((pref: boolean)=> {
-            console.log(pref)
+            console.log('route=', pref)
             pref = true
             return pref
         })
+        setLandmark(false)
     }
     return (<>
         {<div style={{ display: landmark ? 'block' : 'none' }}>
