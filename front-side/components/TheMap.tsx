@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react';
-import L from 'leaflet';
+import L, { LatLng, latLng } from 'leaflet';
 import styles from '@/styles/map.module.css'
 import { LatLngExpression } from 'leaflet';
 import { Marker } from 'react-leaflet';
@@ -12,31 +12,22 @@ interface TheMapInterface {
   markerState: any;
   setMarkerState: any;
   setLandmark: any;
+  route: any;
 };
 
 
 class CustomMarker extends L.Marker {
   type: string;
+  name: string;
   constructor(latlng: LatLngExpression, options: any) {
     super(latlng, options);
     this.type = options.type || 'none';
+    this.name = options.name || 'none';
   }
 };
 
 
-async function getRoute(start: any, finish: any) {
-  try {
-    const response = await fetch(`https://example.com/data?start=${start}&finish=${finish}`);
-    const data = await response.json();
-    console.log(data);
-    //отрисовка карточки достопримечательности
-  } catch (error) {
-    alert("Что-то пошло не так! Проверьте соединение с интернетом!");
-  }
-};
-
-
-const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerState, setLandmark }) => {
+const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerState, setLandmark, route }) => {
   useEffect(() => {
     const map = L.map('map').setView([51.505, -0.09], 13);
     var BelarusGeoJSON: any = {
@@ -86,6 +77,11 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
     }).addTo(map);
 
     const icons: { [key: string]: L.Icon } = {
+      "none":
+        L.icon({
+          iconUrl: 'green_icon.svg',
+          iconSize: [30, 30],
+        }),
       "museum":
         L.icon({
           iconUrl: 'green_icon.svg',
@@ -100,25 +96,28 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
         L.icon({
           iconUrl: 'red_icon.svg',
           iconSize: [30, 30],
+        }),
+      "start":
+        L.icon({
+          iconUrl: 'self.png',
+          iconSize: [30, 30],
         })
     };
 
     const onMarkerClick = function (e: L.LeafletMouseEvent) {
-      // useEffect(() =>{
-        if (markerState.targetMarker == e.target){
-          setLandmark((pref : boolean)=> {
-            pref = !pref
-            return pref
+      if (markerState.targetMarker == e.target) {
+        setLandmark((pref: boolean) => {
+          pref = !pref
+          return pref
         })
-        }
-        else{
-          setLandmark((pref: boolean )=> {
-            pref = true
-            return pref
-          })
-        }
-      // }, [markerState]);
-      setMarkerState((pref: { targetMarker: any; })=> {
+      }
+      else {
+        setLandmark((pref: boolean) => {
+          pref = true
+          return pref
+        })
+      }
+      setMarkerState((pref: { targetMarker: any; }) => {
         pref.targetMarker = e.target
         return pref
       })
@@ -154,7 +153,7 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
           const isDuplicate = drawnedMarkers.some(drawnedMarker => drawnedMarker.getLatLng().lat === markerCoords.lat && drawnedMarker.getLatLng().lng === markerCoords.lng);
 
           if (!isDuplicate) {
-            var marker = new CustomMarker([markerCoords.lat, markerCoords.lng], { icon: icons[markerCoords.type], type: markerCoords.type });
+            var marker = new CustomMarker([markerCoords.lat, markerCoords.lng], { icon: icons[markerCoords.type], type: markerCoords.type, name: markerCoords.name });
             marker.addTo(map);
             drawnedMarkers.push(marker);
             marker.on('click', onMarkerClick);
@@ -170,19 +169,107 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
       }
     };
 
-    //обработка перемещения карты
+    async function getRoute(start: any, finish: any) {
+      try {
+        // const response = await fetch(`https://example.com/data?start=${start}&finish=${finish}`);
+        // var data = await response.json();
+
+        const data = {
+          route: [
+            [54.098865472796994, 26.661071777343754,],
+            [54.098865472796994,
+              26.761071777343754,],
+              [54.098865472796994,
+                26.861071777343754,]
+          ],
+          points: [
+            {
+              name: 'first',
+              latlng: [54.098865472796994, 26.661071777343754,]
+            },
+            {
+              name: 'first',
+              latlng: [54.098865472796994,
+                26.761071777343754,]
+            },
+            {
+              name: 'first',
+              latlng: [54.098865472796994,
+                26.861071777343754,]
+            }
+          ]
+        };
+
+        const latLngs = data.route.map(coords => L.latLng(coords[0], coords[1]));
+        const route = L.polyline(latLngs).addTo(map);
+
+        data.points.forEach(point => {
+          const marker = new CustomMarker(point.latlng, { icon: icons['none'], type: 'none', name: point.name}).addTo(map);
+          marker.bindPopup(point.name);
+          drawnedMarkers.push(marker);
+        });
+        var updatedMapData = { markers: drawnedMarkers };
+        
+        setMapData(updatedMapData);
+        console.log(updatedMapData)
+        const markersLayer = L.layerGroup(drawnedMarkers);
+        map.addLayer(route);
+        map.addLayer(markersLayer);
+
+        console.log(updatedMapData)
+      } catch (error) {
+        alert("Что-то пошло не так! Проверьте соединение с интернетом!");
+      }
+    };
+
     const onMapMoveEnd = function () {
       var left_top = [map.getBounds().getNorthWest().lat, map.getBounds().getNorthWest().lng]
       var right_bottom = [map.getBounds().getSouthEast().lat, map.getBounds().getSouthEast().lng]
       getPoints(left_top, right_bottom)
+      console.log('перемещение отрабатывает')
     };
-    onMapMoveEnd();
-    map.on('moveend', onMapMoveEnd);
+
+    if (route == true) {
+      map.off('moveend', onMapMoveEnd);
+      console.log('moveend размонтирована')
+
+      const onSuccess = function (position: GeolocationPosition) {
+        setMapData((pref: { markers: any[]; }) => {
+          pref.markers.forEach(marker => {
+            marker.removeFrom(map);
+          });
+          return pref;
+        });
+
+        var start: LatLngExpression = [position.coords.latitude, position.coords.longitude]
+        var finish = markerState.targetMarker.latlng
+        console.log(start)
+        getRoute(start, finish)
+        var marker = new CustomMarker(start, { icon: icons['start'], type: 'start' });
+        marker.addTo(map);
+        console.log(`Ваши координаты: ${start}`);
+      }
+
+      const onError = function (error: GeolocationPositionError) {
+        console.log(`Ошибка при получении местоположения: ${error.message}`);
+      }
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(onSuccess, onError);
+      } else {
+        alert("Geolocation не поддерживается в вашем браузере");
+      }
+    }
+    else {
+      console.log('moveend вмонтирована')
+      onMapMoveEnd();
+      map.on('moveend', onMapMoveEnd);
+    }
 
     return () => {
       map.remove(); // Очистка карты при размонтировании компонента
     };
-  }, []);
+  }, [route]);
 
 
   return (<div id="map" className={styles.map}>

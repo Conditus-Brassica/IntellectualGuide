@@ -16,7 +16,6 @@ const TheButton: React.FC<TheButtonInterface> = ({image_path, type, mapData}) =>
       });
 
 
-
     const handlerButtonClick = () =>{
         setButtonState(pref=> {
             pref.isPressed = !pref.isPressed
@@ -40,4 +39,4 @@ const TheButton: React.FC<TheButtonInterface> = ({image_path, type, mapData}) =>
 );
 };
 
-export default TheButton;
+export default TheButton

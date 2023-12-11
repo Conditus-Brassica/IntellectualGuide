@@ -1,6 +1,10 @@
+import asyncio
+
 import openrouteservice as ors
 
 from typing import Dict
+
+from backend.agents.routing_agent import api_key
 from backend.agents.routing_agent.pure_routing_agent import PureRoutingAgent
 
 
@@ -129,37 +133,13 @@ class RoutingAgent(PureRoutingAgent):
         return coordinates_dictionary
 
 # async def main():
-#     a = RoutingAgent()
+#     a = RoutingAgent(ors.Client(key=api_key.__key__))
 #     res = asyncio.create_task(
-#         a.get_route_optimized([[52.19797604067352, 24.43870667812846], [54.490638791728756, 30.4701524897013],
-#                                [53.93429515309309, 27.113365683855704], [53.8602548114542, 30.38039883179099],
-#                                [54.490638791728756, 25.85681447311136]]))
-#
-#     res1 = asyncio.create_task(
-#         a.get_route_optimized([[52.19797604067352, 24.43870667812846], [54.490638791728756, 30.4701524897013],
-#                                [53.93429515309309, 27.113365683855704], [53.8602548114542, 30.38039883179099],
-#                                [54.490638791728756, 25.85681447311136]]))
-#
-#     res2 = asyncio.create_task(
-#         a.get_route_optimized([[52.19797604067352, 24.43870667812846], [54.490638791728756, 30.4701524897013],
-#                                [53.93429515309309, 27.113365683855704], [53.8602548114542, 30.38039883179099],
-#                                [54.490638791728756, 25.85681447311136]]))
-#
-#     res3 = asyncio.create_task(
-#         a.get_route_optimized([[52.19797604067352, 24.43870667812846], [54.490638791728756, 30.4701524897013],
-#                                [53.93429515309309, 27.113365683855704], [53.8602548114542, 30.38039883179099],
-#                                [54.490638791728756, 25.85681447311136]]))
-#
-#     res4 = asyncio.create_task(
-#         a.get_route_optimized([[52.19797604067352, 24.43870667812846], [54.490638791728756, 30.4701524897013],
+#         a.get_optimized_route([[52.19797604067352, 24.43870667812846], [54.490638791728756, 30.4701524897013],
 #                                [53.93429515309309, 27.113365683855704], [53.8602548114542, 30.38039883179099],
 #                                [54.490638791728756, 25.85681447311136]]))
 #
 #     print(await res)
-#     print(await res1)
-#     print(await res2)
-#     print(await res3)
-#     print(await res4)
 #
 #
 # asyncio.run(main())
