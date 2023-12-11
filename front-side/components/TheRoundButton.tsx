@@ -16,7 +16,6 @@ const TheButton: React.FC<TheButtonInterface> = ({image_path, type, mapData}) =>
       });
 
 
-
     const handlerButtonClick = () =>{
         setButtonState(pref=> {
             pref.isPressed = !pref.isPressed

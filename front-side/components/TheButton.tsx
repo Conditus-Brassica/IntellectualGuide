@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 interface TheButtonInterface{
     title: string;
-    func: Function;
+    func: () => void;
 };
 
 
@@ -13,7 +13,7 @@ const TheButton: React.FC<TheButtonInterface> = ({title, func}) => {
     const router = useRouter(); 
 
     return(
-    <div className={styles.button} onClick={() => func}>
+    <div className={styles.button} onClick={func}>
         <span className={styles.title}>{title}</span>
     </div>
 );

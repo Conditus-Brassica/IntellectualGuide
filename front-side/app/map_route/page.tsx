@@ -10,11 +10,11 @@ import TheLandmarkCard from "@/components/TheLandmarkCard";
 export default function MapRoute() {
 
   const [mapData, setMapData] = useState({
-    markers: {}
+    markers: []
   });
 
   const [landmark, setLandmark] = useState(false);
-
+  const [route, setRoute] = useState(false)
 
   const [markerState, setMarkerState] = useState({
     targetMarker: CustomMarker
@@ -32,8 +32,8 @@ export default function MapRoute() {
       <main className={styles.main_page}>
         <div>
           <TheSidePanel mapData={mapData} setMapData={setMapData}/>
-          <TheLandmarkCard markerState={markerState} landmark={landmark}/>
-          <Map setMapData={setMapData} markerState={markerState} setMarkerState={setMarkerState} setLandmark={setLandmark}/> 
+          <TheLandmarkCard markerState={markerState} landmark={landmark} setRoute={setRoute}/>
+          <Map setMapData={setMapData} markerState={markerState} setMarkerState={setMarkerState} setLandmark={setLandmark} route={route}/> 
         </div>
       </main>
     </>

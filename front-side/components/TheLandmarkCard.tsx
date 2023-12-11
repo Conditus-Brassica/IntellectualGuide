@@ -5,9 +5,10 @@ import TheButton from "./TheButton";
 interface TheLandmarkCard {
     markerState: any;
     landmark: any;
+    setRoute: any;
 }
 
-const TheLandmarkCard: React.FC<TheLandmarkCard> = ({ markerState, landmark }) => {
+const TheLandmarkCard: React.FC<TheLandmarkCard> = ({ markerState, landmark, setRoute }) => {
     async function getPointInfo() {
         try {
           const response = await fetch('https://example.com/data');
@@ -20,7 +21,11 @@ const TheLandmarkCard: React.FC<TheLandmarkCard> = ({ markerState, landmark }) =
       };
    
     const buildARoute = function () {
-
+        setRoute((pref: boolean)=> {
+            console.log(pref)
+            pref = true
+            return pref
+        })
     }
     return (<>
         {<div style={{ display: landmark ? 'block' : 'none' }}>

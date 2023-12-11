@@ -12,6 +12,7 @@ interface TheMapInterface {
   markerState: any;
   setMarkerState: any;
   setLandmark: any;
+  route: any;
 };
 
 
@@ -24,19 +25,7 @@ class CustomMarker extends L.Marker {
 };
 
 
-async function getRoute(start: any, finish: any) {
-  try {
-    const response = await fetch(`https://example.com/data?start=${start}&finish=${finish}`);
-    const data = await response.json();
-    console.log(data);
-    //отрисовка карточки достопримечательности
-  } catch (error) {
-    alert("Что-то пошло не так! Проверьте соединение с интернетом!");
-  }
-};
-
-
-const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerState, setLandmark }) => {
+const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerState, setLandmark, route }) => {
   useEffect(() => {
     const map = L.map('map').setView([51.505, -0.09], 13);
     var BelarusGeoJSON: any = {
@@ -104,21 +93,19 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
     };
 
     const onMarkerClick = function (e: L.LeafletMouseEvent) {
-      // useEffect(() =>{
-        if (markerState.targetMarker == e.target){
-          setLandmark((pref : boolean)=> {
-            pref = !pref
-            return pref
+      if (markerState.targetMarker == e.target) {
+        setLandmark((pref: boolean) => {
+          pref = !pref
+          return pref
         })
-        }
-        else{
-          setLandmark((pref: boolean )=> {
-            pref = true
-            return pref
-          })
-        }
-      // }, [markerState]);
-      setMarkerState((pref: { targetMarker: any; })=> {
+      }
+      else {
+        setLandmark((pref: boolean) => {
+          pref = true
+          return pref
+        })
+      }
+      setMarkerState((pref: { targetMarker: any; }) => {
         pref.targetMarker = e.target
         return pref
       })
@@ -170,6 +157,67 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
       }
     };
 
+    async function getRoute(start: any, finish: any) {
+      try {
+        // const response = await fetch(`https://example.com/data?start=${start}&finish=${finish}`);
+        // var routeGeometry = await response.json();
+        var routeGeometry: any =
+        {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                  [-122.4194, 37.7749],
+                  [-122.4196, 37.7748],
+                  [-122.4199, 37.7746]
+                ]
+              }
+            }
+          ]
+        }
+        console.log(routeGeometry);
+        var routeLayer: any = L.geoJSON(routeGeometry).addTo(map);
+
+        map.fitBounds(routeLayer.getBounds());
+
+      } catch (error) {
+        alert("Что-то пошло не так! Проверьте соединение с интернетом!");
+      }
+    };
+
+    if (route) {
+      const onSuccess = function (position: GeolocationPosition) {
+        setMapData((pref: { markers: any[]; }) => {
+          pref.markers.forEach(marker => {
+          marker.removeFrom(map);
+          });
+          return pref
+        
+        })
+        
+        const latitude = position.coords.latitude; // Широта
+        const longitude = position.coords.longitude; // Долгота
+        var start = [latitude, longitude]
+        var finish = markerState.targetMarker.latlng
+        console.log(finish)
+        getRoute(start, finish)
+        console.log(`Ваши координаты: ${latitude}, ${longitude}`);
+      }
+
+      const onError = function (error: GeolocationPositionError) {
+        console.log(`Ошибка при получении местоположения: ${error.message}`);
+      }
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(onSuccess, onError);
+      } else {
+        alert("Geolocation не поддерживается в вашем браузере");
+      }
+    }
     //обработка перемещения карты
     const onMapMoveEnd = function () {
       var left_top = [map.getBounds().getNorthWest().lat, map.getBounds().getNorthWest().lng]
