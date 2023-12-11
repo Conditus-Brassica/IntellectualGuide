@@ -1,5 +1,4 @@
 version: '3.7'
-name: "intelligent_guide_services"
 
 services:
   neo4j:
