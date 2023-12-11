@@ -24,7 +24,7 @@ async def main():
     )
 
     res = await task
-    res = res.result_value
+    res = res.return_value
 
     print(res)
 

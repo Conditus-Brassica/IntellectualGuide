@@ -3,9 +3,15 @@ import asyncio
 import openrouteservice as ors
 
 from typing import Dict
+from aiologger.loggers.json import JsonLogger
 
 from backend.agents.routing_agent import api_key
 from backend.agents.routing_agent.pure_routing_agent import PureRoutingAgent
+
+logger = JsonLogger.with_default_handlers(
+    level="DEBUG",
+    serializer_kwargs={'ensure_ascii': False},
+)
 
 
 class RoutingAgent(PureRoutingAgent):
@@ -50,15 +56,19 @@ class RoutingAgent(PureRoutingAgent):
         """
         Method finds all optimized route points for provided points.
         :param landmark_list: ["coordinates": [latitude: float, longitude: float], ...]
-        :return: Route points, landmarks in route order
+        :return: route points list: {"coordinates": [{"latitude": float, "longitude": float}, ...]}
         """
         for i in landmark_list['coordinates']:
             self._landmarks.append([i['latitude'], i['longitude']])
 
         self._landmarks = self._reverse_coordinates(self._landmarks)
+
         route = await self._create_optimized_route()
+
         route = self._reverse_coordinates(route)
 
+
+        self._landmarks = []
         return self._coordinates_wrap(route)
 
     async def get_optimized_route_main_points(self, landmark_list: Dict):
@@ -71,7 +81,12 @@ class RoutingAgent(PureRoutingAgent):
         for i in landmark_list['coordinates']:
             self._landmarks.append([i['latitude'], i['longitude']])
 
+        await logger.debug(self._landmarks)
+
         self._landmarks = self._reverse_coordinates(self._landmarks)
+
+        await logger.debug(self._landmarks)
+
         route = await self._create_optimized_route()
 
         main_points = []
@@ -88,6 +103,7 @@ class RoutingAgent(PureRoutingAgent):
 
         main_points = self._reverse_coordinates(main_points)
 
+        self._landmarks = []
         return self._coordinates_wrap(main_points)
 
     @staticmethod

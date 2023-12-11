@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  neo4j:
+  knowledgeBase:
     image: neo4j:5.14.0
     restart: always
     ports:
@@ -17,7 +17,7 @@ services:
       - $HOME/neo4j/data:/data
       - $HOME/neo4j/data:/import
   
-  redis:
+  redisBroker:
     image: redis:latest
     restart: always
     ports:
