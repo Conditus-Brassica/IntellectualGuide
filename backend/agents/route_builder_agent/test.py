@@ -27,7 +27,7 @@ async def main():
     res = await task
     res2 = res.return_value
 
-    pprint(res2[1])
+    pprint(res2)
 
 
 asyncio.run(main())
