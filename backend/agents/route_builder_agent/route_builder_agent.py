@@ -1,5 +1,5 @@
 import asyncio
-
+from typing import Dict
 from pure_route_builder_agent import PureRouteBuilder
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
 from backend.broker.agents_tasks.recommendations_agent_tasks import \
@@ -7,13 +7,14 @@ from backend.broker.agents_tasks.recommendations_agent_tasks import \
 from backend.broker.agents_tasks.route_generating_tasks import get_optimized_route_task, \
     get_optimized_route_main_points_task
 
+
 param_dict = {
     "coordinates_of_points": [],
     "categories_names": [],
-    "user_login": str,
+    "user_login": "user",
     "amount_of_recommendations_for_point": 3,
-    "maximum_amount_of_recommendations": int,
-    "optional_limit": int | None,
+    "maximum_amount_of_recommendations": 0,
+    "optional_limit": 0,
 }
 
 
@@ -22,7 +23,6 @@ class RouteBuilderAgent(PureRouteBuilder):
 
     @classmethod
     def get_route_builder_agent(cls):
-
         return cls._single_route_builder
 
     @classmethod
@@ -31,6 +31,16 @@ class RouteBuilderAgent(PureRouteBuilder):
             return True
         else:
             return False
+
+    def __init__(self, params_dict: Dict):
+        """
+        # TODO dockstring
+        :param params_dict:
+        """
+        if not self._single_route_builder:
+            self._single_route_builder = self
+        else:
+            raise RuntimeError("Unexpected behaviour, this class can have only one instance")
 
     async def build_route(self, route_params):
         """
@@ -59,11 +69,11 @@ class RouteBuilderAgent(PureRouteBuilder):
         )
         """
         pre_route_task = asyncio.create_task(
-            AbstractAgentsBroker.call_agent_task(get_optimized_route_main_points_task(),
-                                                 route_params['start_end_points'])
+            AbstractAgentsBroker.call_agent_task(get_optimized_route_main_points_task, route_params['start_end_points'])
         )
 
         pre_route = await pre_route_task
+        pre_route = pre_route.return_value
         param_dict['coordinates_of_points'] = pre_route['coordinates']
         param_dict['categories_names'] = route_params['categories_names']
         param_dict['user_login'] = route_params['user_login']
@@ -71,19 +81,20 @@ class RouteBuilderAgent(PureRouteBuilder):
         param_dict['optional_limit'] = len(pre_route['coordinates']) * 3
 
         landmarks_task = asyncio.create_task(
-            AbstractAgentsBroker.call_agent_task(find_recommendations_for_coordinates_and_categories_task(), param_dict)
+            AbstractAgentsBroker.call_agent_task(find_recommendations_for_coordinates_and_categories_task, param_dict)
         )
         landmarks = await landmarks_task
+        landmarks = landmarks.return_value
 
         formatted_landmarks = self.__format_landmarks(landmarks)
 
         final_route_task = (
-            AbstractAgentsBroker.call_agent_task(get_optimized_route_task(), formatted_landmarks)
+            AbstractAgentsBroker.call_agent_task(get_optimized_route_task, formatted_landmarks)
         )
 
         final_route = await final_route_task
 
-        return final_route, landmarks
+        return final_route.return_value, landmarks
 
     @staticmethod
     def __format_landmarks(landmarks):
