@@ -72,16 +72,15 @@ get_categories_of_landmarks_json = \
                 "required": ["latitude", "longitude"],
                 "maxProperties": 2,
                 "additionalProperties": False
-            }
-        },
-        "categories_names":
-            {
+            },
+            "categories_names": {
                 "type": "array",
                 "items": {
                     "type": "string"
                 },
                 "additionalProperties": False
-            },
+            }
+        },
         "required": ["TL", "BR", "categories_names"],
         "maxProperties": 3,
         "additionalProperties": False

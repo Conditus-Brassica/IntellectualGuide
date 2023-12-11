@@ -22,8 +22,8 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
     single_landmarks_agent = None
 
     def __init__(self):
-        self._squares_in_sector = {"map_sector_names": []}
-        self._cache = {}
+        self._squares_in_sector = {"map_sectors_names": [], "categories_names": []}
+        self._cache = {"map_sectors_names": []}
         self._result = {}
 
     async def get_landmarks_in_sector(self, jsom_params: dict):
@@ -31,9 +31,11 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
         await self._coords_of_square_validation(jsom_params)
         self._get_sectors_in_sector(jsom_params)
         # Comparing with cache, then updating of cache
-        self._squares_in_sector[0] = [i for i in self._squares_in_sector[0] not in self._cache[0]]
+        self._squares_in_sector["map_sectors_names"] = [
+            i for i in self._squares_in_sector["map_sectors_names"] if i not in self._cache["map_sectors_names"]
+        ]
         self._set_cache()
-        if len(self._cache["map_sector_names"]) != 0:
+        if len(self._cache["map_sectors_names"]) != 0:
             landmarks_sectors_async_task = asyncio.create_task(
                 AbstractAgentsBroker.call_agent_task(
                     landmarks_in_map_sectors_task,
@@ -47,10 +49,12 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
     async def get_landmarks_by_categories_in_sector(self, jsom_params: dict):
         await self._coords_of_square_with_categories_validation(jsom_params)
         self._get_sectors_in_sector(jsom_params)
-        self._squares_in_sector[0] = [i for i in self._squares_in_sector[0] not in self._cache[0]]
-        self._squares_in_sector.update(jsom_params["categories_names"])
+        self._squares_in_sector["map_sectors_names"] = [
+            i for i in self._squares_in_sector["map_sectors_names"] if i not in self._cache["map_sectors_names"]
+        ]
+        self._squares_in_sector["categories_names"].extend(jsom_params["categories_names"])
         self._set_cache()
-        if len(self._cache["map_sector_names"]) != 0:
+        if len(self._cache["map_sectors_names"]) != 0:
             landmarks_sectors_categories_async_task = asyncio.create_task(
                 AbstractAgentsBroker.call_agent_task(
                     landmarks_of_categories_in_map_sectors_task, self._squares_in_sector
@@ -61,15 +65,15 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
         return self._result
 
     def _set_cache(self):
-        self._cache["map_sector_names"].append(self._squares_in_sector[0])
+        self._cache["map_sectors_names"].append(self._squares_in_sector[0])
         # To have only unique elements
-        self._cache["map_sector_names"] = list(set(self._cache["map_sector_names"]))
-        if len(self._cache.get("map_sector_names", [])) > 60:
+        self._cache["map_sectors_names"] = list(set(self._cache["map_sectors_names"]))
+        if len(self._cache.get("map_sectors_names", [])) > 60:
             # Truncate the cache to the desired size
-            self._cache["map_sector_names"] = self._cache["map_sector_names"][-60:]
+            self._cache["map_sectors_names"] = self._cache["map_sectors_names"][-60:]
 
     def _get_sectors_in_sector(self, coords_of_sector: dict):
-        data = json.load(open("new_squares.json"))
+        data = json.load(open("backend/agents/landmarks_by_sectors_agent/new_squares.json"))
         for element in data:
             if (coords_of_sector["TL"]["longitude"] - self.LONG_DIFFERENCE <= element["TL"]["longitude"] <
                 element["BR"]["longitude"] <=
@@ -94,7 +98,7 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
             validate(json_params, get_categories_of_landmarks_json)
         except ValidationError as e:
             await logger.info(
-                f"Validation error on json, args: {e.args[0]}, json_params: {get_categories_of_landmarks_json}")
+                f"Validation error on json, args: {e.args[0]}, json_params: {json_params}")
             raise ValidationError
 
     @classmethod
