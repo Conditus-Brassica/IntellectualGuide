@@ -8,7 +8,6 @@ from backend.agents.recommendations_agent.pure_recommendations_agent import Pure
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
 from backend.broker.agents_tasks.crud_agent_tasks import crud_recommendations_by_coordinates_and_categories_task
 
-
 logger = JsonLogger.with_default_handlers(
     level="DEBUG",
     serializer_kwargs={'ensure_ascii': False},
@@ -16,7 +15,6 @@ logger = JsonLogger.with_default_handlers(
 
 
 class RecommendationsAgent(PureRecommendationsAgent):
-
     _single_recommendations_agent = None
 
     @classmethod
@@ -230,8 +228,7 @@ class RecommendationsAgent(PureRecommendationsAgent):
             user_categories_preference,
             maximum_amount_of_recommendations
         )
-        return {
-            "recommendation": a_priori_recommended[index]["recommendation"]
+        return [
+            {"recommendation": a_priori_recommended[index]["recommendation"]}
             for index in a_posteriori_recommended_indexes
-        }
-
+        ]

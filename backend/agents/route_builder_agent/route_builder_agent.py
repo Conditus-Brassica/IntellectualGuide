@@ -71,13 +71,15 @@ class RouteBuilderAgent(PureRouteBuilder):
         param_dict['user_login'] = route_params['user_login']
         param_dict['maximum_amount_of_recommendations'] = len(pre_route['coordinates']) * 1.5
         param_dict['optional_limit'] = len(pre_route['coordinates']) * 3
-        param_dict['amount_of_recommendations_for_point'] = 3
+        param_dict['amount_of_recommendations_for_point'] = 5
 
         landmarks_task = asyncio.create_task(
             AbstractAgentsBroker.call_agent_task(find_recommendations_for_coordinates_and_categories_task, param_dict)
         )
         landmarks = await landmarks_task
         landmarks = landmarks.return_value
+
+        print("Penis ", landmarks)
 
         formatted_landmarks = self.__format_landmarks(landmarks)
 
@@ -100,10 +102,11 @@ class RouteBuilderAgent(PureRouteBuilder):
         coordinates = []
         for i in landmarks:
             curr_coordinates = dict()
-            curr_coordinates['latitude'] = i['recommendation']['latitude']
-            curr_coordinates['longitude'] = i['recommendation']['longitude']
-            coordinates.append(curr_coordinates)
+            if i["recommendation"] is not None:
+                curr_coordinates['latitude'] = i['recommendation']['latitude']
+                curr_coordinates['longitude'] = i['recommendation']['longitude']
+                coordinates.append(curr_coordinates)
 
         formatted['coordinates'] = coordinates
 
-        return formatted
+        return dict(formatted)
