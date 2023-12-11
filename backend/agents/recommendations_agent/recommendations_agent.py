@@ -75,12 +75,52 @@ class RecommendationsAgent(PureRecommendationsAgent):
         return params_unifiers
 
     @staticmethod
-    def _remove_nones_from_kb_result(a_priori_recommended):
-        return [
-            a_priori_recommended[i] for i in range(
-                len(a_priori_recommended)
-            ) if a_priori_recommended[i]["recommendation"]
-        ]
+    def _remove_nones_from_kb_result(a_priori_recommended: List) -> None:
+        """Changes list"""
+        i = 0
+        len_bound = len(a_priori_recommended)
+        while i < len_bound:
+            if a_priori_recommended[i]["recommendation"] is None:
+                a_priori_recommended.pop(i)
+                len_bound -= 1
+                continue
+            i += 1
+
+    @staticmethod
+    def _are_the_same(left_landmark: Dict, right_landmark: Dict) -> bool:
+        if left_landmark["name"] != right_landmark["name"]:
+            return False
+        if left_landmark["latitude"] != right_landmark["latitude"]:
+            return False
+        if left_landmark["longitude"] != right_landmark["longitude"]:
+            return False
+        return True
+
+    @staticmethod
+    def _remove_duplicates_from_kb_result(a_priori_recommended: List):
+        """Changes list"""
+        i = 0
+        len_bound = len(a_priori_recommended)
+        while i < len_bound:
+            j = 0
+            while j < len_bound:
+                if i == j:
+                    j += 1
+                    continue
+                if RecommendationsAgent._are_the_same(
+                        a_priori_recommended[i]["recommendation"], a_priori_recommended[j]["recommendation"]
+                ):
+                    len_bound -= 1
+                    if a_priori_recommended[i]["distance"] <= a_priori_recommended[j]["distance"]:
+                        a_priori_recommended.pop(j)
+                        continue
+                    else:
+                        a_priori_recommended.pop(i)
+                        i -= 1  # To make increase == 0 (i + 1 - 1 == i)
+                        break
+                else:
+                    j += 1
+            i += 1
 
     @staticmethod
     def _categories_overlay(
@@ -176,9 +216,10 @@ class RecommendationsAgent(PureRecommendationsAgent):
             f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
             f"a_priori_recommended: {a_priori_recommended}"
         )
-        a_priori_recommended = self._remove_nones_from_kb_result(a_priori_recommended.return_value)
+        self._remove_nones_from_kb_result(a_priori_recommended.return_value)
         if not a_priori_recommended:
             return a_priori_recommended
+        self._remove_duplicates_from_kb_result(a_priori_recommended)
         user_categories_preference = {"озёра поставского района": 1}  # TODO cash request
         # TODO Cash request
         # TODO check cash on None values
