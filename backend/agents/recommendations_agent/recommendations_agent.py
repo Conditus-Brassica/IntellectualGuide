@@ -189,5 +189,8 @@ class RecommendationsAgent(PureRecommendationsAgent):
             user_categories_preference,
             maximum_amount_of_recommendations
         )
-        return [a_priori_recommended[index]["recommendation"] for index in a_posteriori_recommended_indexes]
+        return {
+            "recommendation": a_priori_recommended[index]["recommendation"]
+            for index in a_posteriori_recommended_indexes
+        }
 
