@@ -209,15 +209,24 @@ class RecommendationsAgent(PureRecommendationsAgent):
         recommendations_async_task = asyncio.create_task(
             AbstractAgentsBroker.call_agent_task(crud_recommendations_by_coordinates_and_categories_task, json_params)
         )
-        a_priori_recommended = await recommendations_async_task
+        a_priori_recommended_asyncio_result = await recommendations_async_task
         logger.debug(
             f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
-            f"a_priori_recommended: {a_priori_recommended}"
+            f"a_priori_recommended_asyncio_result: {a_priori_recommended_asyncio_result}"
         )
-        self._remove_nones_from_kb_result(a_priori_recommended.return_value)
+        a_priori_recommended = a_priori_recommended_asyncio_result.return_value
+        self._remove_nones_from_kb_result(a_priori_recommended)
+        logger.debug(
+            f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
+            f"a_priori_recommended after None removed: {a_priori_recommended}"
+        )
         if not a_priori_recommended:
             return a_priori_recommended
         self._remove_duplicates_from_kb_result(a_priori_recommended)
+        logger.debug(
+            f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
+            f"a_priori_recommended after duplicates removed: {a_priori_recommended}"
+        )
         user_categories_preference = {"озёра поставского района": 1}  # TODO cash request
         # TODO Cash request
         # TODO check cash on None values
