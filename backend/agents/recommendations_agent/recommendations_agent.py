@@ -73,6 +73,15 @@ class RecommendationsAgent(PureRecommendationsAgent):
         return params_unifiers
 
     @staticmethod
+    def _outdated_remove_nones_from_kb_result(a_priori_recommended: List) -> List:
+        """Changes list"""
+        return [
+            a_priori_recommended[i] for i in range(len(a_priori_recommended))
+            if a_priori_recommended[i]["recommendation"]
+        ]
+
+
+    @staticmethod
     def _remove_nones_from_kb_result(a_priori_recommended: List) -> None:
         """Changes list"""
         i = 0
@@ -215,7 +224,8 @@ class RecommendationsAgent(PureRecommendationsAgent):
             f"a_priori_recommended_asyncio_result: {a_priori_recommended_asyncio_result}"
         )
         a_priori_recommended = a_priori_recommended_asyncio_result.return_value
-        self._remove_nones_from_kb_result(a_priori_recommended)
+        a_priori_recommended = self._outdated_remove_nones_from_kb_result(a_priori_recommended)
+        #self._remove_nones_from_kb_result(a_priori_recommended)
         logger.debug(
             f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
             f"a_priori_recommended after None removed: {a_priori_recommended}"
