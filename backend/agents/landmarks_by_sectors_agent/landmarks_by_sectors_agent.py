@@ -18,28 +18,29 @@ logger = JsonLogger.with_default_handlers(
 class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
     LAT_DIFFERENCE = 0.312
     LONG_DIFFERENCE = 0.611
+    CACHE_SECTORS_MAX_SIZE = 60
+    CACHE_CATEGORIES_MAX_SIZE = 10
 
     single_landmarks_agent = None
 
     def __init__(self):
-        self._squares_in_sector = {"map_sectors_names": [], "categories_names": []}
-        self._cache = {"map_sectors_names": set()}
+        self._cache = {"map_sectors_names": set(), "categories_names": set()}
         self._result = {}
 
     async def get_landmarks_in_sector(self, jsom_params: dict):
         # Check if format of dictionary is right using validator
         await self._coords_of_square_validation(jsom_params)
-        self._get_sectors_in_sector(jsom_params)
-        # Comparing with cache, then updating of cache
-        self._squares_in_sector["map_sectors_names"] = [
-            i for i in self._squares_in_sector["map_sectors_names"] if i not in self._cache["map_sectors_names"]
+        squares_in_sector = self._get_sectors_in_sector(jsom_params)
+        # Comparing with cache, then updating cache
+        squares_in_sector["map_sectors_names"] = [
+            i for i in squares_in_sector["map_sectors_names"] if i not in self._cache["map_sectors_names"]
         ]
-        self._set_cache()
-        if len(self._squares_in_sector["map_sectors_names"]) != 0:
+        self._set_cache(squares_in_sector)
+        if len(squares_in_sector["map_sectors_names"]) != 0:
             landmarks_sectors_async_task = asyncio.create_task(
                 AbstractAgentsBroker.call_agent_task(
                     landmarks_in_map_sectors_task,
-                    self._squares_in_sector
+                    squares_in_sector
                 )
             )
             result_task = await landmarks_sectors_async_task
@@ -48,34 +49,45 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
 
     async def get_landmarks_by_categories_in_sector(self, jsom_params: dict):
         await self._coords_of_square_with_categories_validation(jsom_params)
-        self._get_sectors_in_sector(jsom_params)
-        self._squares_in_sector["map_sectors_names"] = [
-            i for i in self._squares_in_sector["map_sectors_names"] if i not in self._cache["map_sectors_names"]
+        squares_in_sector = self._get_sectors_in_sector(jsom_params)
+        squares_in_sector["categories_names"] = jsom_params["categories_names"]
+        squares_in_sector["map_sectors_names"] = [
+            i for i in squares_in_sector["map_sectors_names"] if i not in self._cache["map_sectors_names"]
         ]
-        self._squares_in_sector["categories_names"].extend(jsom_params["categories_names"])
-        self._set_cache()
-        if len(self._squares_in_sector["map_sectors_names"]) != 0:
+        squares_in_sector["categories_names"] = [
+            i for i in squares_in_sector["categories_names"] if i not in self._cache["categories_names"]
+        ]
+        self._set_cache(squares_in_sector)
+        if len(squares_in_sector["map_sectors_names"]) != 0:
             landmarks_sectors_categories_async_task = asyncio.create_task(
                 AbstractAgentsBroker.call_agent_task(
-                    landmarks_of_categories_in_map_sectors_task, self._squares_in_sector
+                    landmarks_of_categories_in_map_sectors_task, squares_in_sector
                 )
             )
             result_task = await landmarks_sectors_categories_async_task
             self._result = result_task.return_value
         return self._result
 
-    def _set_cache(self):
+    def _set_cache(self, squares_in_sector: dict):
         """
         self._cache is set to prevent repeated elements in cache
         """
-        for sector_name in self._squares_in_sector["map_sectors_names"]:
+        for sector_name in squares_in_sector["map_sectors_names"]:
             self._cache["map_sectors_names"].add(sector_name)
-        if len(self._cache.get("map_sectors_names", [])) > 60:
-            # Truncate the cache to the desired size
-            self._cache["map_sectors_names"] = self._cache["map_sectors_names"][-60:]
+        if "categories_names" in squares_in_sector.keys():
+            for category in squares_in_sector["categories_names"]:
+                self._cache["categories_names"].add(category)
+        """
+        Shorten cache to the desired size.
+        """
+        if len(self._cache.get("map_sectors_names", [])) > self.CACHE_SECTORS_MAX_SIZE:
+            self._cache["map_sectors_names"] = self._cache["map_sectors_names"][-self.CACHE_SECTORS_MAX_SIZE:]
+        if len(self._cache.get("categories_names", [])) > self.CACHE_CATEGORIES_MAX_SIZE:
+            self._cache["categories_names"] = self._cache["categories_names"][-self.CACHE_CATEGORIES_MAX_SIZE:]
 
     def _get_sectors_in_sector(self, coords_of_sector: dict):
         data = json.load(open("backend/agents/landmarks_by_sectors_agent/new_squares.json"))
+        squares_in_sector = {"map_sectors_names": []}
         for element in data:
             if (coords_of_sector["TL"]["longitude"] - self.LONG_DIFFERENCE <= element["TL"]["longitude"] <
                 element["BR"]["longitude"] <=
@@ -83,7 +95,8 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
                     coords_of_sector["BR"]["latitude"] - self.LAT_DIFFERENCE <= element["BR"]["latitude"] <
                     element["TL"]["latitude"] <=
                     coords_of_sector["TL"]["latitude"] + self.LAT_DIFFERENCE):
-                self._squares_in_sector["map_sectors_names"].append(element["name"])
+                squares_in_sector["map_sectors_names"].append(element["name"])
+        return squares_in_sector
 
     @staticmethod
     async def _coords_of_square_validation(jsom_params: dict):
@@ -118,6 +131,3 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
             return True
         else:
             return False
-
-
-
