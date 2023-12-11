@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict
+
 from pure_route_builder_agent import PureRouteBuilder
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
 from backend.broker.agents_tasks.recommendations_agent_tasks import \
@@ -41,7 +41,10 @@ class RouteBuilderAgent(PureRouteBuilder):
          "user_login": string,
          "start_end_points":["coordinates":[{"latitude": float, "longitude": float}]]
          }
-        :return: tuple(final_route: "coordinates":[{"latitude": float, "longitude": float}, {"latitude": float, "longitude": float}],
+        :return: tuple(final_route: "coordinates":[
+                                                    {"latitude": float, "longitude": float},
+                                                     {"latitude": float, "longitude": float}
+                                                    ],
             landmarks: {
                          "coordinates_of_points": List [
                             Dict [
