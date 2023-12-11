@@ -11,7 +11,6 @@ async def build_route(route_params):
     :param route_params:
      {
      "categories_names":["category1","category2",...],
-     "coordinates":[{"latitude": float, "longitude": float},{"latitude": float, "longitude": float}],
      "user_login": string,
      "start_end_points":["coordinates":[{"latitude": float, "longitude": float}]]
      }
