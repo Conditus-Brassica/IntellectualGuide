@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.datastructures import ImmutableMultiDict as imd
 
+from backend.db_categories import system_categories
+
 
 class RequestAgent:
     """
@@ -86,6 +88,17 @@ class RequestAgent:
             route_points = {}
 
             return jsonify(route_points)
+
+
+
+
+
+
+        @self.__app__.route("/api/v1/map/categories", methods=['GET'])
+        def get_categories():
+            categories = {*system_categories.values}
+
+            return jsonify(list(categories))
 
 
 if __name__ == "__main__":
