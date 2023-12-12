@@ -66,6 +66,8 @@ class RouteBuilderAgent(PureRouteBuilder):
         pre_route = await pre_route_task
         pre_route = pre_route.return_value
         param_dict = dict()
+
+
         param_dict['coordinates_of_points'] = pre_route['coordinates']
         param_dict['categories_names'] = route_params['categories_names']
         param_dict['user_login'] = route_params['user_login']

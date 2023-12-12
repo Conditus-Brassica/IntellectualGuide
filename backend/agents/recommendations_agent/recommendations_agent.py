@@ -224,15 +224,15 @@ class RecommendationsAgent(PureRecommendationsAgent):
             f"a_priori_recommended_asyncio_result: {a_priori_recommended_asyncio_result}"
         )
         a_priori_recommended = a_priori_recommended_asyncio_result.return_value
-        a_priori_recommended = self._outdated_remove_nones_from_kb_result(a_priori_recommended)
-        #self._remove_nones_from_kb_result(a_priori_recommended)
+        # a_priori_recommended = self._outdated_remove_nones_from_kb_result(a_priori_recommended)
+        self._remove_nones_from_kb_result(a_priori_recommended)
         logger.debug(
             f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
             f"a_priori_recommended after None removed: {a_priori_recommended}"
         )
         if not a_priori_recommended:
             return a_priori_recommended
-        #  self._remove_duplicates_from_kb_result(a_priori_recommended)
+        self._remove_duplicates_from_kb_result(a_priori_recommended)
         logger.debug(
             f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
             f"a_priori_recommended after duplicates removed: {a_priori_recommended}"

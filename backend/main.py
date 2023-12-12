@@ -89,11 +89,6 @@ class RequestAgent:
 
             return jsonify(route_points)
 
-
-
-
-
-
         @self.__app__.route("/api/v1/map/categories", methods=['GET'])
         def get_categories():
             categories = {*system_categories.values}
