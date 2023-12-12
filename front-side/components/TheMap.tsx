@@ -13,6 +13,8 @@ interface TheMapInterface {
   setMarkerState: any;
   setLandmark: any;
   route: any;
+  targetCats: any;
+  setTargetCats: any;
 };
 
 
@@ -27,7 +29,7 @@ class CustomMarker extends L.Marker {
 };
 
 
-const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerState, setLandmark, route }) => {
+const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerState, setLandmark, route, targetCats, setTargetCats }) => {
   useEffect(() => {
     const map = L.map('map').setView([51.505, -0.09], 13);
     var BelarusGeoJSON: any = {
@@ -104,6 +106,11 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
         })
     };
 
+    setTargetCats((prev: never[])=> {
+      prev=[]
+      return prev
+  })
+
     const onMarkerClick = function (e: L.LeafletMouseEvent) {
       if (markerState.targetMarker == e.target) {
         setLandmark((pref: boolean) => {
@@ -127,9 +134,9 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
 
     const getPoints = async function (tl: any, br: any) {
       try {
-//         const response = await fetch(`http://192.168.129.238:4444/api/v1/sector/points?tl_lat=${tl[0]}&tl_lng=${tl[1]}&dr_lat=${br[0]}&dr_lng=${br[1]}`);
-//         const data = await response.json();
-//         console.log(data);
+        // const response = await fetch(`https://example.com/data?tl_lat=${tl[0]}&tl_lng=${tl[1]}&dr_lat=${br[0]}&dr_lng=${br[1]}`);
+        // const data = await response.json();
+        // console.log(data);
         const data = {
           points: [{
             name: "name",
@@ -169,36 +176,36 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
       }
     };
 
-    async function getRoute(start: any, finish: any) {
+    async function getRoute(start: any, finish: any, cat: any) {
       try {
-        const response = await fetch(`http://192.168.129.238:4444/api/v1/map/route?start=${start}&finish=${finish}`);
-        var data = await response.json();
-
-//         const data = {
-//           route: [
-//             [54.098865472796994, 26.661071777343754,],
-//             [54.098865472796994,
-//               26.761071777343754,],
-//               [54.098865472796994,
-//                 26.861071777343754,]
-//           ],
-//           points: [
-//             {
-//               name: 'first',
-//               latlng: [54.098865472796994, 26.661071777343754,]
-//             },
-//             {
-//               name: 'first',
-//               latlng: [54.098865472796994,
-//                 26.761071777343754,]
-//             },
-//             {
-//               name: 'first',
-//               latlng: [54.098865472796994,
-//                 26.861071777343754,]
-//             }
-//           ]
-//         };
+        // const response = await fetch(`/api/v1/map/route?start=${start}&finish=${finish}&catigories=${cat}`);
+        // var data = await response.json();
+        console.log(cat)
+        const data = {
+          route: [
+            [54.098865472796994, 26.661071777343754,],
+            [54.098865472796994,
+              26.761071777343754,],
+              [54.098865472796994,
+                26.861071777343754,]
+          ],
+          points: [
+            {
+              name: 'first',
+              latlng: [54.098865472796994, 26.661071777343754,]
+            },
+            {
+              name: 'first',
+              latlng: [54.098865472796994,
+                26.761071777343754,]
+            },
+            {
+              name: 'first',
+              latlng: [54.098865472796994,
+                26.861071777343754,]
+            }
+          ]
+        };
 
         const latLngs = data.route.map(coords => L.latLng(coords[0], coords[1]));
         const route = L.polyline(latLngs).addTo(map);
@@ -242,9 +249,9 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
         });
 
         var start: LatLngExpression = [position.coords.latitude, position.coords.longitude]
-        var finish = markerState.targetMarker.latlng
-        console.log(start)
-        getRoute(start, finish)
+        var finish = [markerState.targetMarker._latlng.lat, markerState.targetMarker._latlng.lng] 
+        console.log('маршрут от', start, finish)
+        getRoute(start, finish, targetCats)
         var marker = new CustomMarker(start, { icon: icons['start'], type: 'start' });
         marker.addTo(map);
         console.log(`Ваши координаты: ${start}`);

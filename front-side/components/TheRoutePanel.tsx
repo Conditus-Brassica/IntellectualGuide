@@ -29,7 +29,7 @@ const TheRoutePanel: React.FC<TheRoutePanel> = ({ setRoute, route, mapData }) =>
                     </div>
                    <div>
                    {mapData.markers.map((value: typeof CustomMarker, index:number) => (
-                        <div className={style.row}>
+                        <div className={style.row} key={index}>
                             <div className={style.number}>
                                 <span>{index + 1}</span>
                             </div>
