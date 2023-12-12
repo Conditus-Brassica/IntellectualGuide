@@ -4,8 +4,9 @@ import styles from "@/styles/sidepanel.module.css"
 import TheRoundButton from "./TheRoundButton";
 
 interface TheSidePanelInterface {
-    setMapData: any;
+    setTargetCats: any;
     mapData: any;
+    targetCats:any;
 };
 
 const getCategories = function () {
@@ -19,7 +20,7 @@ const getCategories = function () {
 }
 
 
-const TheSidePanel: React.FC<TheSidePanelInterface> = ({ setMapData, mapData }) => {
+const TheSidePanel: React.FC<TheSidePanelInterface> = ({ setTargetCats, mapData, targetCats }) => {
 
 
     return (
@@ -28,7 +29,7 @@ const TheSidePanel: React.FC<TheSidePanelInterface> = ({ setMapData, mapData }) 
             <div className={styles.buttons}>
                 {getCategories().map((value: string, index: number) => (
                     <div key={index}>
-                        <TheRoundButton type={value}  image_path={`/${value}.svg`} functional='filter' mapData={mapData}/>
+                        <TheRoundButton targetCats={targetCats} type={value}  image_path={`/${value}.svg`} functional='filter' mapData={mapData} setTargetCats={setTargetCats}/>
                     </div>
                 ))}
             </div>

@@ -9,6 +9,8 @@ interface ThePopup {
     setRoute: any;
     setPopup: any;
     mapData: any;
+    setTargetCats:any;
+    targetCats:any;
 }
 
 const getCategories = function () {
@@ -21,7 +23,7 @@ const getCategories = function () {
     return data
 }
 
-const ThePopup: React.FC<ThePopup> = ({ setLandmark, popup, setRoute, setPopup, mapData }) => {
+const ThePopup: React.FC<ThePopup> = ({ setLandmark, popup, setRoute, setPopup, mapData, setTargetCats, targetCats }) => {
     const buildARoute = function () {
         setRoute((pref: boolean) => {
             console.log('route=', pref)
@@ -33,12 +35,16 @@ const ThePopup: React.FC<ThePopup> = ({ setLandmark, popup, setRoute, setPopup, 
     }
     return (<>
         {<div style={{ display: popup ? 'block' : 'none' }} className={style.popup}>
-            <div>
-                {getCategories().map((value: string, index: number) => (
-                    <div key={index}>
-                        <TheRoundButton type={value} image_path={`/${value}.svg`} functional='fetch' mapData={mapData}/>
-                    </div>
-                ))}
+            <div className={style.content}>
+                <div className={style.cat}>
+                    {getCategories().map((value: string, index: number) => (
+
+                        <div key={index}>
+                            <TheRoundButton targetCats={targetCats} type={value} image_path={`/${value}.svg`} functional='fetch' mapData={mapData} setTargetCats={setTargetCats}/>
+                        </div>
+
+                    ))}
+                </div>
                 <TheButton title="Составить маршрут!" func={buildARoute} />
             </div>
         </div>}

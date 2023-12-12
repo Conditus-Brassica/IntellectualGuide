@@ -24,14 +24,7 @@ export default function MapRoute() {
     targetMarker: CustomMarker
   })
 
-//   const buildARoute = function () {
-//     setRoute((pref: boolean)=> {
-//         console.log('route=', pref)
-//         pref = true
-//         return pref
-//     })
-//     setLandmark(false)
-// }
+  const [targetCats, setTargetCats] = useState([])
 
   return (
     <>
@@ -42,11 +35,11 @@ export default function MapRoute() {
       </Head>
       <main className={styles.main_page}>
         <div>
-          <TheSidePanel mapData={mapData} setMapData={setMapData} />
+          <TheSidePanel targetCats={targetCats} mapData={mapData} setTargetCats={setTargetCats} />
           <TheLandmarkCard setLandmark={setLandmark} landmark={landmark} setPopup={setPopup} setRoute={setRoute}/>
           <TheRoutePanel setRoute={setRoute} route={route} mapData={mapData} />
-          <Map setMapData={setMapData} markerState={markerState} setMarkerState={setMarkerState} setLandmark={setLandmark} route={route} />
-          <ThePopup setLandmark={setLandmark} popup={popup} setRoute={setRoute} setPopup={setPopup} />
+          <Map setTargetCats={setTargetCats} targetCats={targetCats} setMapData={setMapData} markerState={markerState} setMarkerState={setMarkerState} setLandmark={setLandmark} route={route} />
+          <ThePopup targetCats={targetCats} setLandmark={setLandmark} popup={popup} setRoute={setRoute} setPopup={setPopup} setTargetCats={setTargetCats} mapData={mapData}/>
         </div>
       </main>
     </>

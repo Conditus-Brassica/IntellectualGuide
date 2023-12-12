@@ -13,6 +13,8 @@ interface TheMapInterface {
   setMarkerState: any;
   setLandmark: any;
   route: any;
+  targetCats: any;
+  setTargetCats: any;
 };
 
 
@@ -27,7 +29,7 @@ class CustomMarker extends L.Marker {
 };
 
 
-const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerState, setLandmark, route }) => {
+const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerState, setLandmark, route, targetCats, setTargetCats }) => {
   useEffect(() => {
     const map = L.map('map').setView([51.505, -0.09], 13);
     var BelarusGeoJSON: any = {
@@ -104,6 +106,11 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
         })
     };
 
+    setTargetCats((prev: never[])=> {
+      prev=[]
+      return prev
+  })
+
     const onMarkerClick = function (e: L.LeafletMouseEvent) {
       if (markerState.targetMarker == e.target) {
         setLandmark((pref: boolean) => {
@@ -169,11 +176,11 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
       }
     };
 
-    async function getRoute(start: any, finish: any) {
+    async function getRoute(start: any, finish: any, cat: any) {
       try {
         // const response = await fetch(`/api/v1/map/route?start=${start}&finish=${finish}&catigories=${cat}`);
         // var data = await response.json();
-
+        console.log(cat)
         const data = {
           route: [
             [54.098865472796994, 26.661071777343754,],
@@ -244,7 +251,7 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
         var start: LatLngExpression = [position.coords.latitude, position.coords.longitude]
         var finish = [markerState.targetMarker._latlng.lat, markerState.targetMarker._latlng.lng] 
         console.log('маршрут от', start, finish)
-        getRoute(start, finish)
+        getRoute(start, finish, targetCats)
         var marker = new CustomMarker(start, { icon: icons['start'], type: 'start' });
         marker.addTo(map);
         console.log(`Ваши координаты: ${start}`);
