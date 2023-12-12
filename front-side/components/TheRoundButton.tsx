@@ -6,7 +6,8 @@ interface TheButtonInterface{
     image_path: string;
     type: string;
     mapData: any;
-    setMapData: any;
+    functional: any;
+    // setMapData: any;
 };
 
 
@@ -21,10 +22,11 @@ const TheButton: React.FC<TheButtonInterface> = ({image_path, type, mapData}) =>
             pref.isPressed = !pref.isPressed
             return pref
         })
-
+        
         mapData.markers.forEach(function(drowedMarker: any){
             if(drowedMarker.type == type){
                 drowedMarker.setOpacity(buttonState.isPressed? 1 : 0 ) 
+                // drowedMarker.getElement().style.pointerEvents = buttonState.isPressed? 'none': 'auto'; 
             };
         });
     };

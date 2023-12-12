@@ -171,7 +171,7 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
 
     async function getRoute(start: any, finish: any) {
       try {
-        // const response = await fetch(`https://example.com/data?start=${start}&finish=${finish}`);
+        // const response = await fetch(`/api/v1/map/route?start=${start}&finish=${finish}&catigories=${cat}`);
         // var data = await response.json();
 
         const data = {
@@ -242,8 +242,8 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
         });
 
         var start: LatLngExpression = [position.coords.latitude, position.coords.longitude]
-        var finish = markerState.targetMarker.latlng
-        console.log(start)
+        var finish = [markerState.targetMarker._latlng.lat, markerState.targetMarker._latlng.lng] 
+        console.log('маршрут от', start, finish)
         getRoute(start, finish)
         var marker = new CustomMarker(start, { icon: icons['start'], type: 'start' });
         marker.addTo(map);

@@ -21,13 +21,14 @@ const getCategories = function () {
 
 const TheSidePanel: React.FC<TheSidePanelInterface> = ({ setMapData, mapData }) => {
 
+
     return (
         <div className={styles.panel}>
             <div className={styles.search}>search</div>
             <div className={styles.buttons}>
                 {getCategories().map((value: string, index: number) => (
                     <div key={index}>
-                        <TheRoundButton type={value}  image_path={`/${value}.svg`} setMapData={setMapData} mapData={mapData} />
+                        <TheRoundButton type={value}  image_path={`/${value}.svg`} functional='filter' mapData={mapData}/>
                     </div>
                 ))}
             </div>
