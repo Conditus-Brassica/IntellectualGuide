@@ -69,9 +69,9 @@ class RouteBuilderAgent(PureRouteBuilder):
         param_dict['coordinates_of_points'] = pre_route['coordinates']
         param_dict['categories_names'] = route_params['categories_names']
         param_dict['user_login'] = route_params['user_login']
-        param_dict['maximum_amount_of_recommendations'] = len(pre_route['coordinates'])
-        param_dict['optional_limit'] = len(pre_route['coordinates'])
-        param_dict['amount_of_recommendations_for_point'] = 1
+        param_dict['maximum_amount_of_recommendations'] = int(len(pre_route['coordinates']) * 4)
+        param_dict['optional_limit'] = int(len(pre_route['coordinates']) * 6)
+        param_dict['amount_of_recommendations_for_point'] = 3
 
         landmarks_task = asyncio.create_task(
             AbstractAgentsBroker.call_agent_task(find_recommendations_for_coordinates_and_categories_task, param_dict)

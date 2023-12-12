@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from pprint import pprint
 
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
@@ -31,5 +32,6 @@ async def main():
 
     pprint(res2)
 
-
+a = datetime.datetime.now()
 asyncio.run(main())
+print(datetime.datetime.now() - a)

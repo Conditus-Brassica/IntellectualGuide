@@ -100,6 +100,19 @@ class RequestAgent:
 
             return jsonify(list(categories))
 
+    def __convert_categories_to(self):
+        """
+        From front categories to system
+        :return:
+        """
+        pass
+
+    def __convert_categories_from(self):
+        """
+        From system to front categories
+        :return:
+        """
+
 
 if __name__ == "__main__":
     app = Flask(__name__)

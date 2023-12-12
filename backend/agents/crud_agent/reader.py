@@ -667,7 +667,7 @@ class Reader(PureReader):
                 OPTIONAL MATCH
                     (category:LandmarkCategory)<-[current_landmark_category_ref:REFERS]-(current_landmark)
                         -[:LOCATED]->
-                    (:Region)((:Region&!State)-[:INCLUDE|NEIGHBOUR]-(:Region&!State)){0,4}(:Region)
+                    (:Region)((:Region&!State)-[:INCLUDE|NEIGHBOUR]-(:Region&!State)){2,3}(:Region)
                         <-[:LOCATED]-
                     (recommendedLandmark:Landmark)-[recommendation_landmark_category_ref:REFERS]->(category)
                 OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = $user_login)
