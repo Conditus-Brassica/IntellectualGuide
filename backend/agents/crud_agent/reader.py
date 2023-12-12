@@ -616,18 +616,19 @@ class Reader(PureReader):
                     END AS visited_amount
             } RETURN
                 recommendation,
-                COLLECT {
-                    MATCH (recommendation)
-                        -[refer:REFERS WHERE refer.main_category_flag = True]->
-                    (category:LandmarkCategory)
-                    RETURN category.name AS category_name
-                } AS main_categories_names,
-                COLLECT {
-                    MATCH (recommendation)
-                        -[refer:REFERS WHERE refer.main_category_flag = False]->
-                    (category:LandmarkCategory)
-                    RETURN category.name AS category_name
-                } AS subcategories_names,
+                //COLLECT {
+                //    MATCH (recommendation)
+                //        -[refer:REFERS WHERE refer.main_category_flag = True]->
+                //    (category:LandmarkCategory)
+                //    RETURN category.name AS category_name
+                //} AS main_categories_names,
+                //COLLECT {
+                //    MATCH (recommendation)
+                //        -[refer:REFERS WHERE refer.main_category_flag = False]->
+                //    (category:LandmarkCategory)
+                //    RETURN category.name AS category_name
+                //} AS subcategories_names,
+                //} AS subcategories_names,
                 distance,
                 wish_to_visit,
                 visited_amount
@@ -639,7 +640,8 @@ class Reader(PureReader):
         try:
             result_values = [
                 record.data(
-                    "recommendation", "main_categories_names", "subcategories_names", "distance", "wish_to_visit",
+                    "recommendation", #"main_categories_names", "subcategories_names",
+                    "distance", "wish_to_visit",
                     "visited_amount"
                 ) async for record in result
             ]
@@ -714,7 +716,7 @@ class Reader(PureReader):
                 OPTIONAL MATCH
                     (category:LandmarkCategory)<-[current_landmark_category_ref:REFERS]-(current_landmark)
                         -[:LOCATED]->
-                    (:Region)((:Region&!State)-[:INCLUDE|NEIGHBOUR]-(:Region&!State)){0,4}(:Region)
+                    (:Region)((:Region&!State)-[:INCLUDE|NEIGHBOUR]-(:Region&!State)){2,3}(:Region)
                         <-[:LOCATED]-
                     (recommendedLandmark:Landmark)-[recommendation_landmark_category_ref:REFERS]->(category)
                 OPTIONAL MATCH (userAccount: UserAccount WHERE userAccount.login = $user_login)
@@ -753,18 +755,18 @@ class Reader(PureReader):
                     END AS visited_amount
             } RETURN
                 recommendation,
-                COLLECT {
-                    MATCH (recommendation)
-                        -[refer:REFERS WHERE refer.main_category_flag = True]->
-                    (category:LandmarkCategory)
-                    RETURN category.name AS category_name
-                } AS main_categories_names,
-                COLLECT {
-                    MATCH (recommendation)
-                        -[refer:REFERS WHERE refer.main_category_flag = False]->
-                    (category:LandmarkCategory)
-                    RETURN category.name AS category_name
-                } AS subcategories_names,
+                // COLLECT {
+                //     MATCH (recommendation)
+                //         -[refer:REFERS WHERE refer.main_category_flag = True]->
+                //     (category:LandmarkCategory)
+                //     RETURN category.name AS category_name
+                // } AS main_categories_names,
+                // COLLECT {
+                //     MATCH (recommendation)
+                //         -[refer:REFERS WHERE refer.main_category_flag = False]->
+                //     (category:LandmarkCategory)
+                //     RETURN category.name AS category_name
+                // } AS subcategories_names,
                 distance,
                 wish_to_visit,
                 visited_amount
@@ -776,7 +778,9 @@ class Reader(PureReader):
         try:
             result_values = [
                 record.data(
-                    "recommendation", "main_categories_names", "subcategories_names", "distance", "wish_to_visit",
+                    "recommendation", #"main_categories_names", "subcategories_names",
+                    "distance",
+                    "wish_to_visit",
                     "visited_amount"
                 ) async for record in result
             ]

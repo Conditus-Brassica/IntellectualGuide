@@ -46,19 +46,19 @@ class RecommendationsAgent(PureRecommendationsAgent):
             raise RuntimeError("Unexpected behaviour, this class can have only one instance")
 
     @staticmethod
-    def _find_params_unifiers(user_categories_preference, a_priori_recommended):
+    def _find_params_unifiers(a_priori_recommended):
         params_unifiers = {}
-        logger.debug(
-            f"Recommendations agent, _find_params_unifiers, user_categories_preference: {user_categories_preference}"
-        )
+        #logger.debug(
+        #    f"Recommendations agent, _find_params_unifiers, user_categories_preference: {user_categories_preference}"
+        #)
         logger.debug(
             f"Recommendations agent, _find_params_unifiers, a_priori_recommended: {a_priori_recommended}"
         )
-        max_preference_value = max(user_categories_preference.values())
-        if not max_preference_value or max_preference_value == 0:
-            params_unifiers["user_categories_preference"] = 1
-        else:
-            params_unifiers["user_categories_preference"] = max_preference_value
+        #max_preference_value = max(user_categories_preference.values())
+        #if not max_preference_value or max_preference_value == 0:
+        #    params_unifiers["user_categories_preference"] = 1
+        #else:
+        #   params_unifiers["user_categories_preference"] = max_preference_value
         max_distance = max([recommended["distance"] for recommended in a_priori_recommended])
         if not max_distance or max_distance == 0:
             params_unifiers["distance"] = 1
@@ -129,22 +129,22 @@ class RecommendationsAgent(PureRecommendationsAgent):
                     j += 1
             i += 1
 
-    @staticmethod
-    def _categories_overlay(
-            user_categories_preference: Dict[str, int], categories_list: List[str], preference_unifier: float
-    ) -> float:
-        result_criteria = 0
-        i = 0
-        while i < len(categories_list):
-            result_criteria += user_categories_preference.get(categories_list[i], 0) / preference_unifier
-            i += 1
-        return result_criteria
+    # @staticmethod
+    # def _categories_overlay(
+    #         user_categories_preference: Dict[str, int], categories_list: List[str], preference_unifier: float
+    # ) -> float:
+    #     result_criteria = 0
+    #     i = 0
+    #     while i < len(categories_list):
+    #         result_criteria += user_categories_preference.get(categories_list[i], 0) / preference_unifier
+    #         i += 1
+    #     return result_criteria
 
     @staticmethod
     def _additive_super_criteria(
-            user_categories_preference: Dict[str, int],
-            main_categories_names: List[str],
-            subcategories_names: List[str],
+            #user_categories_preference: Dict[str, int],
+            #main_categories_names: List[str],
+            #subcategories_names: List[str],
             distance: float,
             wish_to_visit: bool,
             visited_amount: int,
@@ -152,14 +152,14 @@ class RecommendationsAgent(PureRecommendationsAgent):
             params_unifiers: Dict[str, float]
     ) -> float:
         return (
-                RecommendationsAgent._categories_overlay(
-                    user_categories_preference, main_categories_names, params_unifiers["user_categories_preference"]
-                )
-                * coefficients["main_categories_names"] / params_unifiers["user_categories_preference"] +
-                RecommendationsAgent._categories_overlay(
-                    user_categories_preference, subcategories_names, params_unifiers["user_categories_preference"]
-                )
-                * coefficients["subcategories_names"] / params_unifiers["user_categories_preference"] +
+                #RecommendationsAgent._categories_overlay(
+                #    user_categories_preference, main_categories_names, params_unifiers["user_categories_preference"]
+                #)
+                #* coefficients["main_categories_names"] / params_unifiers["user_categories_preference"] +
+                #RecommendationsAgent._categories_overlay(
+                #    user_categories_preference, subcategories_names, params_unifiers["user_categories_preference"]
+                #)
+                #* coefficients["subcategories_names"] / params_unifiers["user_categories_preference"] +
                 distance
                 * coefficients["distance"] / params_unifiers["distance"] +
                 int(wish_to_visit)
@@ -172,16 +172,16 @@ class RecommendationsAgent(PureRecommendationsAgent):
             self,
             a_priori_recommended: List[Dict],
             params_unifiers: Dict[str, float],
-            user_categories_preference: Dict[str, int],
+            #user_categories_preference: Dict[str, int],
             maximum_amount_of_recommendations: int,
     ) -> List[int]:
         a_posteriori_recommended_criteria = []
         a_posteriori_recommended_indexes = []
         for i in range(len(a_priori_recommended)):
             criteria = self._additive_super_criteria(
-                user_categories_preference,
-                a_priori_recommended[i]["main_categories_names"],
-                a_priori_recommended[i]["subcategories_names"],
+                #user_categories_preference,
+                #a_priori_recommended[i]["main_categories_names"],
+                #a_priori_recommended[i]["subcategories_names"],
                 a_priori_recommended[i]["distance"],
                 a_priori_recommended[i]["wish_to_visit"],
                 a_priori_recommended[i]["visited_amount"],
@@ -237,14 +237,14 @@ class RecommendationsAgent(PureRecommendationsAgent):
             f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
             f"a_priori_recommended after duplicates removed: {a_priori_recommended}"
         )
-        user_categories_preference = {"озёра поставского района": 1}  # TODO cash request
+        #user_categories_preference = {"озёра поставского района": 1}  # TODO cash request
         # TODO Cash request
         # TODO check cash on None values
-        params_unifiers = self._find_params_unifiers(user_categories_preference, a_priori_recommended)
+        params_unifiers = self._find_params_unifiers(a_priori_recommended)
         a_posteriori_recommended_indexes = self._find_indexes_of_final_recommendations(
             a_priori_recommended,
             params_unifiers,
-            user_categories_preference,
+            #user_categories_preference,
             maximum_amount_of_recommendations
         )
         return [

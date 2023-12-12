@@ -5,15 +5,11 @@ recommendations_agent_coefficients_json = \
   {
       "type": "object",
       "properties": {
-          "main_categories_names": {"type": "number"},
-          "subcategories_names": {"type": "number"},
           "distance": {"type": "number"},
           "wish_to_visit": {"type": "number"},
           "visited_amount": {"type": "number"}
       },
       "required": [
-          "main_categories_names",
-          "subcategories_names",
           "distance",
           "wish_to_visit",
           "visited_amount"

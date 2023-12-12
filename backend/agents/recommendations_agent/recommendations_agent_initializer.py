@@ -7,8 +7,8 @@ if RecommendationsAgent.recommendations_agent_exists():
 else:
 
     test_recommendations_agent_coefficients = {
-        "main_categories_names": 1.0,
-        "subcategories_names": 1.0,
+        #"main_categories_names": 1.0,
+        #"subcategories_names": 1.0,
         "distance": -1.0,
         "wish_to_visit": 1.0,
         "visited_amount": -1.0
