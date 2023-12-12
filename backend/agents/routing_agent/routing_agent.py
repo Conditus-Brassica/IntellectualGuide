@@ -92,12 +92,12 @@ class RoutingAgent(PureRoutingAgent):
         main_points = []
         k = 0
         for i in route:
-            if k == 130:
-                main_points.append(i)  # 130 - points every 30 km of route
+            if k == 260:
+                main_points.append(i)  # 260 - points every 60 km of route
                 k = 0
             k += 1
 
-        if len(route) < 130:
+        if len(route) < 260:
             main_points.append(route[0])
             main_points.append(route[-1])
 
