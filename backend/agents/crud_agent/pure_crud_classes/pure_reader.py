@@ -284,3 +284,46 @@ class PureReader(ABC):
             ]
         """
         raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    async def read_recommendations_by_coordinates_categories_regions(
+            session,
+            coordinates_of_points: List[Dict[str, float]],
+            categories_names: List[str],
+            user_login: str,
+            amount_of_recommendations_for_point: int,
+            optional_limit: int | None
+    ):
+        """
+            Returns recommended landmarks for given user, given coordinates and given categories. Finds given landmark
+            by its name and coordinates; finds user by his/her login. Returns recommended landmark, categories of
+            recommended landmark, node of the given User account, "wish" mark, if user left it on recommended landmark
+            (else None), "visited" mark with the amount of visits, if user already visited this landmark (else None)/
+            Works asynchronously.
+
+            :param session: async session of knowledge base driver
+            :param coordinates_of_points: List[
+                Dict [
+                    "latitude": float,
+                    "longitude": float
+                ]
+            ] coordinates of given points
+            :param categories_names: List[str] names of categories of target landmarks
+            :param user_login: str login of user for whom recommendations will be found
+            :param amount_of_recommendations_for_point: int max amount of recommended landmarks for every point
+            :param optional_limit: int | None max amount of recommended landmarks
+            :return: Coroutine
+            List[
+                Dict[
+                    "recommendation": Dict | None,
+                    "main_categories_names": List[str] | [] (empty list),
+                    "subcategories_names": List[str] | [] (empty list),
+                    "distance": float | None,
+                    "wish_to_visit": bool | None,
+                    "visited_amount": int | None
+                ]
+            ]
+        """
+        raise NotImplementedError
+

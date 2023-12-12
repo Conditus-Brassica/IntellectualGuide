@@ -544,7 +544,7 @@ class Reader(PureReader):
         return result
 
     @staticmethod
-    async def _read_recommendations_by_coordinates_and_categories(
+    async def _read_recommendations_by_coordinates_categories(
             tx,
             coordinates_of_points: List[Dict[str, float]],
             categories_names: List[str],
@@ -631,11 +631,58 @@ class Reader(PureReader):
                 distance,
                 wish_to_visit,
                 visited_amount
+            LIMIT $optional_limit;
+            """,
+            coordinates_of_points=coordinates_of_points, categories_names=categories_names, user_login=user_login,
+            amount_of_recommendations_for_point=amount_of_recommendations_for_point, optional_limit=optional_limit
+        )
+        try:
+            result_values = [
+                record.data(
+                    "recommendation", "main_categories_names", "subcategories_names", "distance", "wish_to_visit",
+                    "visited_amount"
+                ) async for record in result
+            ]
+        except IndexError as ex:
+            await logger.error(f"Index error, args: {ex.args[0]}")
+            result_values = []
 
+        await logger.debug(
+            f"method:\t_read_recommendations_by_coordinates_and_categories,\nresult:\t{await result.consume()}"
+        )
+        return result_values
 
-            UNION
+    @staticmethod
+    async def read_recommendations_by_coordinates_and_categories(
+            session: AsyncSession,
+            coordinates_of_points: List[Dict[str, float]],
+            categories_names: List[str],
+            user_login: str,
+            amount_of_recommendations_for_point: int,
+            optional_limit: int | None
+    ):
+        result = await session.execute_read(
+                Reader._read_recommendations_by_coordinates_categories, coordinates_of_points,
+                categories_names, user_login, amount_of_recommendations_for_point, optional_limit
+        )
+        await logger.debug(
+            f"method:\tread_recommendations_by_coordinates_and_categories,\n"
+            f"result:\t{result}"
+        )
+        return result
 
-
+    @staticmethod
+    async def _read_recommendations_by_coordinates_categories_regions(
+            tx,
+            coordinates_of_points: List[Dict[str, float]],
+            categories_names: List[str],
+            user_login: str,
+            amount_of_recommendations_for_point: int,
+            optional_limit: int | None
+    ):
+        """Transaction handler for read_recommendations_by_coordinates_and_categories"""
+        result = await tx.run(
+            """
             UNWIND $coordinates_of_points AS coordinates_of_point
             CALL {
                 WITH coordinates_of_point
@@ -721,25 +768,18 @@ class Reader(PureReader):
                 distance,
                 wish_to_visit,
                 visited_amount
+            LIMIT $optional_limit;
             """,
             coordinates_of_points=coordinates_of_points, categories_names=categories_names, user_login=user_login,
-            amount_of_recommendations_for_point=amount_of_recommendations_for_point
+            amount_of_recommendations_for_point=amount_of_recommendations_for_point, optional_limit=optional_limit
         )
         try:
-            if optional_limit:
-                result_values = [
-                    record.data(
-                        "recommendation", "main_categories_names", "subcategories_names", "distance", "wish_to_visit",
-                        "visited_amount"
-                    ) for record in await result.fetch(optional_limit)
-                ]
-            else:
-                result_values = [
-                    record.data(
-                        "recommendation", "main_categories_names", "subcategories_names", "distance", "wish_to_visit",
-                        "visited_amount"
-                    ) async for record in result
-                ]
+            result_values = [
+                record.data(
+                    "recommendation", "main_categories_names", "subcategories_names", "distance", "wish_to_visit",
+                    "visited_amount"
+                ) async for record in result
+            ]
         except IndexError as ex:
             await logger.error(f"Index error, args: {ex.args[0]}")
             result_values = []
@@ -750,7 +790,7 @@ class Reader(PureReader):
         return result_values
 
     @staticmethod
-    async def read_recommendations_by_coordinates_and_categories(
+    async def read_recommendations_by_coordinates_categories_regions(
             session: AsyncSession,
             coordinates_of_points: List[Dict[str, float]],
             categories_names: List[str],
@@ -759,9 +799,14 @@ class Reader(PureReader):
             optional_limit: int | None
     ):
         result = await session.execute_read(
-            Reader._read_recommendations_by_coordinates_and_categories, coordinates_of_points,
+            Reader._read_recommendations_by_coordinates_categories_regions, coordinates_of_points,
             categories_names, user_login, amount_of_recommendations_for_point, optional_limit
         )
-        await logger.debug(f"method:\tread_recommendations_by_coordinates_and_categories,\nresult:\t{result}")
+        await logger.debug(
+            f"method:\tread_recommendations_by_coordinates_and_categories_regions,\n"
+            f"result:\t{result}"
+        )
         return result
+
+
 
