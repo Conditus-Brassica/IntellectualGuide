@@ -1,11 +1,11 @@
-#Author: Vodohleb04
+# Author: Vodohleb04
+
 from neo4j import AsyncGraphDatabase
 from backend.agents.crud_agent.reader import Reader
 from backend.agents.crud_agent.crud_agent import CRUDAgent
 
-
-#with open("backend/broker/basic_login.json", 'r') as fout:
-#basic_login = json.load(fout)
+# with open("backend/agents/crud_agent/basic_login.json", 'r') as fout:
+#     basic_login = json.load(fout)
 
 
 if CRUDAgent.crud_exists():
@@ -16,4 +16,3 @@ else:
     reader = Reader()
     CRUD_AGENT = CRUDAgent(reader, driver, 'neo4j')
     print("Crud was created")  # TODO remove
-
