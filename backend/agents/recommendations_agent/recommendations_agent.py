@@ -1,5 +1,4 @@
 # Author: Vodohleb04
-import asyncio
 import backend.agents.recommendations_agent.recommendations_json_validation as json_validation
 from typing import Dict, List
 from jsonschema import validate, ValidationError
@@ -215,10 +214,9 @@ class RecommendationsAgent(PureRecommendationsAgent):
             await logger.error(f"find_recommendations_for_coordinates_and_categories, ValidationError({ex.args[0]})")
             return []  # raise ValidationError
 
-        recommendations_async_task = asyncio.create_task(
-            AbstractAgentsBroker.call_agent_task(crud_recommendations_by_coordinates_and_categories_task, json_params)
+        a_priori_recommended_asyncio_result = await AbstractAgentsBroker.call_agent_task(
+            crud_recommendations_by_coordinates_and_categories_task, json_params
         )
-        a_priori_recommended_asyncio_result = await recommendations_async_task
         logger.debug(
             f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
             f"a_priori_recommended_asyncio_result: {a_priori_recommended_asyncio_result}"

@@ -1,4 +1,4 @@
-import asyncio
+
 import json
 
 from aiologger.loggers.json import JsonLogger
@@ -37,13 +37,10 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
         ]
         self._set_cache(squares_in_sector)
         if len(squares_in_sector["map_sectors_names"]) != 0:
-            landmarks_sectors_async_task = asyncio.create_task(
-                AbstractAgentsBroker.call_agent_task(
+            result_task = await AbstractAgentsBroker.call_agent_task(
                     landmarks_in_map_sectors_task,
                     squares_in_sector
                 )
-            )
-            result_task = await landmarks_sectors_async_task
             self._result = result_task.return_value
         return self._result
 
@@ -59,12 +56,9 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
         ]
         self._set_cache(squares_in_sector)
         if len(squares_in_sector["map_sectors_names"]) != 0:
-            landmarks_sectors_categories_async_task = asyncio.create_task(
-                AbstractAgentsBroker.call_agent_task(
+            result_task = await AbstractAgentsBroker.call_agent_task(
                     landmarks_of_categories_in_map_sectors_task, squares_in_sector
-                )
             )
-            result_task = await landmarks_sectors_categories_async_task
             self._result = result_task.return_value
         return self._result
 

@@ -1,6 +1,7 @@
 import asyncio
 import random
 
+import asyncio
 import werkzeug.exceptions as wer_exp
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -8,6 +9,8 @@ from werkzeug.datastructures import ImmutableMultiDict as imd
 
 from backend.broker.broker_initializer import BROKER
 from backend.db_categories import system_categories
+from backend.broker.abstract_agents_broker import AbstractAgentsBroker
+from backend.broker.agents_tasks.landmarks_by_sectors_agent_tasks import get_landmarks_in_sector_task
 
 from backend.broker.agents_tasks.route_builder_task import build_route
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
@@ -29,7 +32,7 @@ class RequestAgent:
 
     def __handle__(self):
         @self.__app__.route("/api/v1/sector/points", methods=["GET"])
-        def get_sector_points():
+        async def get_sector_points():
             """
             Method gets the request for receiving list
             of landmarks in a specific sector.
@@ -50,6 +53,10 @@ class RequestAgent:
             if gotten_json is None:
                 self.__app__.logger.error("get_sector_points() returned BadRequest")
                 return wer_exp.BadRequest().code
+
+            map_sectors_result = await AbstractAgentsBroker.call_agent_task(
+                    get_landmarks_in_sector_task,
+                )
 
             # TODO: task calling
 
@@ -195,7 +202,6 @@ async def main():
     await CRUD_AGENT.close()
 
 if __name__ == "__main__":
-    with asyncio.Runner() as runner:
-        runner.run(main())
+    asyncio.run(main())
 
 

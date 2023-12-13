@@ -1,5 +1,3 @@
-import asyncio
-
 from backend.agents.route_builder_agent.pure_route_builder_agent import PureRouteBuilder
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
 from backend.broker.agents_tasks.recommendations_agent_tasks import \
@@ -59,11 +57,9 @@ class RouteBuilderAgent(PureRouteBuilder):
                     }
         )
         """
-        pre_route_task = asyncio.create_task(
-            AbstractAgentsBroker.call_agent_task(get_optimized_route_main_points_task, route_params['start_end_points'])
+        pre_route = await AbstractAgentsBroker.call_agent_task(
+            get_optimized_route_main_points_task, route_params['start_end_points']
         )
-
-        pre_route = await pre_route_task
         pre_route = pre_route.return_value
         param_dict = dict()
 
@@ -74,10 +70,9 @@ class RouteBuilderAgent(PureRouteBuilder):
         param_dict['optional_limit'] = int(len(pre_route['coordinates']) * 6)
         param_dict['amount_of_recommendations_for_point'] = 3
 
-        landmarks_task = asyncio.create_task(
-            AbstractAgentsBroker.call_agent_task(find_recommendations_for_coordinates_and_categories_task, param_dict)
+        landmarks = await AbstractAgentsBroker.call_agent_task(
+            find_recommendations_for_coordinates_and_categories_task, param_dict
         )
-        landmarks = await landmarks_task
         landmarks = landmarks.return_value
 
         print("Penis ", landmarks)
