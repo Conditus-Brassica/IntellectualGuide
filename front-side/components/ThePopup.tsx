@@ -1,7 +1,7 @@
 import TheButton from "./TheButton";
 import style from "@/styles/popup.module.css"
 import TheRoundButton from "./TheRoundButton"
-
+import { useState, useEffect } from "react";
 
 interface ThePopup {
     setLandmark: any;
@@ -13,13 +13,10 @@ interface ThePopup {
     targetCats:any;
 }
 
-const getCategories = function () {
-    // const response = await fetch(`https://example.com/data?tl_lat=${tl[0]}&tl_lng=${tl[1]}&dr_lat=${br[0]}&dr_lng=${br[1]}`);
-    // const data: string[] = await response.json();
-    const data = [
-        'museum', 'restaurant', 'river'
-    ]
-
+const getCategories = async function () {
+    const response = await fetch(`https://example.com/data`);
+    const data: string[] = await response.json();
+    
     return data
 }
 
@@ -33,11 +30,23 @@ const ThePopup: React.FC<ThePopup> = ({ setLandmark, popup, setRoute, setPopup, 
         setLandmark(false)
         setPopup(false)
     }
+
+    const [categories, setCategories] = useState<string[]>([]);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        const data = await getCategories();
+        setCategories(data);
+      };
+  
+      fetchData();
+    }, []);
+
     return (<>
         {<div style={{ display: popup ? 'block' : 'none' }} className={style.popup}>
             <div className={style.content}>
                 <div className={style.cat}>
-                    {getCategories().map((value: string, index: number) => (
+                    {categories.map((value: string, index: number) => (
 
                         <div key={index}>
                             <TheRoundButton targetCats={targetCats} type={value} image_path={`/${value}.svg`} functional='fetch' mapData={mapData} setTargetCats={setTargetCats}/>
