@@ -2,7 +2,7 @@
 import asyncio
 import backend.broker.agents_tasks.crud_agent_tasks as crud_tasks
 from pprint import pprint
-from backend.broker.broker_initializer import BROKER
+#from backend.broker.broker_initializer import BROKER
 #from crud_commands import *
 #from backend.agents.crud_agent.crud_commands_fabric import CRUDCommandsFabric
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker

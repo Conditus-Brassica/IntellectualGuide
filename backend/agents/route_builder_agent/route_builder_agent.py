@@ -67,7 +67,6 @@ class RouteBuilderAgent(PureRouteBuilder):
         pre_route = pre_route.return_value
         param_dict = dict()
 
-
         param_dict['coordinates_of_points'] = pre_route['coordinates']
         param_dict['categories_names'] = route_params['categories_names']
         param_dict['user_login'] = route_params['user_login']
@@ -85,13 +84,23 @@ class RouteBuilderAgent(PureRouteBuilder):
 
         formatted_landmarks = self.__format_landmarks(landmarks)
 
+        formatted_landmarks['coordinates'].append(
+            {"latitude": route_params['start_end_points']['coordinates'][-1]['latitude'],
+             "longitude": route_params['start_end_points']['coordinates'][-1]['longitude']})
+
+        formatted_landmarks['coordinates'].insert(0, {
+            "latitude": route_params['start_end_points']['coordinates'][0]['latitude'],
+            "longitude": route_params['start_end_points']['coordinates'][0]['longitude']})
+
         final_route_task = (
             AbstractAgentsBroker.call_agent_task(get_optimized_route_task, formatted_landmarks)
         )
 
         final_route = await final_route_task
 
-        return final_route.return_value, landmarks
+        final_route = final_route.return_value
+
+        return final_route, landmarks
 
     @staticmethod
     def __format_landmarks(landmarks):

@@ -13,11 +13,11 @@ interface TheSidePanelInterface {
 };
 
 const getCategories = async function () {
-    // const response = await fetch(`https://example.com/data?tl_lat=${tl[0]}&tl_lng=${tl[1]}&dr_lat=${br[0]}&dr_lng=${br[1]}`);
-    // const data: string[] = await response.json();
-    const data = [
-        'museum', 'restaurant', 'river'
-    ]
+    const response = await fetch(`http://192.168.129.238:4444/api/v1/map/categories`);
+    const data: string[] = await response.json();
+//     const data = [
+//         'museum', 'restaurant', 'river'
+//     ]
 
     return data
 }

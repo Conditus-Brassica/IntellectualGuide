@@ -1,7 +1,6 @@
 #Author: Vodohleb04
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
 
-
 class AgentsBroker(AbstractAgentsBroker):
     """
     Custom broker class to work with agents.

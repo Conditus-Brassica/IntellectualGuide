@@ -178,34 +178,34 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
 
     async function getRoute(start: any, finish: any, cat: any) {
       try {
-        // const response = await fetch(`/api/v1/map/route?start=${start}&finish=${finish}&catigories=${cat}`);
-        // var data = await response.json();
-        console.log(cat)
-        const data = {
-          route: [
-            [54.098865472796994, 26.661071777343754,],
-            [54.098865472796994,
-              26.761071777343754,],
-              [54.098865472796994,
-                26.861071777343754,]
-          ],
-          points: [
-            {
-              name: 'first',
-              latlng: [54.098865472796994, 26.661071777343754,]
-            },
-            {
-              name: 'first',
-              latlng: [54.098865472796994,
-                26.761071777343754,]
-            },
-            {
-              name: 'first',
-              latlng: [54.098865472796994,
-                26.861071777343754,]
-            }
-          ]
-        };
+        const response = await fetch(`http://192.168.129.238:4444/api/v1/map/route?start=${start}&finish=${finish}&catigories=${cat}`);
+        var data = await response.json();
+//         console.log(cat)
+//         const data = {
+//           route: [
+//             [54.098865472796994, 26.661071777343754,],
+//             [54.098865472796994,
+//               26.761071777343754,],
+//               [54.098865472796994,
+//                 26.861071777343754,]
+//           ],
+//           points: [
+//             {
+//               name: 'first',
+//               latlng: [54.098865472796994, 26.661071777343754,]
+//             },
+//             {
+//               name: 'first',
+//               latlng: [54.098865472796994,
+//                 26.761071777343754,]
+//             },
+//             {
+//               name: 'first',
+//               latlng: [54.098865472796994,
+//                 26.861071777343754,]
+//             }
+//           ]
+//         };
 
         const latLngs = data.route.map(coords => L.latLng(coords[0], coords[1]));
         const route = L.polyline(latLngs).addTo(map);

@@ -1,15 +1,19 @@
 import asyncio
 import random
-q
+
 import werkzeug.exceptions as wer_exp
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.datastructures import ImmutableMultiDict as imd
 
+from backend.broker.broker_initializer import BROKER
 from backend.db_categories import system_categories
 
 from backend.broker.agents_tasks.route_builder_task import build_route
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
+from backend.agents.crud_agent.crud_initializer import CRUD_AGENT
+
+
 
 
 class RequestAgent:
@@ -92,7 +96,7 @@ class RequestAgent:
             # TODO: task calling
 
             param = dict()
-            param['login'] = ""
+            param['user_login'] = ""
             param['start_end_points'] = {
                 "coordinates": [
                     {"latitude": float((gotten_json['start'].split(','))[0]),
@@ -102,11 +106,18 @@ class RequestAgent:
                 ]
             }
 
-            if len(gotten_json['category']) != 0:
-
-                param['categories_names'] = self.__convert_categories_to(gotten_json['category'].split(','))
+            if len(gotten_json['catigories']) != 0:
+                print("cats to send ", gotten_json['catigories'].lower().split(','))
+                categories = self.__convert_categories_to(gotten_json['catigories'].split(','))
+                param['categories_names'] = [i.lower() for i in categories]
             else:
-                param['categories_names'] = self.__generate_cats()
+                curr = self.__generate_cats()
+                for i in range(len(curr)):
+                    curr[i] = curr[i].lower()
+                param['categories_names'] = curr
+
+            print("param ", param)
+
 
             task = asyncio.create_task(
                 AbstractAgentsBroker.call_agent_task(
@@ -115,10 +126,13 @@ class RequestAgent:
             )
 
             res = await task
+
             res = res.return_value
 
+            print("res ", res)
+
             route = list()
-            for i in res[0]['categories']:
+            for i in res[0]['coordinates']:
                 route.append([i['latitude'], i['longitude']])
 
             points = list()
@@ -130,16 +144,19 @@ class RequestAgent:
 
         @self.__app__.route("/api/v1/map/categories", methods=['GET'])
         def get_categories():
-            categories = {*system_categories.values}
-
-            return jsonify(list(categories))
+            lst = list()
+            for value in system_categories.values():
+                if value not in lst:
+                    lst.append(value)
+            print(lst)
+            return lst
 
     def __convert_categories_to(self, curr_list_cat):
         """
         From front categories to system
         :return:
         """
-        keys = system_categories.keys
+        keys = system_categories.keys()
 
         system_cat_result = list()
 
@@ -168,8 +185,17 @@ class RequestAgent:
         return lst
 
 
-if __name__ == "__main__":
+async def main():
+    await BROKER.startup()
     app = Flask(__name__)
     cors = CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
     request_agent = RequestAgent(app)
     app.run(host="0.0.0.0", port=4444, debug=True)
+    await BROKER.shutdown()
+    await CRUD_AGENT.close()
+
+if __name__ == "__main__":
+    with asyncio.Runner() as runner:
+        runner.run(main())
+
+

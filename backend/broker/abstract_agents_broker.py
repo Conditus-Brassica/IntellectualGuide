@@ -2,6 +2,8 @@
 """Pure agents broker"""
 from abc import ABC, abstractmethod
 from typing import Dict
+
+import taskiq
 from taskiq_redis import ListQueueBroker
 
 
@@ -41,5 +43,6 @@ class AbstractAgentsBroker(ListQueueBroker, ABC):
         :return: agent_task.wait_result(). Use return_value property to get result of agent_task
         """
         agent_task = await agent_task.kiq(json_params)
+
         return await agent_task.wait_result()
 
