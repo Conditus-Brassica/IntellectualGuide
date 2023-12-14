@@ -16,6 +16,8 @@ services:
     volumes:
       - $HOME/neo4j/data:/data
       - $HOME/neo4j/data:/import
+      - "D:/Data:/data"
+      - "D:/Import:/import"
   
   redisBroker:
     image: redis:latest
