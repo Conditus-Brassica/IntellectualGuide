@@ -125,14 +125,20 @@ class RoutingAgent(PureRoutingAgent):
         Interaction with OpenRoutService API
         :return:
         """
-        route = self._client_.directions(
-            coordinates=self._landmarks,
-            profile='driving-car',
-            format='geojson',
-            validate=False,
-            optimize_waypoints=True,
-            radiuses=[-1 for _ in range(len(self._landmarks))]
-        )
+        while True:
+            try:
+                route = self._client_.directions(
+                    coordinates=self._landmarks,
+                    profile='driving-car',
+                    format='geojson',
+                    validate=False,
+                    optimize_waypoints=True,
+                    radiuses=[-1 for _ in range(len(self._landmarks))]
+                )
+                break
+            except TypeError:
+                await logger.error("ORS route proplems")
+
         # await asyncio.sleep(5)
         return route['features'][0]['geometry']['coordinates']
 
