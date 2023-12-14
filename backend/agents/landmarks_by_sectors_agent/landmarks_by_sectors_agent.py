@@ -81,9 +81,15 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
         Shorten cache to the desired size.
         """
         if len(self._cache.get("map_sectors_names", [])) > self.CACHE_SECTORS_MAX_SIZE:
-            self._cache["map_sectors_names"] = self._cache["map_sectors_names"][-self.CACHE_SECTORS_MAX_SIZE:]
+            i = 0
+            while i <= (len(self._cache["map_sectors_names"]) - self.CACHE_SECTORS_MAX_SIZE):
+                self._cache["map_sectors_names"] = self._cache["map_sectors_names"].pop()
+                i += 1
         if len(self._cache.get("categories_names", [])) > self.CACHE_CATEGORIES_MAX_SIZE:
-            self._cache["categories_names"] = self._cache["categories_names"][-self.CACHE_CATEGORIES_MAX_SIZE:]
+            i = 0
+            while i <= (len(self._cache["categories_names"]) - self.CACHE_CATEGORIES_MAX_SIZE):
+                self._cache["categories_names"] = self._cache["categories_names"].pop()
+                i += 1
 
     def _get_sectors_in_sector(self, coords_of_sector: dict):
         data = json.load(open("backend/agents/landmarks_by_sectors_agent/new_squares.json"))
