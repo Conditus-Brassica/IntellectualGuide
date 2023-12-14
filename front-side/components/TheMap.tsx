@@ -136,7 +136,7 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
       try {
         const response = await fetch(`http://0.0.0.0:4444/api/v1/sector/points?tl_lat=${tl[0]}&tl_lng=${tl[1]}&br_lat=${br[0]}&br_lng=${br[1]}`);
         const data = await response.json();
-       console.log(data);
+        console.log(data);
 //         const data = {
 //           points: [{
 //             name: "name",

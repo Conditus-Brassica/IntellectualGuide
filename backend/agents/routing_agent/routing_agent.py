@@ -130,7 +130,8 @@ class RoutingAgent(PureRoutingAgent):
             profile='driving-car',
             format='geojson',
             validate=False,
-            optimize_waypoints=True
+            optimize_waypoints=True,
+            radiuses=[-1 for _ in range(len(self._landmarks))]
         )
         # await asyncio.sleep(5)
         return route['features'][0]['geometry']['coordinates']

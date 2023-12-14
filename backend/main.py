@@ -75,13 +75,16 @@ class RequestAgent:
                 if i['landmark']:
                     landmarks.append(
                         {
-                            "name": i['landmark']['name'],
+                            "name": i['landmark']['name'].capitalize(),
                             "lat": i['landmark']['latitude'],
                             "lng": i['landmark']['longitude'],
-                            "type": self.__convert_categories_from(i['categories_names'][0])
+                            "type": "none"
+                                # self.__convert_categories_from(i['categories_names'][0]) #TODO: lol
                         }
                     )
             pprint({"points": landmarks})
+
+
             return jsonify({"points": landmarks})
 
         @self.__app__.route("/api/v1/map/point", methods=["GET"])
@@ -205,7 +208,7 @@ class RequestAgent:
         random.shuffle(lst)
 
         lst = lst[:random.randint(5, len(lst) - 1)]
-
+        lst.append('Историко-культурные ценности Республики Беларусь')
         return lst
 
 
