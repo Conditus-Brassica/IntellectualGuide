@@ -67,7 +67,6 @@ class RoutingAgent(PureRoutingAgent):
 
         route = self._reverse_coordinates(route)
 
-
         self._landmarks = []
         return self._coordinates_wrap(route)
 
@@ -105,7 +104,7 @@ class RoutingAgent(PureRoutingAgent):
             main_points.append(route[-1])
 
         main_points = self._reverse_coordinates(main_points)
-
+        await logger.debug(f"main points arrr {main_points}")
         self._landmarks = []
         return self._coordinates_wrap(main_points)
 

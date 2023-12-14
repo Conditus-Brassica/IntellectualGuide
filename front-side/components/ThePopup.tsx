@@ -14,7 +14,7 @@ interface ThePopup {
 }
 
 const getCategories = async function () {
-    const response = await fetch(`http://192.168.129.238:4444/api/v1/map/categories`);
+    const response = await fetch(`http://0.0.0.0:4444/api/v1/map/categories`);
     const data: string[] = await response.json();
     
     return data

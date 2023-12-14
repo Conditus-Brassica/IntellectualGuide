@@ -1,19 +1,18 @@
 import asyncio
 import random
+from pprint import pprint
 
 import werkzeug.exceptions as wer_exp
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from quart import Quart, request, jsonify
+from quart_cors import cors
 from werkzeug.datastructures import ImmutableMultiDict as imd
 
-from backend.broker.broker_initializer import BROKER
+from backend.broker.agents_tasks.route_builder_task import build_route
+from backend.broker.agents_tasks.landmarks_by_sectors_agent_tasks import get_landmarks_in_sector_task
+
 from backend.db_categories import system_categories
 
-from backend.broker.agents_tasks.route_builder_task import build_route
 from backend.broker.abstract_agents_broker import AbstractAgentsBroker
-from backend.agents.crud_agent.crud_initializer import CRUD_AGENT
-
-
 
 
 class RequestAgent:
@@ -23,13 +22,13 @@ class RequestAgent:
     The response must be a list of landmarks data in the requested sector.
     """
 
-    def __init__(self, flask_app: Flask):
+    def __init__(self, flask_app: Quart):
         self.__app__ = flask_app
         self.__handle__()
 
     def __handle__(self):
         @self.__app__.route("/api/v1/sector/points", methods=["GET"])
-        def get_sector_points():
+        async def get_sector_points():
             """
             Method gets the request for receiving list
             of landmarks in a specific sector.
@@ -38,7 +37,6 @@ class RequestAgent:
             """
             received = request.args
             gotten_json = imd.to_dict(received)
-
             keys = gotten_json.keys()
 
             try:
@@ -51,14 +49,40 @@ class RequestAgent:
                 self.__app__.logger.error("get_sector_points() returned BadRequest")
                 return wer_exp.BadRequest().code
 
-            # TODO: task calling
+            print("gotten json sectors", gotten_json)
 
-            sending_json = {"points": [{"name": "name1",
-                                        "lat": 54.098865472796994,
-                                        "lng": 26.661071777343754,
-                                        "type": "museum"}]}
+            param = {
+                "TL": {
+                    "latitude": float(gotten_json['tl_lat']),
+                    "longitude": float(gotten_json['tl_lng'])
+                },
+                "BR": {
+                    "latitude": float(gotten_json['br_lat']),
+                    "longitude": float(gotten_json['br_lng'])
+                }
+            }
 
-            return jsonify(sending_json)
+            task = asyncio.create_task(
+                AbstractAgentsBroker.call_agent_task(get_landmarks_in_sector_task, param)
+            )
+
+            res = await task
+            res = res.return_value
+
+            print("sector res", res)
+            landmarks = list()
+            for i in res:
+                if i['landmark']:
+                    landmarks.append(
+                        {
+                            "name": i['landmark']['name'],
+                            "lat": i['landmark']['latitude'],
+                            "lng": i['landmark']['longitude'],
+                            "type": self.__convert_categories_from(i['categories_names'][0])
+                        }
+                    )
+            pprint({"points": landmarks})
+            return jsonify({"points": landmarks})
 
         @self.__app__.route("/api/v1/map/point", methods=["GET"])
         def get_point():
@@ -93,8 +117,6 @@ class RequestAgent:
                 self.__app__.logger.error("get_rout() returned BadRequest")
                 return wer_exp.BadRequest()
 
-            # TODO: task calling
-
             param = dict()
             param['user_login'] = ""
             param['start_end_points'] = {
@@ -117,7 +139,6 @@ class RequestAgent:
                 param['categories_names'] = curr
 
             print("param ", param)
-
 
             task = asyncio.create_task(
                 AbstractAgentsBroker.call_agent_task(
@@ -167,11 +188,14 @@ class RequestAgent:
 
         return system_cat_result
 
-    def __convert_categories_from(self):
+    def __convert_categories_from(self, category):
         """
         From system to front categories
         :return:
         """
+        for i in system_categories.keys():
+            if category == i.lower():
+                return system_categories[i]
 
     def __generate_cats(self):
         lst = list()
@@ -185,17 +209,8 @@ class RequestAgent:
         return lst
 
 
-async def main():
-    await BROKER.startup()
-    app = Flask(__name__)
-    cors = CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
+if __name__ == "__main__":
+    app = Quart(__name__)
+    app = cors(app, allow_origin="*")
     request_agent = RequestAgent(app)
     app.run(host="0.0.0.0", port=4444, debug=True)
-    await BROKER.shutdown()
-    await CRUD_AGENT.close()
-
-if __name__ == "__main__":
-    with asyncio.Runner() as runner:
-        runner.run(main())
-
-

@@ -134,27 +134,27 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
 
     const getPoints = async function (tl: any, br: any) {
       try {
-        // const response = await fetch(`https://example.com/data?tl_lat=${tl[0]}&tl_lng=${tl[1]}&dr_lat=${br[0]}&dr_lng=${br[1]}`);
-        // const data = await response.json();
-        // console.log(data);
-        const data = {
-          points: [{
-            name: "name",
-            lat: 54.098865472796994,
-            lng: 26.661071777343754,
-            type: "museum"
-          }, {
-            name: "name1",
-            lat: 54.098865472796994,
-            lng: 26.761071777343754,
-            type: "restaurant"
-          }, {
-            name: "name2",
-            lat: 54.098865472796994,
-            lng: 26.861071777343754,
-            type: "river"
-          }]
-        }
+        const response = await fetch(`http://0.0.0.0:4444/api/v1/sector/points?tl_lat=${tl[0]}&tl_lng=${tl[1]}&br_lat=${br[0]}&br_lng=${br[1]}`);
+        const data = await response.json();
+       console.log(data);
+//         const data = {
+//           points: [{
+//             name: "name",
+//             lat: 54.098865472796994,
+//             lng: 26.661071777343754,
+//             type: "museum"
+//           }, {
+//             name: "name1",
+//             lat: 54.098865472796994,
+//             lng: 26.761071777343754,
+//             type: "restaurant"
+//           }, {
+//             name: "name2",
+//             lat: 54.098865472796994,
+//             lng: 26.861071777343754,
+//             type: "river"
+//           }]
+//         }
 
         data.points.forEach(function (markerCoords: any) {
           const isDuplicate = drawnedMarkers.some(drawnedMarker => drawnedMarker.getLatLng().lat === markerCoords.lat && drawnedMarker.getLatLng().lng === markerCoords.lng);
@@ -178,9 +178,9 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
 
     async function getRoute(start: any, finish: any, cat: any) {
       try {
-        const response = await fetch(`http://192.168.129.238:4444/api/v1/map/route?start=${start}&finish=${finish}&catigories=${cat}`);
+        const response = await fetch(`http://0.0.0.0:4444/api/v1/map/route?start=${start}&finish=${finish}&catigories=${cat}`);
         var data = await response.json();
-//         console.log(cat)
+        console.log(cat)
 //         const data = {
 //           route: [
 //             [54.098865472796994, 26.661071777343754,],
