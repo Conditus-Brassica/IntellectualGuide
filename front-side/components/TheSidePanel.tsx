@@ -12,10 +12,28 @@ interface TheSidePanelInterface {
     targetCats:any;
 };
 
+
+
 const getCategories = async function () {
     const response = await fetch(`http://0.0.0.0:4444/api/v1/map/categories`);
     const data: string[] = await response.json();
-//     const data = [
+    const categories_dict = {
+        'Озёра': 'River',
+        'Историко-культурные ценности': 'Historical_and_cultural_values',
+        'Природные места':'Natural_places',
+        'Активный отдых': 'Leisure',
+        'Мемориальные комплексы': 'Memorial_complexes',
+        'Музеи':'Museums',
+        'Театры':'Theatres',
+        'Сады и парки':'Gardens_and_Parks',
+    },
+    
+    let new_data=[] 
+    data.forEach(element => {
+        new_data.push(categories_dict[element])        
+    });
+
+    //     const data = [
 //         'museum', 'restaurant', 'river'
 //     ]
 

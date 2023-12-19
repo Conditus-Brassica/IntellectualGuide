@@ -84,21 +84,6 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
           iconUrl: 'green_icon.svg',
           iconSize: [30, 30],
         }),
-      "museum":
-        L.icon({
-          iconUrl: 'green_icon.svg',
-          iconSize: [30, 30],
-        }),
-      "restaurant":
-        L.icon({
-          iconUrl: 'blue_icon.svg',
-          iconSize: [30, 30],
-        }),
-      "river":
-        L.icon({
-          iconUrl: 'red_icon.svg',
-          iconSize: [30, 30],
-        }),
       "start":
         L.icon({
           iconUrl: 'self.png',
@@ -162,6 +147,7 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
           if (!isDuplicate) {
             var marker = new CustomMarker([markerCoords.lat, markerCoords.lng], { icon: icons[markerCoords.type], type: markerCoords.type, name: markerCoords.name });
             marker.addTo(map);
+            marker.bindPopup(markerCoords.name);
             drawnedMarkers.push(marker);
             marker.on('click', onMarkerClick);
           };
@@ -207,10 +193,10 @@ const TheMap: React.FC<TheMapInterface> = ({ setMapData, markerState, setMarkerS
 //           ]
 //         };
 
-        const latLngs = data.route.map(coords => L.latLng(coords[0], coords[1]));
+        const latLngs = data.route.map((coords: number[]) => L.latLng(coords[0], coords[1]));
         const route = L.polyline(latLngs).addTo(map);
 
-        data.points.forEach(point => {
+        data.points.forEach((point: { latlng: L.LatLngExpression; name: ((layer: L.Layer) => L.Content) | L.Content | L.Popup; }) => {
           const marker = new CustomMarker(point.latlng, { icon: icons['none'], type: 'none', name: point.name}).addTo(map);
           marker.bindPopup(point.name);
           drawnedMarkers.push(marker);
