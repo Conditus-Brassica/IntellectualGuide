@@ -251,7 +251,7 @@ class RecommendationsAgent(PureRecommendationsAgent):
             maximum_amount_of_recommendations = json_params["maximum_amount_of_recommendations"]
             maximum_amount_of_additional_recommendations = json_params["maximum_amount_of_additional_recommendations"]
             json_params.pop("maximum_amount_of_recommendations")
-            json_params.pop("amount_of_additional_recommendations_for_point")
+            json_params.pop("maximum_amount_of_additional_recommendations")
         except ValidationError as ex:
             await logger.error(f"find_recommendations_for_coordinates_and_categories, ValidationError({ex.args[0]})")
             return []  # raise ValidationError
