@@ -46,7 +46,9 @@ find_recommendations_for_coordinates_and_categories = \
             },
             "user_login": {"type": "string"},
             "amount_of_recommendations_for_point": {"type": "number"},
+            "amount_of_additional_recommendations_for_point": {"type": "number"},
             "maximum_amount_of_recommendations": {"type": "number"},
+            "maximum_amount_of_additional_recommendations": {"type": "number"},
             "optional_limit": {"type": ["number", "null"]},
         },
         "required": [
@@ -54,7 +56,9 @@ find_recommendations_for_coordinates_and_categories = \
             "categories_names",
             "user_login",
             "amount_of_recommendations_for_point",
-            "maximum_amount_of_recommendations"
+            "amount_of_additional_recommendations_for_point",
+            "maximum_amount_of_recommendations",
+            "maximum_amount_of_additional_recommendations"
         ],
         "additionalProperties": False
  }
