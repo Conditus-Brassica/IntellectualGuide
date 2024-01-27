@@ -80,7 +80,6 @@ class RecommendationsAgent(PureRecommendationsAgent):
             if a_priori_recommended[i]["recommendation"]
         ]
 
-
     @staticmethod
     def _remove_nones_from_kb_result(a_priori_recommended: List) -> None:
         """Changes list"""
@@ -91,6 +90,15 @@ class RecommendationsAgent(PureRecommendationsAgent):
                 a_priori_recommended.pop(i)
                 len_bound -= 1
                 continue
+            else:
+                j = 0
+                additional_recommendations_len_bound = len(a_priori_recommended[i]["additional_recommendations"])
+                while j <= additional_recommendations_len_bound:
+                    if a_priori_recommended[i]["additional_recommendations"][0]["recommendation"] is None:
+                        a_priori_recommended[i]["additional_recommendations"].pop(j)
+                        additional_recommendations_len_bound -= 1
+                        continue
+                    j += 1
             i += 1
 
     @staticmethod
@@ -102,6 +110,36 @@ class RecommendationsAgent(PureRecommendationsAgent):
         if left_landmark["longitude"] != right_landmark["longitude"]:
             return False
         return True
+
+    @staticmethod
+    def _remove_duplicates_from_additional_recommendations(
+            a_priori_recommended: List, this_index: int, other_index: int
+    ):
+        i = 0
+        this_additional_recommendations_len = len(a_priori_recommended[this_index]["additional_recommendations"])
+        while i < this_additional_recommendations_len:
+            j = 0
+            other_additional_recommendations_len = len(
+                a_priori_recommended[other_index]["additional_recommendations"]
+            )
+            while j < other_additional_recommendations_len:
+                if RecommendationsAgent._are_the_same(
+                        a_priori_recommended[this_index]["additional_recommendations"][i]["recommendation"],
+                        a_priori_recommended[other_index]["additional_recommendations"][j]["recommendation"]
+                ):
+                    if (
+                            a_priori_recommended[this_index]["additional_recommendations"][i]["distance"] <=
+                            a_priori_recommended[other_index]["additional_recommendations"][j]["distance"]
+                    ):
+                        a_priori_recommended[other_index]["additional_recommendations"].pop(j)
+                        other_additional_recommendations_len -= 1
+                        continue
+                    else:
+                        a_priori_recommended[this_index]["additional_recommendations"].pop(i)
+                        i -= 1
+                        break
+                j += 1
+            i += 1
 
     @staticmethod
     def _remove_duplicates_from_kb_result(a_priori_recommended: List):
@@ -126,6 +164,7 @@ class RecommendationsAgent(PureRecommendationsAgent):
                         i -= 1  # To make increase == 0 (i + 1 - 1 == i)
                         break
                 else:
+                    RecommendationsAgent._remove_duplicates_from_additional_recommendations(a_priori_recommended, i, j)
                     j += 1
             i += 1
 
@@ -206,11 +245,13 @@ class RecommendationsAgent(PureRecommendationsAgent):
         if json_params["maximum_amount_of_recommendations"] and json_params["maximum_amount_of_recommendations"] <= 0:
             raise ValidationError("maximum_amount_of_recommendations can\'t be less or equal to zero")
 
-    async def find_recommendations_for_coordinates_and_categories(self, json_params: Dict):
+    async def find_recommendations_for_coordinates_and_categories(self, json_params: Dict):  # TODO change json_params
         try:
             self._json_params_validation(json_params)
             maximum_amount_of_recommendations = json_params["maximum_amount_of_recommendations"]
+            maximum_amount_of_additional_recommendations = json_params["maximum_amount_of_additional_recommendations"]
             json_params.pop("maximum_amount_of_recommendations")
+            json_params.pop("amount_of_additional_recommendations_for_point")
         except ValidationError as ex:
             await logger.error(f"find_recommendations_for_coordinates_and_categories, ValidationError({ex.args[0]})")
             return []  # raise ValidationError
@@ -247,6 +288,7 @@ class RecommendationsAgent(PureRecommendationsAgent):
             user_categories_preference,
             maximum_amount_of_recommendations
         )
+        # TODO add additional recommendations
         return [
             {"recommendation": a_priori_recommended[index]["recommendation"]}
             for index in a_posteriori_recommended_indexes

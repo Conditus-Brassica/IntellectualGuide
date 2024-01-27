@@ -252,10 +252,17 @@ get_recommendations_by_coordinates_and_categories = \
             },
             "user_login": {"type": "string"},
             "amount_of_recommendations_for_point": {"type": "number"},
+            "amount_of_additional_recommendations_for_point": {"type": "number"},
             "optional_limit": {"type": ["null", "number"]}
 
         },
-        "required": ["coordinates_of_points", "categories_names", "amount_of_recommendations_for_point", "user_login"],
-        "maxProperties": 5,
+        "required": [
+            "coordinates_of_points",
+            "categories_names",
+            "amount_of_recommendations_for_point",
+            "amount_of_additional_recommendations_for_point",
+            "user_login"
+        ],
+        "maxProperties": 6,
         "additionalProperties": False
     }
