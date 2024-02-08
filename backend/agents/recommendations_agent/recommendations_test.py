@@ -50,7 +50,9 @@ if __name__ == '__main__':
                     "user_login": "user",
                     "amount_of_recommendations_for_point": 3,
                     "optional_limit": 20,
-                    "maximum_amount_of_recommendations": 15
+                    "maximum_amount_of_recommendations": 15,
+                    "amount_of_additional_recommendations_for_point": 3,
+                    "maximum_amount_of_additional_recommendations": 1
                 }
             )
         )

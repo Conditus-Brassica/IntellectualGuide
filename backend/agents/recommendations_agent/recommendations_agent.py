@@ -341,8 +341,8 @@ class RecommendationsAgent(PureRecommendationsAgent):
             j = 0
             for recommended_index in recommended_indexes:
                 if self._are_the_same(
-                    recommendations[recommended_index],
-                    recommendations[additional_indexes[i][0]]["additional_recommendations"][additional_indexes[i][1]]
+                    recommendations[recommended_index]["recommendation"],
+                    recommendations[additional_indexes[i][0]]["additional_recommendations"][additional_indexes[i][1]]["recommendation"]
                 ):
                     recommendations[additional_indexes[i][0]]["additional_recommendations"].pop(
                         [additional_indexes[i][1]]
@@ -379,6 +379,6 @@ class RecommendationsAgent(PureRecommendationsAgent):
             f"Recommendations agent, find_recommendations_for_coordinates_and_categories, "
             f"a_priori_recommended after duplicates removed: {a_priori_recommended}"
         )
-        return self._find_recommendations_for_coordinates_and_categories(
+        return await self._find_recommendations_for_coordinates_and_categories(
             a_priori_recommended, maximum_amount_of_recommendations, maximum_amount_of_additional_recommendations
         )
