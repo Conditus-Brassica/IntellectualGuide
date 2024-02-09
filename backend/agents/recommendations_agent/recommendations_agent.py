@@ -94,8 +94,8 @@ class RecommendationsAgent(PureRecommendationsAgent):
             else:
                 j = 0
                 additional_recommendations_len_bound = len(a_priori_recommended[i]["additional_recommendations"])
-                while j <= additional_recommendations_len_bound:
-                    if a_priori_recommended[i]["additional_recommendations"][0]["recommendation"] is None:
+                while j < additional_recommendations_len_bound:
+                    if a_priori_recommended[i]["additional_recommendations"][j]["recommendation"] is None:
                         a_priori_recommended[i]["additional_recommendations"].pop(j)
                         additional_recommendations_len_bound -= 1
                         continue
@@ -315,7 +315,8 @@ class RecommendationsAgent(PureRecommendationsAgent):
             result[i]["recommendation"] = recommendations[index]["recommendation"]
             i += 1
         for index in additional_indexes:
-            result[i]["recommendation"] = recommendations[index[0]]["additional_recommendations"][index[1]]
+            result[i]["recommendation"] = recommendations[index[0]]["additional_recommendations"][index[1]]["recommendation"]
+            i += 1
         return result
 
     async def _find_recommendations_for_coordinates_and_categories(
@@ -338,19 +339,18 @@ class RecommendationsAgent(PureRecommendationsAgent):
         i = 0
         additional_bound = len(additional_indexes)
         while i < additional_bound:
-            j = 0
             for recommended_index in recommended_indexes:
                 if self._are_the_same(
                     recommendations[recommended_index]["recommendation"],
                     recommendations[additional_indexes[i][0]]["additional_recommendations"][additional_indexes[i][1]]["recommendation"]
                 ):
                     recommendations[additional_indexes[i][0]]["additional_recommendations"].pop(
-                        [additional_indexes[i][1]]
+                        additional_indexes[i][1]
                     )
                     additional_indexes.pop(i)
+                    additional_bound -= 1
                     i -= 1
                     break
-                j += 1
             i += 1
         return self._wrap_recommendations_result(recommendations, recommended_indexes, additional_indexes)
 
@@ -364,6 +364,8 @@ class RecommendationsAgent(PureRecommendationsAgent):
         except ValidationError as ex:
             await logger.error(f"find_recommendations_for_coordinates_and_categories, ValidationError({ex.args[0]})")
             return []  # raise ValidationError
+        import datetime
+        a = datetime.datetime
 
         a_priori_recommended = await self._a_priori_recommended_by_coordinates_and_categories(json_params)
         #a_priori_recommended = self._outdated_remove_nones_from_kb_result(a_priori_recommended)
