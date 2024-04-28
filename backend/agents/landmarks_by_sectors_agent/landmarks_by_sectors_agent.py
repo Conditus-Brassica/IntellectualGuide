@@ -27,10 +27,10 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
         self._cache = {"map_sectors_names": set(), "categories_names": set()}
         self._result = {}
 
-    async def get_landmarks_in_sector(self, jsom_params: dict):
+    async def get_landmarks_in_sector(self, json_params: dict):
         # Check if format of dictionary is right using validator
-        await self._coords_of_square_validation(jsom_params)
-        squares_in_sector = self._get_sectors_in_sector(jsom_params)
+        await self._coords_of_square_validation(json_params)
+        squares_in_sector = self._get_sectors_in_sector(json_params)
         # Comparing with cache, then updating cache
         squares_in_sector["map_sectors_names"] = [
             i for i in squares_in_sector["map_sectors_names"] if i not in self._cache["map_sectors_names"]
@@ -47,10 +47,10 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
             self._result = result_task.return_value
         return self._result
 
-    async def get_landmarks_by_categories_in_sector(self, jsom_params: dict):
-        await self._coords_of_square_with_categories_validation(jsom_params)
-        squares_in_sector = self._get_sectors_in_sector(jsom_params)
-        squares_in_sector["categories_names"] = jsom_params["categories_names"]
+    async def get_landmarks_by_categories_in_sector(self, json_params: dict):
+        await self._coords_of_square_with_categories_validation(json_params)
+        squares_in_sector = self._get_sectors_in_sector(json_params)
+        squares_in_sector["categories_names"] = json_params["categories_names"]
         squares_in_sector["map_sectors_names"] = [
             i for i in squares_in_sector["map_sectors_names"] if i not in self._cache["map_sectors_names"]
         ]
@@ -94,14 +94,14 @@ class LandmarksBySectorsAgent(PURELandmarksBySectorsAgent):
     def _get_sectors_in_sector(self, coords_of_sector: dict):
         data = json.load(open("backend/agents/landmarks_by_sectors_agent/new_squares.json"))
         squares_in_sector = {"map_sectors_names": []}
-        for element in data:
-            if (coords_of_sector["TL"]["longitude"] - self.LONG_DIFFERENCE <= element["TL"]["longitude"] <
-                element["BR"]["longitude"] <=
+        for index in range(0, len(data)):
+            if (coords_of_sector["TL"]["longitude"] - self.LONG_DIFFERENCE <= data[index]["TL"]["longitude"] <
+                data[index]["BR"]["longitude"] <=
                 coords_of_sector["BR"]["longitude"] + self.LONG_DIFFERENCE) and (
-                    coords_of_sector["BR"]["latitude"] - self.LAT_DIFFERENCE <= element["BR"]["latitude"] <
-                    element["TL"]["latitude"] <=
+                    coords_of_sector["BR"]["latitude"] - self.LAT_DIFFERENCE <= data[index]["BR"]["latitude"] <
+                    data[index]["TL"]["latitude"] <=
                     coords_of_sector["TL"]["latitude"] + self.LAT_DIFFERENCE):
-                squares_in_sector["map_sectors_names"].append(element["name"])
+                squares_in_sector["map_sectors_names"].append(data[index]["name"])
         return squares_in_sector
 
     @staticmethod
